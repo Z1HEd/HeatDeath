@@ -1,14 +1,16 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Ship))]
 public abstract class ModuleBase: MonoBehaviour
 {
     protected Ship ship;
-    public virtual void Start()
+    public virtual void OnEnable()
     {
         ship = GetComponent<Ship>();
+        ship.AddModule(this);
     }
-    public virtual void FixedUpdate() {}
-    public virtual void Update(){}
+    protected virtual void OnDestroy()
+    {
+        ship.moduleManager.RemoveModule(this);
+    }
 }

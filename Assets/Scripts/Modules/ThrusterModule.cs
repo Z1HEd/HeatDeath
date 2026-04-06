@@ -1,23 +1,17 @@
 using UnityEngine;
-
-
 public class ThrusterModule : MovementModule
 {
     [Header("Thruster Settings")]
     [SerializeField] private float thrust = 0.5f;
     [SerializeField] private float maxSpeed = 10.0f;
-    [SerializeField] private float stopDistance = 0.1f;
-    [SerializeField, Range(0f, 1f)] private float brakingSafety = 0.9f;
     
-
     [Header("Internal")]
     [SerializeField] private float thrustScale = 100.0f;
+    [SerializeField] private float stopDistance = 0.1f;
+    [SerializeField, Range(0f, 1f)] private float brakingSafety = 0.9f;
 
-    public override void FixedUpdate()
+    public void FixedUpdate()
     {
-        if (body == null)
-            return;
-
         Vector2 toTarget = targetPosition - body.position;
         float dist = toTarget.magnitude;
 

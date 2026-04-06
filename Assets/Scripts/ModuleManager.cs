@@ -12,4 +12,14 @@ public class ModuleManager : MonoBehaviour
     {
         ship = GetComponent<Ship>();
     }
+    public void AddModule(ModuleBase module)
+    {
+        if (module is MovementModule && !movementModules.Contains(module as MovementModule))
+            movementModules.Add(module as MovementModule);
+    }
+    public void RemoveModule(ModuleBase module)
+    {
+        if (module is MovementModule && movementModules.Contains(module as MovementModule))
+            movementModules.Remove(module as MovementModule);
+    }
 }

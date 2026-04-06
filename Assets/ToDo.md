@@ -2,11 +2,12 @@ __# Heat Death To-Do List __
 
 - ✅Add basic modules system
 - ✅Add player movement
-- Add basic enemy spawning, enemy follow player/keep distance modules
+- ✅Add enemy follow player/keep distance modules
 - Add HP/Shields mechanic
 - Add ramming mechanic, damage system
 - Add cannon and shotgun modules
-- Add levels, scraps and experience mechanics
+- Add levels and scraps mechanics
+- Add basic enemy spawning
 - Add basic upgrades on level up, pause to choose
 - Add per-module upgrades (stackable and unique, different rarities)
 
