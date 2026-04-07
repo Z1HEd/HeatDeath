@@ -1,0 +1,52 @@
+:root {
+    font-size: 16px;
+}
+
+.hud-container {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: 300px;
+    background-color: rgba(64, 64, 64, 0.7);
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding: 8px 12px;
+    gap: 8px;
+}
+
+.bar-section {
+    flex-direction: column;
+    gap: 0;
+}
+
+.bar-background {
+    height: 12px;
+    background-color: rgb(30, 30, 30);
+    border: 1px solid rgb(100, 100, 100);
+    border-radius: 2px;
+    flex-direction: row;
+    position: relative;
+}
+
+.bar-fill {
+    height: 100%;
+    width: 0%;
+}
+
+.health-bar {
+    background-color: rgb(204, 41, 41);
+}
+
+.shield-bar {
+    background-color: rgb(41, 128, 204);
+}
+
+.bar-text {
+    font-size: 11px;
+    color: white;
+    position: absolute;
+    left: 4px;
+    top: -2px;
+    -unity-text-align: middle-left;
+}

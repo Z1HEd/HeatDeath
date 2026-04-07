@@ -3,8 +3,9 @@ __# Heat Death To-Do List __
 - ✅Add basic modules system
 - ✅Add player movement
 - ✅Add enemy follow player/keep distance modules
-- Add HP/Shields mechanic
-- Add ramming mechanic, damage system
+- ✅Add HP/Shields mechanic
+- ✅Add ramming mechanic, damage system
+- ✅Add basic hp/shields UI
 - Add cannon and shotgun modules
 - Add levels and scraps mechanics
 - Add basic enemy spawning

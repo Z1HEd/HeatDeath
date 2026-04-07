@@ -12,6 +12,9 @@ public class ThrusterModule : MovementModule
 
     public void FixedUpdate()
     {
+        if (ship != null && ship.IsKnockedBack)
+            return;
+
         Vector2 toTarget = targetPosition - body.position;
         float dist = toTarget.magnitude;
 
