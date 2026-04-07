@@ -6,9 +6,11 @@ public abstract class MovementModule : ModuleBase
     [SerializeField] 
     public Vector2 targetPosition;
     protected Rigidbody2D body;
-    public void Start()
+    protected override void Start()
     {
+        base.Start();
         body = GetComponent<Rigidbody2D>();
         targetPosition = body.position;
     }
-}   
+}
+   

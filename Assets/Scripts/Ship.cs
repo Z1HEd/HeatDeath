@@ -82,15 +82,21 @@ public class Ship : MonoBehaviour, IHittable
         if (shipRigidbody == null || hitter.KnockbackPower <= 0f)
             return;
 
-        ContactPoint2D contact = collision.GetContact(0);
-        Vector2 direction = contact.normal;
-        if (direction.sqrMagnitude <= 0f)
+        Vector2 direction = Vector2.up;
+
+        if (collision != null)
         {
-            direction = (Vector2)(transform.position - collision.transform.position).normalized;
+            ContactPoint2D contact = collision.GetContact(0);
+            direction = contact.normal;
             if (direction.sqrMagnitude <= 0f)
             {
-                direction = Vector2.up;
+                direction = (Vector2)(transform.position - collision.transform.position).normalized;
             }
+        }
+
+        if (direction.sqrMagnitude <= 0f)
+        {
+            direction = Vector2.up;
         }
 
         shipRigidbody.AddForce(-direction * hitter.KnockbackPower, ForceMode2D.Impulse);
@@ -111,7 +117,7 @@ public class Ship : MonoBehaviour, IHittable
     }
     public void SetTargetPosition(Vector3 targetPosition)
     {
-        foreach (var module in moduleManager.movementModules)
+        foreach (var module in moduleManager.MovementModules)
         {
             module.targetPosition = targetPosition;
         }

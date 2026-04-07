@@ -6,7 +6,8 @@ __# Heat Death To-Do List __
 - ✅Add HP/Shields mechanic
 - ✅Add ramming mechanic, damage system
 - ✅Add basic hp/shields UI
-- Add cannon and shotgun modules
+- ✅Add cannon and shotgun modules
+- Add world bounds
 - Add levels and scraps mechanics
 - Add basic enemy spawning
 - Add basic upgrades on level up, pause to choose
@@ -18,6 +19,8 @@ __# Heat Death To-Do List __
 - - Laser
 - - Tesla
 - - Mines
+
+- Make weapon modules display properly on the ship module
 
 - Add more general modules:
 - - TODO: Make up more general modules

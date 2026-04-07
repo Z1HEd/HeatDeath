@@ -4,11 +4,12 @@ using UnityEngine;
 public abstract class ModuleBase: MonoBehaviour
 {
     protected Ship ship;
-    public virtual void OnEnable()
+    protected virtual void Start()
     {
         ship = GetComponent<Ship>();
         ship.AddModule(this);
     }
+
     protected virtual void OnDestroy()
     {
         ship.moduleManager.RemoveModule(this);
