@@ -98,6 +98,6 @@ ServerData
 # Auto-generated scenes by play mode tests
 [Aa]ssets[Ii]nit[Tt]est[Ss]cene.unity
 Assembly-CSharp.csproj
-.vscode/settings.json
+.vscode
 HeatDeath.slnx
 Assembly-CSharp.csproj
