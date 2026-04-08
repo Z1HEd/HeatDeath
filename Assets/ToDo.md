@@ -9,7 +9,7 @@ __# Heat Death To-Do List __
 - ✅Add cannon and shotgun modules
 - ✅Add world bounds
 - ✅Add levels and scraps mechanics
-- Add basic enemy spawning
+- ✅Add basic enemy spawning
 - Add basic upgrades on level up, pause to choose
 - Add per-module upgrades (stackable and unique, different rarities)
 
