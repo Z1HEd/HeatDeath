@@ -6,6 +6,7 @@ using System;
 public class Ship : MonoBehaviour, IHittable
 {
     public Action OnHPShieldsChanged;
+    public Action OnDeath;
     [SerializeField]
     public ModuleManager moduleManager;
     [SerializeField]
@@ -105,6 +106,7 @@ public class Ship : MonoBehaviour, IHittable
 
     public virtual void Die()
     {
+        OnDeath?.Invoke();
         Destroy(gameObject);
     }
     public void AddModule(ModuleBase module)

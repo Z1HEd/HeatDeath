@@ -11,7 +11,7 @@ public class RammingModule : ModuleBase, IHitter
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject == null)
+        if (collision.gameObject == null || collision.gameObject.layer == gameObject.layer)
             return;
 
         var hittable = collision.gameObject.GetComponent<IHittable>();

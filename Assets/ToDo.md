@@ -8,7 +8,7 @@ __# Heat Death To-Do List __
 - ✅Add basic hp/shields UI
 - ✅Add cannon and shotgun modules
 - ✅Add world bounds
-- Add levels and scraps mechanics
+- ✅Add levels and scraps mechanics
 - Add basic enemy spawning
 - Add basic upgrades on level up, pause to choose
 - Add per-module upgrades (stackable and unique, different rarities)
@@ -29,6 +29,8 @@ __# Heat Death To-Do List __
 
 - Add more enemies:
 - - TODO: Make up more enemy types
+
+- Update enemy spawning system
 
 - Add 3 base ships to choose from
 

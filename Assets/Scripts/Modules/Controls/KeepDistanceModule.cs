@@ -6,6 +6,7 @@ public class KeepDistanceModule : ControlModule
     public float distanceMax = 6;
     public void FixedUpdate()
     {
+        if ((ship as Enemy).Player == null) return;
         var playerPosition = (ship as Enemy).Player.transform.position;
         var fromPlayer = transform.position - playerPosition;
 

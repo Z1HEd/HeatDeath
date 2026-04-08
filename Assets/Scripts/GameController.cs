@@ -9,6 +9,8 @@ public class GameController : MonoBehaviour
     private int currentLevel = 1;
     [SerializeField]
     private float currentXP = 0f;
+    [SerializeField]
+    private GameObject gameUIPrefab;
     
     public Action OnXPChanged;
     public Action OnLevelChanged;
@@ -27,21 +29,17 @@ public class GameController : MonoBehaviour
             return;
         }
         instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
-    public static GameController Instance
+    private void Start()
     {
-        get
+        if (gameUIPrefab != null)
         {
-            if (instance == null)
-            {
-                var go = new GameObject("GameController");
-                instance = go.AddComponent<GameController>();
-            }
-            return instance;
+            Instantiate(gameUIPrefab);
         }
     }
+
+    public static GameController Instance => instance;
 
     public void AddXP(float xpAmount)
     {
@@ -66,6 +64,6 @@ public class GameController : MonoBehaviour
 
     private float CalculateXPRequiredForLevel(int level)
     {
-        return 10f * level;
+        return 10f * (level-1);
     }
 }
