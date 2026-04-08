@@ -10,6 +10,9 @@ public class GameUIController : MonoBehaviour
     private VisualElement shieldFill;
     private Label healthText;
     private Label shieldText;
+    private VisualElement xpFill;
+    private Label xpText;
+    private Label levelText;
 
     private void OnEnable()
     {
@@ -21,6 +24,9 @@ public class GameUIController : MonoBehaviour
         shieldFill = root.Q<VisualElement>("ShieldFill");
         healthText = root.Q<Label>("HealthText");
         shieldText = root.Q<Label>("ShieldText");
+        xpFill = root.Q<VisualElement>("XPFill");
+        xpText = root.Q<Label>("XPText");
+        levelText = root.Q<Label>("LevelText");
 
         var playerObject = GameObject.FindGameObjectWithTag("Player");
         if (playerObject == null) return;
@@ -29,8 +35,12 @@ public class GameUIController : MonoBehaviour
         if (playerShip == null) return;
         
         playerShip.OnHPShieldsChanged += UpdateBars;
-        UpdateBars();
+        GameController.Instance.OnXPChanged += UpdateXPBar;
+        GameController.Instance.OnLevelChanged += UpdateLevelText;
         
+        UpdateBars();
+        UpdateXPBar();
+        UpdateLevelText();
     }
 
     private void OnDisable()
@@ -38,6 +48,11 @@ public class GameUIController : MonoBehaviour
         if (playerShip != null)
         {
             playerShip.OnHPShieldsChanged -= UpdateBars;
+        }
+        if (GameController.Instance != null)
+        {
+            GameController.Instance.OnXPChanged -= UpdateXPBar;
+            GameController.Instance.OnLevelChanged -= UpdateLevelText;
         }
     }
 
@@ -67,5 +82,20 @@ public class GameUIController : MonoBehaviour
         float fillPercent = maxShields > 0 ? currentShields / maxShields : 0;
         shieldFill.style.width = Length.Percent(Mathf.Clamp01(fillPercent) * 100f);
         shieldText.text = $"{currentShields:F0}/{maxShields}";
+    }
+
+    private void UpdateXPBar()
+    {
+        float currentXP = GameController.Instance.CurrentXP;
+        float xpRequired = GameController.Instance.XPRequiredForNextLevel;
+
+        float fillPercent = xpRequired > 0 ? currentXP / xpRequired : 0;
+        xpFill.style.width = Length.Percent(Mathf.Clamp01(fillPercent) * 100f);
+        xpText.text = $"{currentXP:F0}/{xpRequired:F0}";
+    }
+
+    private void UpdateLevelText()
+    {
+        levelText.text = $"Level {GameController.Instance.CurrentLevel}";
     }
 }

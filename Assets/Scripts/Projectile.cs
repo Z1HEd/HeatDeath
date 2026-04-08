@@ -29,20 +29,19 @@ public class Projectile : MonoBehaviour, IHitter
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log($"Projectile hit: {collision.gameObject.name}");
         if (collision.gameObject == null)
             return;
 
         var hittable = collision.GetComponent<IHittable>();
-        if (hittable != null)
+        if (hittable == null) return;
+
+        hittable.Hit(this);
+        if (collision.GetComponent<Rigidbody2D>() != null)
         {
-            hittable.Hit(this);
-            if (collision.GetComponent<Rigidbody2D>() != null)
-            {
-                // Store collision for knockback that might be applied
-                hittable.ApplyKnockback(this, null);
-            }
-            Destroy(gameObject);
+            // Store collision for knockback that might be applied
+            hittable.ApplyKnockback(this, null);
         }
+        Destroy(gameObject);
+
     }
 }

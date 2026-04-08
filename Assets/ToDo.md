@@ -7,7 +7,7 @@ __# Heat Death To-Do List __
 - ✅Add ramming mechanic, damage system
 - ✅Add basic hp/shields UI
 - ✅Add cannon and shotgun modules
-- Add world bounds
+- ✅Add world bounds
 - Add levels and scraps mechanics
 - Add basic enemy spawning
 - Add basic upgrades on level up, pause to choose

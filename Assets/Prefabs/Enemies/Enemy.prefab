@@ -199,6 +199,7 @@ MonoBehaviour:
   shieldRegen: 0
   knockbackFreezeDuration: 0.15
   _player: {fileID: 0}
+  xpReward: 2
 --- !u!114 &4564847529224197787
 MonoBehaviour:
   m_ObjectHideFlags: 0

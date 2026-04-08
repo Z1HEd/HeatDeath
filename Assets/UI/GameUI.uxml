@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/Style.uss?fileID=7433441132597879392&amp;guid=455ad7f7bf01ad84b8487fb033edc018&amp;type=3#Style"/>
     <ui:VisualElement class="hud-container" style="left: 0; right: 0; width: auto; bottom: 0; justify-content: center; align-content: auto;">
-        <ui:VisualElement class="bar-section">
+        <ui:VisualElement class="bar-section" style="margin-bottom: 0;">
             <ui:VisualElement class="bar-background">
                 <ui:VisualElement name="ShieldFill" class="bar-fill shield-bar" style="-unity-text-align: upper-center;"/>
                 <ui:Label name="ShieldText" text="100/100" class="bar-text" style="font-size: 10px; -unity-paragraph-spacing: 0; height: 12px; top: -4px; left: 0; -unity-text-align: middle-center; width: 289px;"/>
@@ -10,8 +10,17 @@
         <ui:VisualElement class="bar-section" style="height: 18px;">
             <ui:VisualElement class="bar-background" style="height: 20px;">
                 <ui:VisualElement name="HealthFill" class="bar-fill health-bar" style="height: 100%; -unity-text-outline-width: 0; width: 50%; align-items: stretch; align-self: flex-start;"/>
-                <ui:Label name="HealthText" text="100/100" class="bar-text" style="height: 12px; width: 289px; font-size: 10px; top: auto; -unity-text-align: middle-center; left: auto; flex-grow: 0; -unity-text-outline-width: 0;"/>
+                <ui:Label name="HealthText" text="100/100" class="bar-text" style="height: 8px; width: 289px; font-size: 10px; top: auto; -unity-text-align: middle-center; left: auto; flex-grow: 0; -unity-text-outline-width: 0;"/>
             </ui:VisualElement>
         </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="XPPanel" class="xp-panel">
+        <ui:VisualElement class="bar-section" style="margin-bottom: 0;">
+            <ui:VisualElement class="bar-background" style="height: 15px;">
+                <ui:VisualElement name="XPFill" class="bar-fill xp-bar"/>
+                <ui:Label name="XPText" text="0/200" class="xp-text" style="padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; height: 17px;"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Label name="LevelText" text="Level 1" class="level-text" style="height: 8px;"/>
     </ui:VisualElement>
 </ui:UXML>

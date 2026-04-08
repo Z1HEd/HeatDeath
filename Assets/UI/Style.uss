@@ -12,18 +12,24 @@
     justify-content: flex-start;
     align-items: stretch;
     padding: 8px 12px;
-    gap: 8px;
 }
 
 .bar-section {
     flex-direction: column;
-    gap: 0;
+    margin-bottom: 8px;
 }
 
 .bar-background {
     height: 12px;
     background-color: rgb(30, 30, 30);
-    border: 1px solid rgb(100, 100, 100);
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgb(100, 100, 100);
+    border-right-color: rgb(100, 100, 100);
+    border-top-color: rgb(100, 100, 100);
+    border-bottom-color: rgb(100, 100, 100);
     border-radius: 2px;
     flex-direction: row;
     position: relative;
@@ -49,4 +55,37 @@
     left: 4px;
     top: -2px;
     -unity-text-align: middle-left;
+}
+
+.xp-text {
+    font-size: 11px;
+    color: white;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -2px;
+    -unity-text-align: middle-center;
+}
+
+.xp-bar {
+    background-color: rgb(200, 200, 200);
+}
+
+.xp-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(64, 64, 64, 0.7);
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding: 8px 12px;
+}
+
+.level-text {
+    font-size: 14px;
+    color: white;
+    -unity-text-align: middle-left;
+    margin-top: 4px;
 }

@@ -16,8 +16,9 @@ public class KeepDistanceModule : ControlModule
         {
             var desiredDistance = (distanceMin + distanceMax) / 2f;
             var targetPosition = playerPosition + fromPlayer.normalized * desiredDistance;
+            var clampedPosition = ClampPositionToCameraBounds(targetPosition);
 
-            ship.SetTargetPosition(targetPosition);
+            ship.SetTargetPosition(clampedPosition);
         }
     }
 }

@@ -103,9 +103,8 @@ public class Ship : MonoBehaviour, IHittable
         knockbackTimeRemaining = Mathf.Max(knockbackTimeRemaining, knockbackFreezeDuration);
     }
 
-    public void Die()
+    public virtual void Die()
     {
-        Debug.Log("Died");
         Destroy(gameObject);
     }
     public void AddModule(ModuleBase module)

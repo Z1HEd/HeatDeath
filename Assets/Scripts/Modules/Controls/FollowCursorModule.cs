@@ -10,6 +10,7 @@ public class FollowCursorModule : ControlModule
         mousePosition.y = -mousePosition.y;
         var worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
         worldPosition.y += Camera.main.orthographicSize*2;
-        ship.SetTargetPosition(worldPosition);
+        var clampedPosition = ClampPositionToCameraBounds(worldPosition);
+        ship.SetTargetPosition(clampedPosition);
     }
 }

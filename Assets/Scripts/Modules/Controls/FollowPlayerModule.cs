@@ -3,6 +3,8 @@ public class FollowPlayerModule : ControlModule
 {
     public void FixedUpdate()
     {
-        ship.SetTargetPosition((ship as Enemy).Player.gameObject.transform.position);
+        var playerPosition = (ship as Enemy).Player.gameObject.transform.position;
+        var clampedPosition = ClampPositionToCameraBounds(playerPosition);
+        ship.SetTargetPosition(clampedPosition);
     }
 }
