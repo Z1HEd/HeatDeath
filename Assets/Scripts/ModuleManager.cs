@@ -45,6 +45,20 @@ public class ModuleManager : MonoBehaviour
         return null;
     }
 
+    public HashSet<ModuleDefinition> GetInstalledModuleDefinitions()
+    {
+        var result = new HashSet<ModuleDefinition>();
+        foreach (var module in modules)
+        {
+            if (module == null || module.ModuleDefinition == null)
+                continue;
+
+            result.Add(module.ModuleDefinition);
+        }
+
+        return result;
+    }
+
     // Backward compatibility: expose movement modules through generic accessor
     public List<MovementModule> MovementModules => GetModules<MovementModule>();
 }

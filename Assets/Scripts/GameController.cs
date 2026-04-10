@@ -13,7 +13,7 @@ public class GameController : MonoBehaviour
     private GameObject gameUIPrefab;
     
     public Action OnXPChanged;
-    public Action OnLevelChanged;
+    public Action<int> OnLevelChanged;
     
     public int CurrentLevel => currentLevel;
     public float CurrentXP => currentXP;
@@ -47,23 +47,45 @@ public class GameController : MonoBehaviour
         Debug.Log($"Added {xpAmount} XP. Total: {currentXP}");
         OnXPChanged?.Invoke();
 
-        while (currentXP >= XPRequiredForNextLevel)
-        {
-            currentXP -= XPRequiredForNextLevel;
-            LevelUp();
-        }
+        ProcessLevelUpsFromCurrentXP();
     }
 
-    private void LevelUp()
+    public void Resume()
     {
-        currentLevel++;
-        Debug.Log($"Level Up! Now level {currentLevel}");
-        OnLevelChanged?.Invoke();
-        OnXPChanged?.Invoke();
+        Time.timeScale = 1f;
     }
 
     private float CalculateXPRequiredForLevel(int level)
     {
         return 10f * (level-1);
+    }
+
+    private void ProcessLevelUpsFromCurrentXP()
+    {
+        int levelsGained = 0;
+
+        while (currentXP >= XPRequiredForNextLevel)
+        {
+            currentXP -= XPRequiredForNextLevel;
+            currentLevel++;
+            levelsGained++;
+        }
+
+        if (levelsGained <= 0)
+            return;
+
+        Debug.Log($"Level Up! Gained {levelsGained} levels. Now level {currentLevel}");
+        OnLevelChanged?.Invoke(levelsGained);
+        OnXPChanged?.Invoke();
+
+        Time.timeScale = 0f;
+    }
+
+    private void OnDestroy()
+    {
+        if (instance == this)
+            instance = null;
+
+        Time.timeScale = 1f;
     }
 }

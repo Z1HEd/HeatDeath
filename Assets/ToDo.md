@@ -10,8 +10,8 @@ __# Heat Death To-Do List __
 - ✅Add world bounds
 - ✅Add levels and scraps mechanics
 - ✅Add basic enemy spawning
-- Add basic upgrades on level up, pause to choose
-- Add per-module upgrades (stackable and unique, different rarities)
+- ✅Add per-module upgrades (stackable and unique, different rarities), pause to choose
+- Fill the basic upgrade data, double check upgrade system, polish
 
 - Add more gun modules:
 - - Missile
@@ -28,11 +28,16 @@ __# Heat Death To-Do List __
 - Add new weapons and new modules obtaining at certain levels
 
 - Add more enemies:
-- - TODO: Make up more enemy types
+- - Basic AI, cannon weapon
+- - Basic AI, ramming weapon
+- 
 
 - Update enemy spawning system
 
 - Add 3 base ships to choose from
+
+- Add more upgrades
+- Weapon evolution system
 
 - Work on game flow: certain stages for each level, enemy spawn patterns
 - Basic pause menu

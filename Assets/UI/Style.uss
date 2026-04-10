@@ -89,3 +89,70 @@
     -unity-text-align: middle-left;
     margin-top: 4px;
 }
+
+.upgrade-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.72);
+    justify-content: center;
+    align-items: center;
+    display: none;
+}
+
+.upgrade-panel {
+    width: 420px;
+    background-color: rgb(28, 28, 28);
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-left-color: rgb(110, 110, 110);
+    border-right-color: rgb(110, 110, 110);
+    border-top-color: rgb(110, 110, 110);
+    border-bottom-color: rgb(110, 110, 110);
+    padding: 12px;
+}
+
+.upgrade-header {
+    color: white;
+    font-size: 16px;
+    margin-bottom: 8px;
+    -unity-text-align: middle-center;
+}
+
+.upgrade-option {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    white-space: normal;
+    min-height: 48px;
+    color: rgb(220, 220, 220);
+}
+
+.upgrade-option-common {
+    border-left-width: 2px;
+    border-left-color: rgb(130, 130, 130);
+}
+
+.upgrade-option-rare {
+    border-left-width: 2px;
+    border-left-color: rgb(72, 153, 255);
+    background-color: rgba(32, 58, 92, 0.45);
+    color: rgb(214, 235, 255);
+}
+
+.upgrade-option-epic {
+    border-left-width: 2px;
+    border-left-color: rgb(214, 118, 255);
+    background-color: rgba(78, 38, 92, 0.45);
+    color: rgb(243, 218, 255);
+}
+
+.upgrade-option-legendary {
+    border-left-width: 2px;
+    border-left-color: rgb(255, 189, 63);
+    background-color: rgba(98, 68, 24, 0.5);
+    color: rgb(255, 241, 209);
+}
