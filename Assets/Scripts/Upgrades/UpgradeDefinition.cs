@@ -9,7 +9,7 @@ public enum UpgradeRarity
     Legendary = 3
 }
 
-[CreateAssetMenu(fileName = "UpgradeDefinition", menuName = "HeatDeath/Upgrades/Upgrade Definition")]
+[CreateAssetMenu(fileName = "UpgradeDefinition", menuName = "HeatDeath/Upgrade Definition")]
 public class UpgradeDefinition : ScriptableObject
 {
     [SerializeField] private string displayName;

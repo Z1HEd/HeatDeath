@@ -10,11 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 76beddaea2d54064c8b194d74f03c422, type: 3}
-  m_Name: UpgradeDefinition
+  m_Name: RammingPower
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeDefinition
-  displayName: 
-  description: 
-  targetModule: {fileID: 0}
+  displayName: Battle Ram
+  key: upgrade.ramming.damage
+  description: Ramming damage +25%
+  targetModule: {fileID: 11400000, guid: e9c980f1257f55646bf5bdc16e5e7810, type: 2}
   rarity: 0
-  maxStacks: 1
-  effects: []
+  maxStacks: 4
+  effects:
+  - stat: {fileID: 11400000, guid: bfede197c6ee7db429a302f3260af84b, type: 2}
+    operation: 1
+    value: 25

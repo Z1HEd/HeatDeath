@@ -10,7 +10,7 @@ public enum UpgradeEffectOperation
 [Serializable]
 public struct UpgradeEffect
 {
-    [SerializeField] public UpgradeStatDefinition stat;
+    [SerializeField] public StatDefinition stat;
     [SerializeField] public UpgradeEffectOperation operation;
     [SerializeField] public float value;
 }

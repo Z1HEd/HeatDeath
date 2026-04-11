@@ -9,11 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fb1b9b702af71448a8a5db731e57d43, type: 3}
-  m_Name: UpgradeDatabase
-  m_EditorClassIdentifier: Assembly-CSharp::UpgradeDatabase
-  upgrades: []
-  commonWeight: 70
-  rareWeight: 20
-  epicWeight: 8
-  legendaryWeight: 2
+  m_Script: {fileID: 11500000, guid: 03ce558eff3159a49ab96066d0a3bbe8, type: 3}
+  m_Name: Cannon
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeModuleDefinition
+  displayName: Cannon
+  key: module.weapon.cannon
+  componentTypeName: ProjectileModule

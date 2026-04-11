@@ -5,108 +5,57 @@ using System.Collections.Generic;
 [RequireComponent(typeof(Ship))]
 public class ShipCoreModule : ModuleBase
 {
-    private const string MaxHealthKey = "stat.core.max_health";
-    private const string MaxShieldsKey = "stat.core.max_shields";
-    private const string ShieldRegenKey = "stat.core.shield_regen";
-
     [Header("Base Core Stats")]
-    [SerializeField] private int baseMaxHealth = 100;
-    [SerializeField] private int baseMaxShields = 100;
-    [SerializeField] private float baseShieldRegen = 2f;
+    [SerializeField] private ResourceStat health = new ResourceStat(100f, 1f);
+    [SerializeField] private ResourceStat shields = new ResourceStat(100f, 0f);
+    [SerializeField] private ScalarStat shieldRegen = new ScalarStat(2f, 0f);
 
     public event Action OnHPShieldsChanged;
 
-    private int currentMaxHealth;
-    private int currentMaxShields;
-    public float CurrentShieldRegen { get; private set; }
-    private float currentHealth;
-    private float currentShields;
-
-    public float CurrentHealth => currentHealth;
-    public float CurrentShields => currentShields;
-    public int CurrentMaxHealth => currentMaxHealth;
-    public int CurrentMaxShields => currentMaxShields;
+    public float CurrentHealth => health.CurrentValue;
+    public float CurrentShields => shields.CurrentValue;
+    public int CurrentMaxHealth => Mathf.RoundToInt(health.MaxValue);
+    public int CurrentMaxShields => Mathf.RoundToInt(shields.MaxValue);
+    public float CurrentShieldRegen => shieldRegen.CurrentValue;
 
     public void Initialize()
     {
-        Recalculate(true);
+        Recalculate();
+        ResetValues();
     }
 
     private void Update()
     {
-        if (currentShields >= currentMaxShields)
+        if (shields.CurrentValue >= shields.MaxValue)
             return;
 
-        currentShields = Mathf.Min(currentShields + CurrentShieldRegen * Time.deltaTime, currentMaxShields);
+        shields.AddCurrent(CurrentShieldRegen * Time.deltaTime);
         OnHPShieldsChanged?.Invoke();
     }
 
     public bool ApplyDamage(float incomingDamage)
     {
-        float damage = Mathf.Max(0f, incomingDamage);
-
-        if (currentShields < damage)
-        {
-            damage -= currentShields;
-            currentShields = 0f;
-        }
-        else
-        {
-            currentShields -= damage;
-            damage = 0f;
-        }
-
+        float damage = shields.Consume(incomingDamage);
         if (damage > 0f)
-        {
-            currentHealth = Mathf.Max(0f, currentHealth - damage);
-        }
+            health.Consume(damage);
 
         OnHPShieldsChanged?.Invoke();
-        return currentHealth <= 0f;
+        return health.CurrentValue <= 0f;
     }
 
     public override void Recalculate()
     {
-        Recalculate(false);
-    }
-
-    private void Recalculate(bool resetCurrentValues)
-    {
-        UpgradeManager upgradeManager = ship != null ? ship.GetComponent<UpgradeManager>() : GetComponent<UpgradeManager>();
-        Dictionary<string, StatModifier> modifiers = BuildStatModifiers(upgradeManager);
-
-        float nextMaxHealth = ResolveValue(baseMaxHealth, modifiers, MaxHealthKey);
-        float nextMaxShields = ResolveValue(baseMaxShields, modifiers, MaxShieldsKey);
-        float nextShieldRegen = ResolveValue(baseShieldRegen, modifiers, ShieldRegenKey);
-
-        float previousMaxHealth = Mathf.Max(1f, currentMaxHealth);
-        float previousMaxShields = Mathf.Max(1f, currentMaxShields);
-        float healthRatio = currentHealth / previousMaxHealth;
-        float shieldsRatio = currentShields / previousMaxShields;
-
-        currentMaxHealth = Mathf.Max(1, Mathf.RoundToInt(nextMaxHealth));
-        currentMaxShields = Mathf.Max(0, Mathf.RoundToInt(nextMaxShields));
-        CurrentShieldRegen = Mathf.Max(0f, nextShieldRegen);
-
-        if (resetCurrentValues)
-        {
-            currentHealth = currentMaxHealth;
-            currentShields = currentMaxShields;
-        }
-        else
-        {
-            currentHealth = Mathf.Clamp(currentMaxHealth * healthRatio, 0f, currentMaxHealth);
-            currentShields = Mathf.Clamp(currentMaxShields * shieldsRatio, 0f, currentMaxShields);
-        }
+        health.Recalculate(CurrentModifiers, true);
+        shields.Recalculate(CurrentModifiers, true);
+        shieldRegen.Recalculate(CurrentModifiers);
 
         OnHPShieldsChanged?.Invoke();
     }
 
-    private float ResolveValue(float baseValue, Dictionary<string, StatModifier> modifiers, string statKey)
+    protected override void ResetValues()
     {
-        if (!modifiers.TryGetValue(statKey, out StatModifier modifier))
-            return baseValue;
-
-        return (baseValue + modifier.Flat) * (1f + modifier.Percent);
+        health.ResetToMax();
+        shields.ResetToMax();
+        OnHPShieldsChanged?.Invoke();
     }
 }

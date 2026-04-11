@@ -69,3 +69,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameUIController
   uiDocument: {fileID: 5522747870843253521}
+  upgradeDatabase: {fileID: 11400000, guid: d30972105d240984683630854523b7f4, type: 2}

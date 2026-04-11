@@ -1,9 +1,10 @@
 using UnityEngine;
+using System.Collections.Generic;
 public class ThrusterModule : MovementModule
 {
     [Header("Thruster Settings")]
-    [SerializeField] private float thrust = 0.5f;
-    [SerializeField] private float maxSpeed = 10.0f;
+    [SerializeField] private ScalarStat thrust = new ScalarStat(0.5f, 0f);
+    [SerializeField] private ScalarStat maxSpeed = new ScalarStat(10f, 0f);
     
     [Header("Internal")]
     [SerializeField] private float thrustScale = 100.0f;
@@ -58,5 +59,17 @@ public class ThrusterModule : MovementModule
     public void SetTargetPosition(Vector2 newTarget)
     {
         targetPosition = newTarget;
+    }
+
+    public override void Recalculate()
+    {
+        thrust.Recalculate(CurrentModifiers);
+        maxSpeed.Recalculate(CurrentModifiers);
+    }
+
+    protected override void ResetValues()
+    {
+        thrust.ResetToBase();
+        maxSpeed.ResetToBase();
     }
 }

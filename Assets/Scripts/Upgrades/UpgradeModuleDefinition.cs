@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-[CreateAssetMenu(fileName = "ModuleDefinition", menuName = "HeatDeath/Modules/Module Definition")]
+[CreateAssetMenu(fileName = "ModuleDefinition", menuName = "HeatDeath/Module Definition")]
 public class ModuleDefinition : ScriptableObject
 {
     [SerializeField] private string displayName;

@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 4564847529224197787}
   - component: {fileID: 2962834857077140815}
   - component: {fileID: 2582061582026557243}
+  - component: {fileID: 1824285348416659981}
   m_Layer: 7
   m_Name: Enemy
   m_TagString: Untagged
@@ -186,17 +187,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   moduleManager: {fileID: 0}
-  baseCharacteristics:
-    maxHealth: 50
-    maxShields: 25
-    shieldRegen: 0
-  currentCharacteristics:
-    maxHealth: 0
-    maxShields: 0
-    shieldRegen: 0
-  health: 0
-  shields: 0
-  shieldRegen: 0
   knockbackFreezeDuration: 0.15
   _player: {fileID: 0}
   xpReward: 2
@@ -212,6 +202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45f1356eb22bc6742bb84d3b8d423420, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FollowPlayerModule
+  moduleDefinition: {fileID: 0}
 --- !u!114 &2962834857077140815
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -224,9 +215,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baad76691ffcccc4296979df7c28d8fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ThrusterModule
+  moduleDefinition: {fileID: 11400000, guid: a3f144a87eb1d22449ea79a4d0b8c12b, type: 2}
   targetPosition: {x: 0, y: 0}
-  thrust: 0.1
-  maxSpeed: 2
+  thrust:
+    definition: {fileID: 11400000, guid: 06bdb340f57377640bc811e66297c6e6, type: 2}
+    baseValue: 0.1
+    minValue: 0
+  maxSpeed:
+    definition: {fileID: 11400000, guid: 694c11ebc4322d84389ec99e9c63fb16, type: 2}
+    baseValue: 2
+    minValue: 0
   thrustScale: 100
   stopDistance: 0.1
   brakingSafety: 0.9
@@ -242,5 +240,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6808db0d499ea1a4785aa51656879470, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RammingModule
-  damage: 10
-  knockbackPower: 1
+  moduleDefinition: {fileID: 0}
+  damage:
+    definition: {fileID: 11400000, guid: bfede197c6ee7db429a302f3260af84b, type: 2}
+    baseValue: 10
+    minValue: 0
+  knockbackPower:
+    definition: {fileID: 11400000, guid: a4cdf53e35b0d364cb13a1dbfb44a2ec, type: 2}
+    baseValue: 1
+    minValue: 0
+--- !u!114 &1824285348416659981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7622125486683924137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eede7cedb1d541847bd05d4f273563b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShipCoreModule
+  moduleDefinition: {fileID: 11400000, guid: f4b1836a0ae68c6498413a6f2ec0caef, type: 2}
+  health:
+    definition: {fileID: 11400000, guid: f7c262a985668b246a396557a194a0cd, type: 2}
+    baseValue: 20
+    minValue: 1
+  shields:
+    definition: {fileID: 11400000, guid: 9cece08ed7525db449195d2ac5aa96c3, type: 2}
+    baseValue: 10
+    minValue: 0
+  shieldRegen:
+    definition: {fileID: 11400000, guid: d4698ffc86bfa474b83d4955024a7ddc, type: 2}
+    baseValue: 0
+    minValue: 0

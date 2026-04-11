@@ -4,11 +4,11 @@ public class ProjectileModule : WeaponModule
 {
     [SerializeField] protected Projectile projectilePrefab;
     [SerializeField] protected Transform firePoint;
-    [SerializeField] protected float projectileSpeed = 20f;
-    [SerializeField] protected float projectileDamage = 10f;
-    [SerializeField] protected float projectileKnockback = 5f;
-    [SerializeField] protected int projectileCount = 1;
-    [SerializeField] protected float range = 15f;
+    [SerializeField] protected ScalarStat projectileSpeed = new ScalarStat(20f, 0f);
+    [SerializeField] protected ScalarStat projectileDamage = new ScalarStat(10f, 0f);
+    [SerializeField] protected ScalarStat projectileKnockback = new ScalarStat(0f, 0f);
+    [SerializeField] protected ScalarStat projectileCount = new ScalarStat(1f, 1f);
+    [SerializeField] protected ScalarStat range = new ScalarStat(15f, 0f);
 
     private RangeDetector rangeDetector;
     private Ship currentTarget;
@@ -85,12 +85,38 @@ public class ProjectileModule : WeaponModule
             ? (target.transform.position - spawnPosition).normalized
             : (firePoint != null ? firePoint.right : transform.right);
 
-        for (int i = 0; i < projectileCount; i++)
+        int count = Mathf.Max(1, Mathf.FloorToInt(projectileCount));
+        for (int i = 0; i < count; i++)
         {
             Projectile projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
             projectile.gameObject.layer = DetectLayer;
             projectile.Initialize(aimDirection * projectileSpeed, projectileDamage, projectileKnockback);
         }
+    }
+
+    public override void Recalculate()
+    {
+        base.Recalculate();
+
+        projectileSpeed.Recalculate(CurrentModifiers);
+        projectileDamage.Recalculate(CurrentModifiers);
+        projectileKnockback.Recalculate(CurrentModifiers);
+        projectileCount.Recalculate(CurrentModifiers);
+        range.Recalculate(CurrentModifiers);
+
+        if (rangeDetector != null)
+            rangeDetector.Initialize(range);
+    }
+
+    protected override void ResetValues()
+    {
+        base.ResetValues();
+
+        projectileSpeed.ResetToBase();
+        projectileDamage.ResetToBase();
+        projectileKnockback.ResetToBase();
+        projectileCount.ResetToBase();
+        range.ResetToBase();
     }
 
     protected override void OnDestroy()

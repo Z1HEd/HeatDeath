@@ -2,6 +2,14 @@
 
 public abstract class ControlModule : ModuleBase
 {
+    public override void Recalculate()
+    {
+    }
+
+    protected override void ResetValues()
+    {
+    }
+
     public Vector3 ClampPositionToCameraBounds(Vector3 targetPosition)
     {
         Camera cam = Camera.main;

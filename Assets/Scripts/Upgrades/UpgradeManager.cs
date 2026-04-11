@@ -6,8 +6,10 @@ using UnityEngine;
 public class UpgradeManager : MonoBehaviour
 {
     private readonly Dictionary<UpgradeDefinition, int> stackCounts = new Dictionary<UpgradeDefinition, int>();
+    private readonly Dictionary<StatDefinition, StatModifier> statModifiers = new Dictionary<StatDefinition, StatModifier>();
 
     public event Action OnChanged;
+    public IReadOnlyDictionary<StatDefinition, StatModifier> StatModifiers => statModifiers;
 
     public bool CanAddUpgrade(UpgradeDefinition upgrade)
     {
@@ -81,6 +83,8 @@ public class UpgradeManager : MonoBehaviour
         if (moduleManager == null)
             return;
 
+        RebuildCombinedStatModifiers();
+
         List<ModuleBase> modules = moduleManager.GetModules<ModuleBase>();
         for (int i = 0; i < modules.Count; i++)
         {
@@ -90,5 +94,41 @@ public class UpgradeManager : MonoBehaviour
 
             module.Recalculate();
         }
+    }
+
+    public void RebuildCombinedStatModifiers()
+    {
+        statModifiers.Clear();
+
+        foreach (var pair in stackCounts)
+        {
+            UpgradeDefinition upgrade = pair.Key;
+            int stacks = pair.Value;
+            if (upgrade == null || stacks <= 0)
+                continue;
+
+            IReadOnlyList<UpgradeEffect> effects = upgrade.Effects;
+            for (int i = 0; i < effects.Count; i++)
+            {
+                UpgradeEffect effect = effects[i];
+                if (effect.stat == null)
+                    continue;
+
+                AddModifier(statModifiers, effect.stat, effect.operation, effect.value * stacks);
+            }
+        }
+    }
+
+    private static void AddModifier(Dictionary<StatDefinition, StatModifier> map, StatDefinition stat, UpgradeEffectOperation operation, float amount)
+    {
+        if (!map.TryGetValue(stat, out StatModifier modifier))
+            modifier = default;
+
+        if (operation == UpgradeEffectOperation.AddPercent)
+            modifier.Percent += amount;
+        else
+            modifier.Flat += amount;
+
+        map[stat] = modifier;
     }
 }

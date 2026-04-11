@@ -3,10 +3,20 @@ using UnityEngine;
 [RequireComponent(typeof(Ship))]
 public abstract class WeaponModule : ModuleBase
 {
-    [SerializeField] protected float fireRate = 1f;
+    [SerializeField] protected ScalarStat fireRate = new ScalarStat(1f, 0.0001f);
     protected float lastFireTime;
 
     protected int DetectLayer { get; private set; }
+
+    public override void Recalculate()
+    {
+        fireRate.Recalculate(CurrentModifiers);
+    }
+
+    protected override void ResetValues()
+    {
+        fireRate.ResetToBase();
+    }
 
     protected override void Start()
     {
@@ -14,7 +24,7 @@ public abstract class WeaponModule : ModuleBase
         DetermineWeaponLayer();
     }
 
-    protected virtual float FireDelay => 1f / Mathf.Max(fireRate, 0.0001f);
+    protected virtual float FireDelay => 1f / fireRate;
     protected virtual bool CanFire => Time.time >= lastFireTime + FireDelay;
 
     protected virtual void Update() {}

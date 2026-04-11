@@ -9,7 +9,6 @@ public class GameUIController : MonoBehaviour
     private const string RarityClassRare = "upgrade-option-rare";
     private const string RarityClassEpic = "upgrade-option-epic";
     private const string RarityClassLegendary = "upgrade-option-legendary";
-
     [SerializeField] private UIDocument uiDocument;
     [SerializeField] private UpgradeDatabase upgradeDatabase;
     

@@ -45,9 +45,9 @@ public class GameController : MonoBehaviour
     {
         currentXP += xpAmount;
         Debug.Log($"Added {xpAmount} XP. Total: {currentXP}");
-        OnXPChanged?.Invoke();
-
+        
         ProcessLevelUpsFromCurrentXP();
+        OnXPChanged?.Invoke();
     }
 
     public void Resume()
@@ -57,7 +57,7 @@ public class GameController : MonoBehaviour
 
     private float CalculateXPRequiredForLevel(int level)
     {
-        return 10f * (level-1);
+        return 5f * (level-1);
     }
 
     private void ProcessLevelUpsFromCurrentXP()
@@ -70,15 +70,14 @@ public class GameController : MonoBehaviour
             currentLevel++;
             levelsGained++;
         }
-
+        
         if (levelsGained <= 0)
             return;
 
         Debug.Log($"Level Up! Gained {levelsGained} levels. Now level {currentLevel}");
-        OnLevelChanged?.Invoke(levelsGained);
-        OnXPChanged?.Invoke();
-
         Time.timeScale = 0f;
+        OnLevelChanged?.Invoke(levelsGained);
+        
     }
 
     private void OnDestroy()

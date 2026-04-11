@@ -2,11 +2,23 @@
     font-size: 16px;
 }
 
-.hud-container {
+.screen-root {
     position: absolute;
-    bottom: 20px;
-    left: 20px;
-    width: 300px;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    flex-direction: column;
+}
+
+.playable-area {
+    flex-grow: 1;
+    position: relative;
+    padding: 5px;
+}
+
+.hud-container {
+    position: relative;
     background-color: rgba(64, 64, 64, 0.7);
     flex-direction: column;
     justify-content: flex-start;
@@ -72,10 +84,7 @@
 }
 
 .xp-panel {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+    position: relative;
     background-color: rgba(64, 64, 64, 0.7);
     flex-direction: column;
     justify-content: flex-start;
@@ -103,7 +112,11 @@
 }
 
 .upgrade-panel {
-    width: 420px;
+    position: absolute;
+    left: 5px;
+    right: 5px;
+    top: 5px;
+    bottom: 5px;
     background-color: rgb(28, 28, 28);
     border-left-width: 2px;
     border-right-width: 2px;
@@ -114,6 +127,7 @@
     border-top-color: rgb(110, 110, 110);
     border-bottom-color: rgb(110, 110, 110);
     padding: 12px;
+    justify-content: flex-start;
 }
 
 .upgrade-header {
