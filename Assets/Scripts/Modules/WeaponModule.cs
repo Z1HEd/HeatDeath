@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(Ship))]
 public abstract class WeaponModule : ModuleBase
@@ -8,12 +9,12 @@ public abstract class WeaponModule : ModuleBase
 
     protected int DetectLayer { get; private set; }
 
-    public override void Recalculate()
+    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
     {
-        fireRate.Recalculate(CurrentModifiers);
+        fireRate.Recalculate(modifiers);
     }
 
-    protected override void ResetValues()
+    protected override void ResetModifiers()
     {
         fireRate.ResetToBase();
     }

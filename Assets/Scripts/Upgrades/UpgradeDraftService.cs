@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class UpgradeDraftService
@@ -57,6 +58,8 @@ public class UpgradeDraftService
 
         ModuleManager moduleManager = player.moduleManager;
         UpgradeManager upgradeManager = player.GetComponent<UpgradeManager>();
+        if (moduleManager == null || upgradeManager == null)
+            return result;
 
         HashSet<ModuleDefinition> installedModules = moduleManager.GetInstalledModuleDefinitions();
         IReadOnlyList<UpgradeDefinition> allUpgrades = database.Upgrades;
@@ -64,17 +67,27 @@ public class UpgradeDraftService
         for (int i = 0; i < allUpgrades.Count; i++)
         {
             UpgradeDefinition upgrade = allUpgrades[i];
-            
-            if (!installedModules.Contains(upgrade.TargetModule))
-                continue;
-
-            if (!upgradeManager.CanAddUpgrade(upgrade))
-                continue;
-
-            result.Add(upgrade);
+            if (IsEligibleForDraft(upgrade, installedModules, upgradeManager))
+                result.Add(upgrade);
         }
 
         return result;
+    }
+
+    private static bool IsEligibleForDraft(
+        UpgradeDefinition upgrade,
+        IReadOnlyCollection<ModuleDefinition> installedModules,
+        UpgradeManager upgradeManager)
+    {
+        if (upgrade == null || upgradeManager == null)
+            return false;
+
+        if (!upgradeManager.CanAddUpgrade(upgrade))
+            return false;
+        
+        return upgrade.BoundModule != null
+            ? installedModules != null && installedModules.Contains(upgrade.BoundModule)
+            : IsApplicableToAnyInstalledModule(upgrade, installedModules);
     }
 
     public bool HasAnyAvailableUpgradeForModule(ModuleDefinition moduleDefinition, Player player)
@@ -85,7 +98,52 @@ public class UpgradeDraftService
         List<UpgradeDefinition> available = GetAvailableUpgrades(player);
         for (int i = 0; i < available.Count; i++)
         {
-            if (available[i].TargetModule == moduleDefinition)
+            UpgradeDefinition upgrade = available[i];
+            if (upgrade != null && upgrade.IsBoundTo(moduleDefinition))
+                return true;
+
+            if (upgrade != null && upgrade.IsGeneral && IsApplicableToModule(upgrade, moduleDefinition))
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsApplicableToAnyInstalledModule(UpgradeDefinition upgrade, IReadOnlyCollection<ModuleDefinition> installedModules)
+    {
+        if (upgrade == null || installedModules == null || installedModules.Count == 0)
+            return false;
+
+        IReadOnlyList<StatModifier> effects = upgrade.Modifiers;
+        for (int i = 0; i < effects.Count; i++)
+        {
+            StatModifier effect = effects[i];
+            if (effect.stat == StatType.None)
+                continue;
+
+            foreach (ModuleDefinition module in installedModules)
+            {
+                if (effect.MatchesModule(module))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsApplicableToModule(UpgradeDefinition upgrade, ModuleDefinition moduleDefinition)
+    {
+        if (upgrade == null || moduleDefinition == null)
+            return false;
+
+        IReadOnlyList<StatModifier> effects = upgrade.Modifiers;
+        for (int i = 0; i < effects.Count; i++)
+        {
+            StatModifier effect = effects[i];
+            if (effect.stat == StatType.None)
+                continue;
+
+            if (effect.MatchesModule(moduleDefinition))
                 return true;
         }
 

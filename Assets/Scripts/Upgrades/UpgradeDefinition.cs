@@ -15,24 +15,30 @@ public class UpgradeDefinition : ScriptableObject
     [SerializeField] private string displayName;
     [SerializeField] private string key;
     [SerializeField, TextArea(2, 4)] private string description;
-    [SerializeField] private ModuleDefinition targetModule;
+    [SerializeField] private ModuleDefinition boundModule;
     [SerializeField] private UpgradeRarity rarity;
     [SerializeField] private int maxStacks = 1;
-    [SerializeField] private List<UpgradeEffect> effects = new List<UpgradeEffect>();
+    [SerializeField] private List<StatModifier> modifiers = new List<StatModifier>();
 
     public string DisplayName => displayName;
     public string Key => key;
     public string Description => description;
-    public ModuleDefinition TargetModule => targetModule;
+    public ModuleDefinition BoundModule => boundModule;
+    public bool IsGeneral => boundModule == null;
     public UpgradeRarity Rarity => rarity;
     public int MaxStacks => maxStacks;
-    public IReadOnlyList<UpgradeEffect> Effects => effects;
+    public IReadOnlyList<StatModifier> Modifiers => modifiers;
 
-    public bool CanStackFromCount(int currentCount)
+    public bool IsBoundTo(ModuleDefinition module)
+    {
+        return module != null && boundModule == module;
+    }
+
+    public bool IsMaxStacks(int currentCount)
     {
         if (maxStacks < 1)
-            return true;
+            return false;
 
-        return currentCount < maxStacks;
+        return currentCount >= maxStacks;
     }
 }

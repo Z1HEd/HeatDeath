@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class ProjectileModule : WeaponModule
 {
@@ -8,6 +9,7 @@ public class ProjectileModule : WeaponModule
     [SerializeField] protected ScalarStat projectileDamage = new ScalarStat(10f, 0f);
     [SerializeField] protected ScalarStat projectileKnockback = new ScalarStat(0f, 0f);
     [SerializeField] protected ScalarStat projectileCount = new ScalarStat(1f, 1f);
+    [SerializeField] protected ScalarStat projectileSpread = new ScalarStat(0f, 0f);
     [SerializeField] protected ScalarStat range = new ScalarStat(15f, 0f);
 
     private RangeDetector rangeDetector;
@@ -86,36 +88,51 @@ public class ProjectileModule : WeaponModule
             : (firePoint != null ? firePoint.right : transform.right);
 
         int count = Mathf.Max(1, Mathf.FloorToInt(projectileCount));
+        float spreadDegrees = Mathf.Max(0f, projectileSpread);
         for (int i = 0; i < count; i++)
         {
+            float angleOffset = GetSpreadAngleOffset(spreadDegrees);
+            Vector3 shotDirection = Quaternion.AngleAxis(angleOffset, Vector3.forward) * aimDirection;
+
             Projectile projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
             projectile.gameObject.layer = DetectLayer;
-            projectile.Initialize(aimDirection * projectileSpeed, projectileDamage, projectileKnockback);
+
+            projectile.Initialize(shotDirection * projectileSpeed, projectileDamage, projectileKnockback);
         }
     }
 
-    public override void Recalculate()
+    private static float GetSpreadAngleOffset(float spreadDegrees)
     {
-        base.Recalculate();
+        if (spreadDegrees <= 0f)
+            return 0f;
 
-        projectileSpeed.Recalculate(CurrentModifiers);
-        projectileDamage.Recalculate(CurrentModifiers);
-        projectileKnockback.Recalculate(CurrentModifiers);
-        projectileCount.Recalculate(CurrentModifiers);
-        range.Recalculate(CurrentModifiers);
+        float halfSpread = spreadDegrees * 0.5f;
+        return Random.Range(-halfSpread, halfSpread);
+    }
+
+    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
+    {
+        base.ApplyModifiers(modifiers);
+        projectileSpeed.Recalculate(modifiers);
+        projectileDamage.Recalculate(modifiers);
+        projectileKnockback.Recalculate(modifiers);
+        projectileCount.Recalculate(modifiers);
+        projectileSpread.Recalculate(modifiers);
+        range.Recalculate(modifiers);
 
         if (rangeDetector != null)
             rangeDetector.Initialize(range);
     }
 
-    protected override void ResetValues()
+    protected override void ResetModifiers()
     {
-        base.ResetValues();
+        base.ResetModifiers();
 
         projectileSpeed.ResetToBase();
         projectileDamage.ResetToBase();
         projectileKnockback.ResetToBase();
         projectileCount.ResetToBase();
+        projectileSpread.ResetToBase();
         range.ResetToBase();
     }
 

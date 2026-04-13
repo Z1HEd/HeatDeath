@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 76beddaea2d54064c8b194d74f03c422, type: 3}
-  m_Name: RammingPower
+  m_Name: Shotgun
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeDefinition
-  displayName: Battle Ram
-  key: upgrade.ramming.damage
-  description: Ramming damage +25%
-  rarity: 0
-  maxStacks: 4
+  displayName: Shotgun Upgrade
+  key: 
+  description: +2 bullets per shot
+  boundModule: {fileID: 11400000, guid: 10b237f597433b6429d00f65eefac757, type: 2}
+  rarity: 1
+  maxStacks: 1
   modifiers:
-  - stat: {fileID: 11400000, guid: 72ff628d0e6954549b42855860283ce1, type: 2}
-    operation: 1
-    value: 25
-    targetTags:
-    - {fileID: 11400000, guid: 470584dae2cc13f4ba33db33bf5eec71, type: 2}
+  - stat: 12
+    operation: 0
+    value: 2
+    targetTags: []

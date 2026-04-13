@@ -2,11 +2,11 @@
 
 public abstract class ControlModule : ModuleBase
 {
-    public override void Recalculate()
+    protected override void ResetModifiers()
     {
     }
 
-    protected override void ResetValues()
+    protected override void ApplyModifiers(System.Collections.Generic.IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
     {
     }
 

@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 
-public struct StatModifier
+public struct StatModifierAggregate
 {
     public float Flat;
     public float Percent;
@@ -10,7 +11,8 @@ public struct StatModifier
 [System.Serializable]
 public class ResourceStat
 {
-    [SerializeField] private StatDefinition definition;
+    [FormerlySerializedAs("definition")]
+    [SerializeField] private StatType type;
     [SerializeField] private float baseValue = 1f;
     [SerializeField] private float minValue = 0f;
 
@@ -28,7 +30,7 @@ public class ResourceStat
         this.minValue = minValue;
     }
 
-    public StatDefinition Definition => definition;
+    public StatType Type => type;
     public float BaseValue => baseValue;
     public float CurrentValue => initialized ? currentValue : Mathf.Max(minValue, baseValue);
     public float MaxValue => initialized ? maxValue : Mathf.Max(minValue, baseValue);
@@ -38,12 +40,12 @@ public class ResourceStat
         return stat != null ? stat.CurrentValue : 0f;
     }
 
-    public void Recalculate(IReadOnlyDictionary<StatDefinition, StatModifier> modifiers, bool preserveCurrentRatio)
+    public void Recalculate(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers, bool preserveCurrentRatio)
     {
         float previousMax = initialized ? Mathf.Max(minValue, maxValue) : 0f;
         float ratio = previousMax > 0f ? currentValue / previousMax : 1f;
 
-        maxValue = Mathf.Max(minValue, CalculateModifiedValue(baseValue, modifiers, definition));
+        maxValue = Mathf.Max(minValue, CalculateModifiedValue(baseValue, modifiers, type));
 
         if (!initialized || !preserveCurrentRatio)
             currentValue = maxValue;
@@ -87,12 +89,12 @@ public class ResourceStat
         return leftover;
     }
 
-    private static float CalculateModifiedValue(float baseStatValue, IReadOnlyDictionary<StatDefinition, StatModifier> modifiers, StatDefinition stat)
+    private static float CalculateModifiedValue(float baseStatValue, IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers, StatType stat)
     {
-        if (modifiers == null || stat == null)
+        if (modifiers == null || stat == StatType.None)
             return baseStatValue;
 
-        modifiers.TryGetValue(stat, out StatModifier modifier);
+        modifiers.TryGetValue(stat, out StatModifierAggregate modifier);
         return (baseStatValue + modifier.Flat) * (1f + (modifier.Percent * 0.01f));
     }
 }
@@ -100,7 +102,8 @@ public class ResourceStat
 [System.Serializable]
 public class ScalarStat
 {
-    [SerializeField] private StatDefinition definition;
+    [FormerlySerializedAs("definition")]
+    [SerializeField] private StatType type;
     [SerializeField] private float baseValue;
     [SerializeField] private float minValue = 0f;
 
@@ -117,7 +120,7 @@ public class ScalarStat
         this.minValue = minValue;
     }
 
-    public StatDefinition Definition => definition;
+    public StatType Type => type;
     public float BaseValue => baseValue;
     public float CurrentValue => initialized ? currentValue : Mathf.Max(minValue, baseValue);
 
@@ -126,9 +129,9 @@ public class ScalarStat
         return stat != null ? stat.CurrentValue : 0f;
     }
 
-    public void Recalculate(IReadOnlyDictionary<StatDefinition, StatModifier> modifiers)
+    public void Recalculate(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
     {
-        currentValue = Mathf.Max(minValue, CalculateModifiedValue(baseValue, modifiers, definition));
+        currentValue = Mathf.Max(minValue, CalculateModifiedValue(baseValue, modifiers, type));
         initialized = true;
     }
 
@@ -138,12 +141,12 @@ public class ScalarStat
         initialized = true;
     }
 
-    private static float CalculateModifiedValue(float baseStatValue, IReadOnlyDictionary<StatDefinition, StatModifier> modifiers, StatDefinition stat)
+    private static float CalculateModifiedValue(float baseStatValue, IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers, StatType stat)
     {
-        if (modifiers == null || stat == null)
+        if (modifiers == null || stat == StatType.None)
             return baseStatValue;
 
-        modifiers.TryGetValue(stat, out StatModifier modifier);
+        modifiers.TryGetValue(stat, out StatModifierAggregate modifier);
         return (baseStatValue + modifier.Flat) * (1f + (modifier.Percent * 0.01f));
     }
 }
@@ -155,8 +158,6 @@ public abstract class ModuleBase: MonoBehaviour
 
     protected Ship ship;
     protected UpgradeManager upgradeManager;
-    protected IReadOnlyDictionary<StatDefinition, StatModifier> CurrentModifiers =>
-        upgradeManager != null ? upgradeManager.StatModifiers : null;
     public ModuleDefinition ModuleDefinition => moduleDefinition;
 
     protected virtual void Start()
@@ -164,7 +165,7 @@ public abstract class ModuleBase: MonoBehaviour
         ship = GetComponent<Ship>();
         upgradeManager = GetComponent<UpgradeManager>();
         ship.AddModule(this);
-        ResetValues();
+        ResetModifiers();
     }
 
     protected virtual void OnDestroy()
@@ -172,7 +173,46 @@ public abstract class ModuleBase: MonoBehaviour
         ship.moduleManager.RemoveModule(this);
     }
 
-    public abstract void Recalculate();
+    protected IReadOnlyDictionary<StatType, StatModifierAggregate> GetCurrentModifiers()
+    {
+        var result = new Dictionary<StatType, StatModifierAggregate>();
+        if (upgradeManager == null || moduleDefinition == null)
+            return result;
 
-    protected abstract void ResetValues();
+        IReadOnlyList<ActiveStatModifier> effects = upgradeManager.ActiveEffects;
+        for (int i = 0; i < effects.Count; i++)
+        {
+            ActiveStatModifier effect = effects[i];
+            if (!effect.AppliesToModule(moduleDefinition))
+                continue;
+
+            AddModifier(result, effect);
+        }
+
+        return result;
+    }
+
+    public virtual void UpdateModifiers()
+    {
+        ResetModifiers();
+        ApplyModifiers(GetCurrentModifiers());
+    }
+
+    private static void AddModifier(Dictionary<StatType, StatModifierAggregate> map, ActiveStatModifier modifierData)
+    {
+        StatModifier data = modifierData.Modifier;
+        if (!map.TryGetValue(data.stat, out StatModifierAggregate modifier))
+            modifier = default;
+
+        if (data.operation == ModifierOperation.AddPercent)
+            modifier.Percent += data.value;
+        else
+            modifier.Flat += data.value;
+
+        map[data.stat] = modifier;
+    }
+
+    protected abstract void ResetModifiers();
+
+    protected abstract void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers);
 }

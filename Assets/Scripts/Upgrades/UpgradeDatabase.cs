@@ -14,6 +14,47 @@ public class UpgradeDatabase : ScriptableObject
 
     public IReadOnlyList<UpgradeDefinition> Upgrades => upgrades;
 
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        ValidateAndLogWarnings();
+    }
+#endif
+
+    public void ValidateAndLogWarnings()
+    {
+        var seenKeys = new HashSet<string>();
+
+        for (int i = 0; i < upgrades.Count; i++)
+        {
+            UpgradeDefinition upgrade = upgrades[i];
+            if (upgrade == null)
+                continue;
+
+            if (string.IsNullOrWhiteSpace(upgrade.Key))
+            {
+                Debug.LogWarning($"Upgrade key not set: {upgrade.name}", upgrade);
+            }
+            else if (!seenKeys.Add(upgrade.Key))
+            {
+                Debug.LogWarning($"Duplicate upgrade key in database: {upgrade.Key}", upgrade);
+            }
+
+            IReadOnlyList<StatModifier> modifiers = upgrade.Modifiers;
+            for (int j = 0; j < modifiers.Count; j++)
+            {
+                StatModifier modifier = modifiers[j];
+                bool invalidType = modifier.stat == StatType.None;
+                bool missingTagsOnGeneral = upgrade.IsGeneral && !modifier.HasTargetTags;
+                if (invalidType || missingTagsOnGeneral)
+                {
+                    Debug.LogWarning($"Invalid modifier found in upgrade: {upgrade.name}", upgrade);
+                    break;
+                }
+            }
+        }
+    }
+
     public int GetRarityWeight(UpgradeRarity rarity)
     {
         switch (rarity)

@@ -10,13 +10,13 @@ public class RammingModule : ModuleBase, IHitter
     public float Damage => damage;
     public float KnockbackPower => knockbackPower;
 
-    public override void Recalculate()
+    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
     {
-        damage.Recalculate(CurrentModifiers);
-        knockbackPower.Recalculate(CurrentModifiers);
+        damage.Recalculate(modifiers);
+        knockbackPower.Recalculate(modifiers);
     }
 
-    protected override void ResetValues()
+    protected override void ResetModifiers()
     {
         damage.ResetToBase();
         knockbackPower.ResetToBase();

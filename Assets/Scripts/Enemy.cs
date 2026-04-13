@@ -19,6 +19,9 @@ public class Enemy: Ship
 
     public override void Die()
     {
+        if (IsDead)
+            return;
+
         GameController.Instance.AddXP(xpReward);
         base.Die();
     }

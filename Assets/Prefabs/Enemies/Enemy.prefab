@@ -240,13 +240,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6808db0d499ea1a4785aa51656879470, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RammingModule
-  moduleDefinition: {fileID: 0}
+  moduleDefinition: {fileID: 11400000, guid: e9c980f1257f55646bf5bdc16e5e7810, type: 2}
   damage:
-    definition: {fileID: 11400000, guid: bfede197c6ee7db429a302f3260af84b, type: 2}
+    definition: {fileID: 11400000, guid: 72ff628d0e6954549b42855860283ce1, type: 2}
     baseValue: 10
     minValue: 0
   knockbackPower:
-    definition: {fileID: 11400000, guid: a4cdf53e35b0d364cb13a1dbfb44a2ec, type: 2}
+    definition: {fileID: 11400000, guid: ec1bd1fd3a56cc0408feac2f1d098f8c, type: 2}
     baseValue: 1
     minValue: 0
 --- !u!114 &1824285348416659981
@@ -267,10 +267,10 @@ MonoBehaviour:
     baseValue: 20
     minValue: 1
   shields:
-    definition: {fileID: 11400000, guid: 9cece08ed7525db449195d2ac5aa96c3, type: 2}
+    definition: {fileID: 11400000, guid: c7d1ee33eba4b32488ac0f181b6072c9, type: 2}
     baseValue: 10
     minValue: 0
   shieldRegen:
-    definition: {fileID: 11400000, guid: d4698ffc86bfa474b83d4955024a7ddc, type: 2}
+    definition: {fileID: 11400000, guid: b8ebdcc2aeb4f314c97c23fc017ed762, type: 2}
     baseValue: 0
     minValue: 0

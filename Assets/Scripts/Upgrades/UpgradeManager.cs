@@ -2,14 +2,43 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct ActiveStatModifier
+{
+    public StatModifier Modifier;
+    public bool IsUpgradeBound;
+    public ModuleDefinition BoundModule;
+
+    public bool AppliesToModule(ModuleDefinition module)
+    {
+        if (module == null || Modifier.stat == StatType.None)
+            return false;
+
+        if (IsUpgradeBound)
+        {
+            if (BoundModule == null || module != BoundModule)
+                return false;
+
+            if (!Modifier.HasTargetTags)
+                return true;
+
+            return Modifier.MatchesModule(module);
+        }
+
+        if (!Modifier.HasTargetTags)
+            return false;
+
+        return Modifier.MatchesModule(module);
+    }
+}
+
 [RequireComponent(typeof(Ship))]
 public class UpgradeManager : MonoBehaviour
 {
     private readonly Dictionary<UpgradeDefinition, int> stackCounts = new Dictionary<UpgradeDefinition, int>();
-    private readonly Dictionary<StatDefinition, StatModifier> statModifiers = new Dictionary<StatDefinition, StatModifier>();
+    private readonly List<ActiveStatModifier> activeEffects = new List<ActiveStatModifier>();
 
     public event Action OnChanged;
-    public IReadOnlyDictionary<StatDefinition, StatModifier> StatModifiers => statModifiers;
+    public IReadOnlyList<ActiveStatModifier> ActiveEffects => activeEffects;
 
     public bool CanAddUpgrade(UpgradeDefinition upgrade)
     {
@@ -17,7 +46,7 @@ public class UpgradeManager : MonoBehaviour
             return false;
 
         int current = GetStackCount(upgrade);
-        return upgrade.CanStackFromCount(current);
+        return !upgrade.IsMaxStacks(current);
     }
 
     public void AddUpgrade(UpgradeDefinition upgrade)
@@ -45,6 +74,26 @@ public class UpgradeManager : MonoBehaviour
     public bool HasUpgrade(UpgradeDefinition upgrade)
     {
         return GetStackCount(upgrade) > 0;
+    }
+
+    public bool IsFullUpgraded(ModuleDefinition module, IReadOnlyList<UpgradeDefinition> allUpgrades)
+    {
+        if (module == null || allUpgrades == null)
+            return false;
+
+        bool hasBoundUpgrade = false;
+        for (int i = 0; i < allUpgrades.Count; i++)
+        {
+            UpgradeDefinition upgrade = allUpgrades[i];
+            if (upgrade == null || !upgrade.IsBoundTo(module))
+                continue;
+
+            hasBoundUpgrade = true;
+            if (!upgrade.IsMaxStacks(GetStackCount(upgrade)))
+                return false;
+        }
+
+        return hasBoundUpgrade;
     }
 
     public IReadOnlyDictionary<UpgradeDefinition, int> GetAllUpgrades()
@@ -77,28 +126,27 @@ public class UpgradeManager : MonoBehaviour
         OnChanged?.Invoke();
     }
 
-    private void RecalculateAllModules()
+    public void RecalculateAllModules()
     {
         ModuleManager moduleManager = GetComponent<ModuleManager>();
         if (moduleManager == null)
             return;
 
-        RebuildCombinedStatModifiers();
-
         List<ModuleBase> modules = moduleManager.GetModules<ModuleBase>();
+        RebuildActiveEffects();
         for (int i = 0; i < modules.Count; i++)
         {
             ModuleBase module = modules[i];
             if (module == null)
                 continue;
 
-            module.Recalculate();
+            module.UpdateModifiers();
         }
     }
 
-    public void RebuildCombinedStatModifiers()
+    private void RebuildActiveEffects()
     {
-        statModifiers.Clear();
+        activeEffects.Clear();
 
         foreach (var pair in stackCounts)
         {
@@ -107,28 +155,21 @@ public class UpgradeManager : MonoBehaviour
             if (upgrade == null || stacks <= 0)
                 continue;
 
-            IReadOnlyList<UpgradeEffect> effects = upgrade.Effects;
+            IReadOnlyList<StatModifier> effects = upgrade.Modifiers;
             for (int i = 0; i < effects.Count; i++)
             {
-                UpgradeEffect effect = effects[i];
-                if (effect.stat == null)
+                StatModifier effect = effects[i];
+                if (effect.stat == StatType.None)
                     continue;
 
-                AddModifier(statModifiers, effect.stat, effect.operation, effect.value * stacks);
+                effect.value *= stacks;
+                activeEffects.Add(new ActiveStatModifier
+                {
+                    Modifier = effect,
+                    IsUpgradeBound = upgrade.BoundModule != null,
+                    BoundModule = upgrade.BoundModule
+                });
             }
         }
-    }
-
-    private static void AddModifier(Dictionary<StatDefinition, StatModifier> map, StatDefinition stat, UpgradeEffectOperation operation, float amount)
-    {
-        if (!map.TryGetValue(stat, out StatModifier modifier))
-            modifier = default;
-
-        if (operation == UpgradeEffectOperation.AddPercent)
-            modifier.Percent += amount;
-        else
-            modifier.Flat += amount;
-
-        map[stat] = modifier;
     }
 }

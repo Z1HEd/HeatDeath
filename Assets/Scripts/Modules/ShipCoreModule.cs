@@ -20,8 +20,8 @@ public class ShipCoreModule : ModuleBase
 
     public void Initialize()
     {
-        Recalculate();
-        ResetValues();
+        UpdateModifiers();
+        ResetModifiers();
     }
 
     private void Update()
@@ -43,16 +43,16 @@ public class ShipCoreModule : ModuleBase
         return health.CurrentValue <= 0f;
     }
 
-    public override void Recalculate()
+    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
     {
-        health.Recalculate(CurrentModifiers, true);
-        shields.Recalculate(CurrentModifiers, true);
-        shieldRegen.Recalculate(CurrentModifiers);
+        health.Recalculate(modifiers, true);
+        shields.Recalculate(modifiers, true);
+        shieldRegen.Recalculate(modifiers);
 
         OnHPShieldsChanged?.Invoke();
     }
 
-    protected override void ResetValues()
+    protected override void ResetModifiers()
     {
         health.ResetToMax();
         shields.ResetToMax();

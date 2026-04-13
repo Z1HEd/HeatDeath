@@ -15,8 +15,10 @@ public class Ship : MonoBehaviour, IHittable
     protected Rigidbody2D shipRigidbody;
     private ShipCoreModule coreModule;
     private float knockbackTimeRemaining;
+    protected bool dead;
 
     public bool IsKnockedBack => knockbackTimeRemaining > 0f;
+    public bool IsDead => dead;
 
     public virtual void Start()
     {
@@ -37,6 +39,9 @@ public class Ship : MonoBehaviour, IHittable
 
     public void Hit(IHitter hitter)
     {
+        if (dead || hitter == null)
+            return;
+
         bool isDead = coreModule.ApplyDamage(hitter.Damage);
         if (isDead)
             Die();
@@ -44,6 +49,9 @@ public class Ship : MonoBehaviour, IHittable
 
     public void ApplyKnockback(IHitter hitter, Collision2D collision)
     {
+        if (dead)
+            return;
+
         if (shipRigidbody == null || hitter.KnockbackPower <= 0f)
             return;
 
@@ -70,6 +78,10 @@ public class Ship : MonoBehaviour, IHittable
 
     public virtual void Die()
     {
+        if (dead)
+            return;
+
+        dead = true;
         OnDeath?.Invoke();
         Destroy(gameObject);
     }

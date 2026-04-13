@@ -61,13 +61,13 @@ public class ThrusterModule : MovementModule
         targetPosition = newTarget;
     }
 
-    public override void Recalculate()
+    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
     {
-        thrust.Recalculate(CurrentModifiers);
-        maxSpeed.Recalculate(CurrentModifiers);
+        thrust.Recalculate(modifiers);
+        maxSpeed.Recalculate(modifiers);
     }
 
-    protected override void ResetValues()
+    protected override void ResetModifiers()
     {
         thrust.ResetToBase();
         maxSpeed.ResetToBase();
