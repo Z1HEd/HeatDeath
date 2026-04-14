@@ -11,7 +11,7 @@ __# Heat Death To-Do List __
 - ✅Add levels and scraps mechanics
 - ✅Add basic enemy spawning
 - ✅Add per-module upgrades (stackable and unique, different rarities), pause to choose
-- Fill the basic upgrade data, double check upgrade system, polish
+- ✅Fill the basic upgrade data, double check upgrade system, polish
 
 - Add more gun modules:
 - - Missile
