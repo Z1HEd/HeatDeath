@@ -15,11 +15,11 @@ MonoBehaviour:
   displayName: Battle Ram
   key: upgrade.ramming.damage
   description: Ramming damage +25%
+  boundModule: {fileID: 11400000, guid: e9c980f1257f55646bf5bdc16e5e7810, type: 2}
   rarity: 0
   maxStacks: 4
   modifiers:
-  - stat: {fileID: 11400000, guid: 72ff628d0e6954549b42855860283ce1, type: 2}
+  - stat: 6
     operation: 1
     value: 25
-    targetTags:
-    - {fileID: 11400000, guid: 470584dae2cc13f4ba33db33bf5eec71, type: 2}
+    targetTags: []

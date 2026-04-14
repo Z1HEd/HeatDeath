@@ -16,7 +16,7 @@ MonoBehaviour:
   key: 
   description: +2 bullets per shot
   boundModule: {fileID: 11400000, guid: 10b237f597433b6429d00f65eefac757, type: 2}
-  rarity: 1
+  rarity: 0
   maxStacks: 1
   modifiers:
   - stat: 12

@@ -15,16 +15,15 @@ MonoBehaviour:
   displayName: Shield power
   key: upgrade.shipcore.shieldpower
   description: Maximum shield capacity +20%, Shield regen +1/sec
+  boundModule: {fileID: 11400000, guid: f4b1836a0ae68c6498413a6f2ec0caef, type: 2}
   rarity: 1
   maxStacks: 5
   modifiers:
-  - stat: {fileID: 11400000, guid: c7d1ee33eba4b32488ac0f181b6072c9, type: 2}
+  - stat: 2
     operation: 1
     value: 20
-    targetTags:
-    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
-  - stat: {fileID: 11400000, guid: b8ebdcc2aeb4f314c97c23fc017ed762, type: 2}
+    targetTags: []
+  - stat: 3
     operation: 0
     value: 1
-    targetTags:
-    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
+    targetTags: []

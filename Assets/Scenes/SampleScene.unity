@@ -799,6 +799,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1281153770697153149, guid: 8f80a7030b3d70745b6e93d8701f2f3f, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 512
+      objectReference: {fileID: 0}
     - target: {fileID: 2971715066136385992, guid: 8f80a7030b3d70745b6e93d8701f2f3f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -838,6 +842,22 @@ PrefabInstance:
     - target: {fileID: 2971715066136385992, guid: 8f80a7030b3d70745b6e93d8701f2f3f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3244822507373702589, guid: 8f80a7030b3d70745b6e93d8701f2f3f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3244822507373702589, guid: 8f80a7030b3d70745b6e93d8701f2f3f, type: 3}
+      propertyPath: range.baseValue
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3244822507373702589, guid: 8f80a7030b3d70745b6e93d8701f2f3f, type: 3}
+      propertyPath: projectileSpeed.baseValue
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3244822507373702589, guid: 8f80a7030b3d70745b6e93d8701f2f3f, type: 3}
+      propertyPath: projectileSpread.baseValue
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 3575443304599885754, guid: 8f80a7030b3d70745b6e93d8701f2f3f, type: 3}
       propertyPath: m_Name
