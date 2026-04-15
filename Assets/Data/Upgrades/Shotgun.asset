@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Shotgun
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeDefinition
   displayName: Shotgun Upgrade
-  key: 
+  key: upgrade.shotgun.bulletcount
   description: +2 bullets per shot
   boundModule: {fileID: 11400000, guid: 10b237f597433b6429d00f65eefac757, type: 2}
   rarity: 0
-  maxStacks: 1
+  maxStacks: 3
   modifiers:
   - stat: 12
     operation: 0
