@@ -23,17 +23,20 @@ __# Heat Death To-Do List __
 - Add more general modules:
 - - TODO: Make up more general modules
 
+- Add 3 base ships to choose from
+
 - Add new weapons and new modules obtaining at certain levels
 - Make weapon modules display properly on the ship module
 
-- Add more enemies:
-- - Basic AI, cannon weapon
-- - Basic AI, ramming weapon
-- 
-
 - Update enemy spawning system
+- Add enemy locations:
+- - Outer Belt
+- - Aegis Sector
+- - Hive Drift
+- - Iron Reach
+- - Storm Verge
 
-- Add 3 base ships to choose from
+
 
 - Add more upgrades
 - Weapon evolution system
