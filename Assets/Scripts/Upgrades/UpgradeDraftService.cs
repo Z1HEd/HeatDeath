@@ -23,7 +23,7 @@ public class UpgradeDraftService
         random = seed.HasValue ? new System.Random(seed.Value) : new System.Random();
     }
 
-    public List<UpgradeDefinition> BuildDraftOptions(Player player, int optionCount)
+    public List<UpgradeDefinition> BuildUpgradeDraftOptions(Player player, int optionCount)
     {
         var result = new List<UpgradeDefinition>();
         if (database == null || player == null || optionCount <= 0)

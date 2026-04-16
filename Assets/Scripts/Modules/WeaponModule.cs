@@ -4,7 +4,7 @@ using System.Collections.Generic;
 [RequireComponent(typeof(Ship))]
 public abstract class WeaponModule : ModuleBase
 {
-    [SerializeField] protected ScalarStat fireRate = new ScalarStat(1f, 0.0001f);
+    [SerializeField] protected ScalarStat fireRate = new ScalarStat(StatType.FireRate, 1f, 0.0001f);
     protected float lastFireTime;
 
     protected int DetectLayer { get; private set; }

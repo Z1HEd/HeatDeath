@@ -15,7 +15,12 @@ public class GameUIController : MonoBehaviour
     private ShipCoreModule playerCoreModule;
     private Player player;
     private UpgradeManager upgradeManager;
-    private UpgradeDraftService draftService;
+    private UpgradeDraftService upgradeDraftService;
+    private WeaponDraftService weaponDraftService;
+
+    private List<WeaponDefinition> weaponDefinitions = new List<WeaponDefinition>();
+    private readonly HashSet<string> ownedWeaponKeys = new HashSet<string>();
+    private List<WeaponDefinition> currentWeaponOptions = new List<WeaponDefinition>();
 
     private VisualElement healthFill;
     private VisualElement shieldFill;
@@ -29,7 +34,8 @@ public class GameUIController : MonoBehaviour
     private Button[] optionButtons;
     private Action[] optionHandlers;
 
-    private int pendingDraftPicks;
+    private int pendingUpgradeDrafts;
+    private int pendingWeaponDrafts;
     private List<UpgradeDefinition> currentOptions = new List<UpgradeDefinition>();
 
     private void OnEnable()
@@ -72,7 +78,10 @@ public class GameUIController : MonoBehaviour
         upgradeManager = playerObject.GetComponent<UpgradeManager>();
 
         if (upgradeDatabase != null)
-            draftService = new UpgradeDraftService(upgradeDatabase);
+            upgradeDraftService = new UpgradeDraftService(upgradeDatabase);
+
+        weaponDraftService = new WeaponDraftService();
+        weaponDefinitions = weaponDraftService.LoadDefinitions();
 
         if (playerCoreModule == null) return;
         
@@ -84,6 +93,13 @@ public class GameUIController : MonoBehaviour
         UpdateBars();
         UpdateXPBar();
         UpdateLevelText(0);
+
+        if (GameController.Instance.IsWeaponDraftLevel())
+        {
+            Time.timeScale = 0f;
+            pendingWeaponDrafts++;
+            ShowNextDraftOrResume();
+        }
     }
 
     private void OnDisable()
@@ -156,37 +172,84 @@ public class GameUIController : MonoBehaviour
         if (levelsGained <= 0)
             return;
 
-        if (player == null || upgradeManager == null || draftService == null)
+        if (player == null || upgradeManager == null || upgradeDraftService == null)
         {
             GameController.Instance.Resume();
             return;
         }
 
-        pendingDraftPicks = levelsGained;
+        QueueDraftPicks(levelsGained);
         ShowNextDraftOrResume();
     }
 
     private void ShowNextDraftOrResume()
     {
-        if (pendingDraftPicks <= 0)
+        if (pendingUpgradeDrafts <= 0 && pendingWeaponDrafts <= 0)
         {
             SetUpgradeOverlayVisible(false);
             GameController.Instance.Resume();
             return;
         }
 
-        currentOptions = draftService.BuildDraftOptions(player, 3);
+        if (pendingWeaponDrafts > 0)
+            ShowWeaponDraft();
+        else
+            ShowUpgradeDraft();
+    }
+
+    private void ShowWeaponDraft()
+    {
+        currentWeaponOptions = weaponDraftService.GetDraftOptions(weaponDefinitions, ownedWeaponKeys, 3);
+
+        if (currentWeaponOptions.Count == 0)
+        {
+            pendingWeaponDrafts--;
+            ShowNextDraftOrResume();
+            return;
+        }
+
+        string header = pendingWeaponDrafts > 1
+            ? $"Choose Weapon ({pendingWeaponDrafts} picks remaining)"
+            : "Choose Weapon";
+
+        PopulateDraftButtons(header, currentWeaponOptions.Count,
+            i =>
+            {
+                WeaponDefinition def = currentWeaponOptions[i];
+                ClearRarityClasses(optionButtons[i]);
+                optionButtons[i].text = $"{def.DisplayName}\n{def.Description}";
+            });
+    }
+
+    private void ShowUpgradeDraft()
+    {
+        currentOptions = upgradeDraftService.GetDraftOptions(player, 3);
         if (currentOptions.Count == 0)
         {
-            pendingDraftPicks = 0;
+            pendingUpgradeDrafts = 0;
             SetUpgradeOverlayVisible(false);
             GameController.Instance.Resume();
             return;
         }
 
+        string header = pendingUpgradeDrafts > 1
+            ? $"Choose Upgrade ({pendingUpgradeDrafts} picks remaining)"
+            : "Choose Upgrade";
+
+        PopulateDraftButtons(header, currentOptions.Count,
+            i =>
+            {
+                UpgradeDefinition opt = currentOptions[i];
+                ApplyRarityClass(optionButtons[i], opt.Rarity);
+                optionButtons[i].text = $"[{opt.Rarity}] {opt.DisplayName}\n{opt.Description}";
+            });
+    }
+
+    private void PopulateDraftButtons(string header, int activeCount, System.Action<int> configureButton)
+    {
         SetUpgradeOverlayVisible(true);
         if (upgradeHeader != null)
-            upgradeHeader.text = pendingDraftPicks > 1 ? $"Choose Upgrade ({pendingDraftPicks} picks remaining)" : "Choose Upgrade";
+            upgradeHeader.text = header;
 
         for (int i = 0; i < optionButtons.Length; i++)
         {
@@ -194,13 +257,11 @@ public class GameUIController : MonoBehaviour
             if (button == null)
                 continue;
 
-            if (i < currentOptions.Count)
+            if (i < activeCount)
             {
-                UpgradeDefinition option = currentOptions[i];
                 button.style.display = DisplayStyle.Flex;
                 button.SetEnabled(true);
-                ApplyRarityClass(button, option.Rarity);
-                button.text = $"[{option.Rarity}] {option.DisplayName}\n{option.Description}";
+                configureButton(i);
             }
             else
             {
@@ -213,14 +274,39 @@ public class GameUIController : MonoBehaviour
 
     private void OnUpgradeOptionClicked(int index)
     {
-        if (index < 0 || index >= currentOptions.Count)
-            return;
+        if (pendingWeaponDrafts > 0)
+        {
+            if (index < 0 || index >= currentWeaponOptions.Count)
+                return;
 
-        UpgradeDefinition selected = currentOptions[index];
-        upgradeManager.AddUpgrade(selected);
+            // Weapon grant will be wired in Phase 4; ownership recorded here.
+            ownedWeaponKeys.Add(currentWeaponOptions[index].Key);
+            pendingWeaponDrafts--;
+        }
+        else
+        {
+            if (index < 0 || index >= currentOptions.Count)
+                return;
 
-        pendingDraftPicks--;
+            upgradeManager.AddUpgrade(currentOptions[index]);
+            pendingUpgradeDrafts--;
+        }
+
         ShowNextDraftOrResume();
+    }
+
+    private void QueueDraftPicks(int levelsGained)
+    {
+        int currentLevel = GameController.Instance.CurrentLevel;
+        int firstGainedLevel = currentLevel - levelsGained + 1;
+
+        for (int level = firstGainedLevel; level <= currentLevel; level++)
+        {
+            if (GameController.Instance.IsWeaponDraftLevel(level))
+                pendingWeaponDrafts++;
+            else
+                pendingUpgradeDrafts++;
+        }
     }
 
     private void SetUpgradeOverlayVisible(bool visible)

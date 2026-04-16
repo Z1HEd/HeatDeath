@@ -7,12 +7,13 @@ public enum StatType
 	Thrust = 4,
 	MaxSpeed = 5,
 	Damage = 6,
-	KnockbackPower = 7,
+	Knockback = 7,
 	FireRate = 8,
 	ProjectileSpeed = 9,
 	ProjectileDamage = 10,
 	ProjectileKnockback = 11,
 	ProjectileCount = 12,
 	Range = 13,
-	ProjectileSpread = 14
+	ProjectileSpread = 14,
+	CanAim = 15
 }

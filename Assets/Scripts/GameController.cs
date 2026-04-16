@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 public class GameController : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class GameController : MonoBehaviour
     private int currentLevel = 1;
     [SerializeField]
     private float currentXP = 0f;
+    [SerializeField]
+    private List<int> weaponDraftLevels = new List<int> { 1, 10, 20, 40 };
     [SerializeField]
     private GameObject gameUIPrefab;
     
@@ -20,6 +23,19 @@ public class GameController : MonoBehaviour
 
     public float XPRequiredForNextLevel => CalculateXPRequiredForLevel(currentLevel + 1);
     public float CurrentLevelProgress => currentXP / XPRequiredForNextLevel;
+
+    public bool IsWeaponDraftLevel()
+    {
+        return IsWeaponDraftLevel(currentLevel);
+    }
+
+    public bool IsWeaponDraftLevel(int level)
+    {
+        if (level <= 0 || weaponDraftLevels == null || weaponDraftLevels.Count == 0)
+            return false;
+
+        return weaponDraftLevels.Contains(level);
+    }
 
     private void Awake()
     {
