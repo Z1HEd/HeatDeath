@@ -5,13 +5,13 @@ public class ProjectileModule : WeaponModule
 {
     [SerializeField] protected Projectile projectilePrefab;
     [SerializeField] protected Transform firePoint;
-    [SerializeField] protected ScalarStat projectileSpeed = new ScalarStat(20f, 0f);
-    [SerializeField] protected ScalarStat projectileDamage = new ScalarStat(10f, 0f);
-    [SerializeField] protected ScalarStat projectileKnockback = new ScalarStat(0f, 0f);
-    [SerializeField] protected ScalarStat projectileCount = new ScalarStat(1f, 1f);
-    [SerializeField] protected ScalarStat projectileSpread = new ScalarStat(0f, 0f);
-    [SerializeField] protected ScalarStat range = new ScalarStat(15f, 0f);
-
+    [SerializeField] protected ScalarStat projectileSpeed = new ScalarStat(StatType.ProjectileSpeed, 20f, 0f);
+    [SerializeField] protected ScalarStat projectileDamage = new ScalarStat(StatType.ProjectileDamage, 10f, 0f);
+    [SerializeField] protected ScalarStat projectileKnockback = new ScalarStat(StatType.ProjectileKnockback, 0f, 0f);
+    [SerializeField] protected ScalarStat projectileCount = new ScalarStat(StatType.ProjectileCount, 1f, 1f);
+    [SerializeField] protected ScalarStat projectileSpread = new ScalarStat(StatType.ProjectileSpread, 0f, 0f);
+    [SerializeField] protected ScalarStat range = new ScalarStat(StatType.Range, 15f, 0f);
+    [SerializeField] protected BoolStat canAim = new BoolStat(StatType.CanAim, true);
     private RangeDetector rangeDetector;
     private Ship currentTarget;
 
@@ -71,21 +71,20 @@ public class ProjectileModule : WeaponModule
     protected override void Fire()
     {
         base.Fire();
-        SpawnProjectiles(currentTarget);
+        Vector3 spawnPosition = firePoint != null ? firePoint.position : transform.position;
+        Vector3 aimDirection = canAim
+            ? (currentTarget.transform.position - spawnPosition).normalized
+            : (firePoint != null ? firePoint.up : transform.up);
+        SpawnProjectiles(spawnPosition, aimDirection);
     }
 
-    private void SpawnProjectiles(Ship target)
+    private void SpawnProjectiles(Vector3 spawnPosition, Vector3 aimDirection)
     {
         if (projectilePrefab == null)
         {
             Debug.LogWarning("Projectile prefab not assigned on " + gameObject.name);
             return;
         }
-
-        Vector3 spawnPosition = firePoint != null ? firePoint.position : transform.position;
-        Vector3 aimDirection = target != null
-            ? (target.transform.position - spawnPosition).normalized
-            : (firePoint != null ? firePoint.right : transform.right);
 
         int count = Mathf.Max(1, Mathf.FloorToInt(projectileCount));
         float spreadDegrees = Mathf.Max(0f, projectileSpread);
@@ -119,6 +118,7 @@ public class ProjectileModule : WeaponModule
         projectileCount.Recalculate(modifiers);
         projectileSpread.Recalculate(modifiers);
         range.Recalculate(modifiers);
+        canAim.Recalculate(modifiers);
 
         if (rangeDetector != null)
             rangeDetector.Initialize(range);

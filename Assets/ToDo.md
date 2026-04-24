@@ -13,20 +13,20 @@ __# Heat Death To-Do List __
 - ✅Add per-module upgrades (stackable and unique, different rarities), pause to choose
 - ✅Fill the basic upgrade data, double check upgrade system, polish
 
+- Weapon Draft system
 - Add more gun modules:
 - - Missile
 - - Railgun
 - - Laser
 - - Tesla
 - - Mines
+- Make weapon modules display properly on the ship module
 
+- General module draft system
 - Add more general modules:
-- - TODO: Make up more general modules
+- - TODO: Transfer general modules from docs here
 
 - Add 3 base ships to choose from
-
-- Add new weapons and new modules obtaining at certain levels
-- Make weapon modules display properly on the ship module
 
 - Update enemy spawning system
 - Add enemy locations:
@@ -36,12 +36,9 @@ __# Heat Death To-Do List __
 - - Iron Reach
 - - Storm Verge
 
-
-
 - Add more upgrades
 - Weapon evolution system
 
-- Work on game flow: certain stages for each level, enemy spawn patterns
 - Basic pause menu
 - Basic main menu
 - Saving and continuing runs

@@ -6,9 +6,9 @@ using System.Collections.Generic;
 public class ShipCoreModule : ModuleBase
 {
     [Header("Base Core Stats")]
-    [SerializeField] private ResourceStat health = new ResourceStat(100f, 1f);
-    [SerializeField] private ResourceStat shields = new ResourceStat(100f, 0f);
-    [SerializeField] private ScalarStat shieldRegen = new ScalarStat(2f, 0f);
+    [SerializeField] private ResourceStat health = new ResourceStat(StatType.Health, 100f, 1f);
+    [SerializeField] private ResourceStat shields = new ResourceStat(StatType.Shields, 100f, 0f);
+    [SerializeField] private ScalarStat shieldRegen = new ScalarStat(StatType.ShieldRegen, 2f, 0f);
 
     public event Action OnHPShieldsChanged;
 
@@ -54,8 +54,5 @@ public class ShipCoreModule : ModuleBase
 
     protected override void ResetModifiers()
     {
-        health.ResetToMax();
-        shields.ResetToMax();
-        OnHPShieldsChanged?.Invoke();
     }
 }
