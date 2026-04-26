@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 8f3696386b8736c4da0a38f7ef67b814
+guid: 5336abb35a9ae324783b32fd03ace7f1
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -116,10 +116,10 @@ TextureImporter:
       name: Scout_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 64
-        height: 64
+        x: 10
+        y: 3
+        width: 44
+        height: 61
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
