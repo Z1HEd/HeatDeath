@@ -19,7 +19,6 @@ GameObject:
   - component: {fileID: 8031382927778479037}
   - component: {fileID: 4831795120304215577}
   - component: {fileID: 4872993711872551110}
-  - component: {fileID: 3244822507373702589}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -285,47 +284,4 @@ MonoBehaviour:
   shieldRegen:
     type: 3
     baseValue: 2
-    minValue: 0
---- !u!114 &3244822507373702589
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3575443304599885754}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c743f8faaee6ec40b59bee7f55a932e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectileModule
-  moduleDefinition: {fileID: 11400000, guid: 10b237f597433b6429d00f65eefac757, type: 2}
-  fireRate:
-    type: 8
-    baseValue: 1
-    minValue: 0.0001
-  projectilePrefab: {fileID: 8872413515496322224, guid: 32fde49ac5ad8ea49a2d1db61f4fb5d4, type: 3}
-  firePoint: {fileID: 0}
-  projectileSpeed:
-    type: 9
-    baseValue: 20
-    minValue: 0
-  projectileDamage:
-    type: 10
-    baseValue: 5
-    minValue: 0
-  projectileKnockback:
-    type: 7
-    baseValue: 0
-    minValue: 0
-  projectileCount:
-    type: 12
-    baseValue: 5
-    minValue: 1
-  projectileSpread:
-    type: 14
-    baseValue: 5
-    minValue: 0
-  range:
-    type: 13
-    baseValue: 10
     minValue: 0

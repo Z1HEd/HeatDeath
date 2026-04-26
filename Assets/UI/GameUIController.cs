@@ -10,7 +10,6 @@ public class GameUIController : MonoBehaviour
     private const string RarityClassEpic = "upgrade-option-epic";
     private const string RarityClassLegendary = "upgrade-option-legendary";
     [SerializeField] private UIDocument uiDocument;
-    [SerializeField] private UpgradeDatabase upgradeDatabase;
     
     private ShipCoreModule playerCoreModule;
     private Player player;
@@ -18,8 +17,6 @@ public class GameUIController : MonoBehaviour
     private UpgradeDraftService upgradeDraftService;
     private WeaponDraftService weaponDraftService;
 
-    private List<WeaponDefinition> weaponDefinitions = new List<WeaponDefinition>();
-    private readonly HashSet<string> ownedWeaponKeys = new HashSet<string>();
     private List<WeaponDefinition> currentWeaponOptions = new List<WeaponDefinition>();
 
     private VisualElement healthFill;
@@ -30,6 +27,7 @@ public class GameUIController : MonoBehaviour
     private Label xpText;
     private Label levelText;
     private VisualElement upgradeOverlay;
+    private VisualElement upgradePanel;
     private Label upgradeHeader;
     private Button[] optionButtons;
     private Action[] optionHandlers;
@@ -52,6 +50,7 @@ public class GameUIController : MonoBehaviour
         xpText = root.Q<Label>("XPText");
         levelText = root.Q<Label>("LevelText");
         upgradeOverlay = root.Q<VisualElement>("UpgradeOverlay");
+        upgradePanel = root.Q<VisualElement>("UpgradePanel");
         upgradeHeader = root.Q<Label>("UpgradeHeader");
         optionButtons = new[]
         {
@@ -77,11 +76,8 @@ public class GameUIController : MonoBehaviour
         playerCoreModule = playerObject.GetComponent<ShipCoreModule>();
         upgradeManager = playerObject.GetComponent<UpgradeManager>();
 
-        if (upgradeDatabase != null)
-            upgradeDraftService = new UpgradeDraftService(upgradeDatabase);
-
+        upgradeDraftService = new UpgradeDraftService();
         weaponDraftService = new WeaponDraftService();
-        weaponDefinitions = weaponDraftService.LoadDefinitions();
 
         if (playerCoreModule == null) return;
         
@@ -172,7 +168,7 @@ public class GameUIController : MonoBehaviour
         if (levelsGained <= 0)
             return;
 
-        if (player == null || upgradeManager == null || upgradeDraftService == null)
+        if (player == null)
         {
             GameController.Instance.Resume();
             return;
@@ -199,7 +195,8 @@ public class GameUIController : MonoBehaviour
 
     private void ShowWeaponDraft()
     {
-        currentWeaponOptions = weaponDraftService.GetDraftOptions(weaponDefinitions, ownedWeaponKeys, 3);
+        upgradePanel?.AddToClassList("weapon-draft-active");
+        currentWeaponOptions = weaponDraftService.GetDraftOptions(player, 3);
 
         if (currentWeaponOptions.Count == 0)
         {
@@ -223,6 +220,7 @@ public class GameUIController : MonoBehaviour
 
     private void ShowUpgradeDraft()
     {
+        upgradePanel?.RemoveFromClassList("weapon-draft-active");
         currentOptions = upgradeDraftService.GetDraftOptions(player, 3);
         if (currentOptions.Count == 0)
         {
@@ -279,8 +277,7 @@ public class GameUIController : MonoBehaviour
             if (index < 0 || index >= currentWeaponOptions.Count)
                 return;
 
-            // Weapon grant will be wired in Phase 4; ownership recorded here.
-            ownedWeaponKeys.Add(currentWeaponOptions[index].Key);
+            player.moduleManager.AddWeapon(currentWeaponOptions[index]);
             pendingWeaponDrafts--;
         }
         else

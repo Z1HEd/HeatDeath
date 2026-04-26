@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.Serialization;
 
-[RequireComponent(typeof(Ship))]
 public abstract class ModuleBase: MonoBehaviour
 {
     [SerializeField] private ModuleDefinition moduleDefinition;

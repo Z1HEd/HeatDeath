@@ -14,19 +14,28 @@ public class UpgradeDraftService
             { UpgradeRarity.Legendary, new[] { UpgradeRarity.Legendary, UpgradeRarity.Epic, UpgradeRarity.Rare, UpgradeRarity.Common } }
         };
 
-    private readonly UpgradeDatabase database;
+    private static readonly Dictionary<UpgradeRarity, int> RarityWeights =
+        new Dictionary<UpgradeRarity, int>
+        {
+            { UpgradeRarity.Common,    70 },
+            { UpgradeRarity.Rare,      20 },
+            { UpgradeRarity.Epic,       8 },
+            { UpgradeRarity.Legendary,  2 },
+        };
+
+    private readonly List<UpgradeDefinition> definitions;
     private readonly System.Random random;
 
-    public UpgradeDraftService(UpgradeDatabase database, int? seed = null)
+    public UpgradeDraftService(int? seed = null)
     {
-        this.database = database;
+        definitions = new List<UpgradeDefinition>(Resources.LoadAll<UpgradeDefinition>("Upgrades"));
         random = seed.HasValue ? new System.Random(seed.Value) : new System.Random();
     }
 
-    public List<UpgradeDefinition> BuildUpgradeDraftOptions(Player player, int optionCount)
+    public List<UpgradeDefinition> GetDraftOptions(Player player, int optionCount)
     {
         var result = new List<UpgradeDefinition>();
-        if (database == null || player == null || optionCount <= 0)
+        if (player == null || optionCount <= 0)
             return result;
 
         List<UpgradeDefinition> candidates = GetAvailableUpgrades(player);
@@ -53,41 +62,36 @@ public class UpgradeDraftService
     public List<UpgradeDefinition> GetAvailableUpgrades(Player player)
     {
         var result = new List<UpgradeDefinition>();
-        if (database == null || player == null)
+        if (player == null)
             return result;
 
-        ModuleManager moduleManager = player.moduleManager;
-        UpgradeManager upgradeManager = player.GetComponent<UpgradeManager>();
-        if (moduleManager == null || upgradeManager == null)
-            return result;
-
-        HashSet<ModuleDefinition> installedModules = moduleManager.GetInstalledModuleDefinitions();
-        IReadOnlyList<UpgradeDefinition> allUpgrades = database.Upgrades;
-
-        for (int i = 0; i < allUpgrades.Count; i++)
+        for (int i = 0; i < definitions.Count; i++)
         {
-            UpgradeDefinition upgrade = allUpgrades[i];
-            if (IsEligibleForDraft(upgrade, installedModules, upgradeManager))
+            UpgradeDefinition upgrade = definitions[i];
+            if (IsEligibleForDraft(upgrade, player))
                 result.Add(upgrade);
         }
 
         return result;
     }
 
-    private static bool IsEligibleForDraft(
-        UpgradeDefinition upgrade,
-        IReadOnlyCollection<ModuleDefinition> installedModules,
-        UpgradeManager upgradeManager)
+    private static bool IsEligibleForDraft(UpgradeDefinition upgrade, Player player)
     {
-        if (upgrade == null || upgradeManager == null)
+        if (upgrade == null || player == null)
+            return false;
+
+        ModuleManager moduleManager = player.moduleManager;
+        UpgradeManager upgradeManager = player.GetComponent<UpgradeManager>();
+
+        if (moduleManager == null || upgradeManager == null)
             return false;
 
         if (!upgradeManager.CanAddUpgrade(upgrade))
             return false;
-        
+
         return upgrade.BoundModule != null
-            ? installedModules != null && installedModules.Contains(upgrade.BoundModule)
-            : IsApplicableToAnyInstalledModule(upgrade, installedModules);
+            ? moduleManager.HasModule(upgrade.BoundModule)
+            : IsApplicableToAnyInstalledModule(upgrade, moduleManager);
     }
 
     public bool HasAnyAvailableUpgradeForModule(ModuleDefinition moduleDefinition, Player player)
@@ -109,9 +113,13 @@ public class UpgradeDraftService
         return false;
     }
 
-    private static bool IsApplicableToAnyInstalledModule(UpgradeDefinition upgrade, IReadOnlyCollection<ModuleDefinition> installedModules)
+    private static bool IsApplicableToAnyInstalledModule(UpgradeDefinition upgrade, ModuleManager moduleManager)
     {
-        if (upgrade == null || installedModules == null || installedModules.Count == 0)
+        if (upgrade == null || moduleManager == null)
+            return false;
+
+        HashSet<ModuleDefinition> installedModules = moduleManager.GetInstalledModuleDefinitions();
+        if (installedModules.Count == 0)
             return false;
 
         IReadOnlyList<StatModifier> effects = upgrade.Modifiers;
@@ -180,23 +188,20 @@ public class UpgradeDraftService
 
     private UpgradeRarity RollRarity()
     {
-        int common = Mathf.Max(0, database.GetRarityWeight(UpgradeRarity.Common));
-        int rare = Mathf.Max(0, database.GetRarityWeight(UpgradeRarity.Rare));
-        int epic = Mathf.Max(0, database.GetRarityWeight(UpgradeRarity.Epic));
-        int legendary = Mathf.Max(0, database.GetRarityWeight(UpgradeRarity.Legendary));
-
-        int total = common + rare + epic + legendary;
+        int total = RarityWeights[UpgradeRarity.Common]
+                  + RarityWeights[UpgradeRarity.Rare]
+                  + RarityWeights[UpgradeRarity.Epic]
+                  + RarityWeights[UpgradeRarity.Legendary];
         if (total <= 0)
             return UpgradeRarity.Common;
 
         int roll = random.Next(total);
-        if (roll < common)
-            return UpgradeRarity.Common;
-        if (roll < common + rare)
-            return UpgradeRarity.Rare;
-        if (roll < common + rare + epic)
-            return UpgradeRarity.Epic;
-
+        int common = RarityWeights[UpgradeRarity.Common];
+        int rare   = RarityWeights[UpgradeRarity.Rare];
+        int epic   = RarityWeights[UpgradeRarity.Epic];
+        if (roll < common)               return UpgradeRarity.Common;
+        if (roll < common + rare)        return UpgradeRarity.Rare;
+        if (roll < common + rare + epic) return UpgradeRarity.Epic;
         return UpgradeRarity.Legendary;
     }
 

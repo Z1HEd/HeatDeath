@@ -3,36 +3,29 @@ using UnityEngine;
 
 public class WeaponDraftService
 {
-    public const string DefaultResourcesPath = "Weapons";
-
-    private readonly string resourcesPath;
+    private readonly List<WeaponDefinition> definitions;
     private readonly System.Random random;
 
-    public WeaponDraftService(string resourcesPath = DefaultResourcesPath, int? seed = null)
+    public WeaponDraftService(int? seed = null)
     {
-        this.resourcesPath = string.IsNullOrWhiteSpace(resourcesPath) ? DefaultResourcesPath : resourcesPath;
+        definitions = new List<WeaponDefinition>(Resources.LoadAll<WeaponDefinition>("Weapons"));
         random = seed.HasValue ? new System.Random(seed.Value) : new System.Random();
     }
 
-    // Loads all authored WeaponDefinition assets from Resources/<path>.
-    public List<WeaponDefinition> LoadDefinitions()
-    {
-        WeaponDefinition[] assets = Resources.LoadAll<WeaponDefinition>(resourcesPath);
-        return new List<WeaponDefinition>(assets);
-    }
-
-    // Returns up to optionCount random unowned weapons from the provided catalog.
-    public List<WeaponDefinition> GetDraftOptions(List<WeaponDefinition> allDefinitions, ISet<string> ownedKeys, int optionCount)
+    // Returns up to optionCount random uninstalled weapons.
+    public List<WeaponDefinition> GetDraftOptions(Player player, int optionCount)
     {
         var result = new List<WeaponDefinition>();
-        if (allDefinitions == null || optionCount <= 0)
+        if (player == null || optionCount <= 0)
             return result;
 
+        ModuleManager moduleManager = player.GetComponent<ModuleManager>();
+
         var candidates = new List<WeaponDefinition>();
-        for (int i = 0; i < allDefinitions.Count; i++)
+        for (int i = 0; i < definitions.Count; i++)
         {
-            WeaponDefinition def = allDefinitions[i];
-            if (def != null && (ownedKeys == null || !ownedKeys.Contains(def.Key)))
+            WeaponDefinition def = definitions[i];
+            if (def != null && (moduleManager == null || !moduleManager.HasModule(def)))
                 candidates.Add(def);
         }
 

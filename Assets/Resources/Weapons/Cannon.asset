@@ -9,12 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03ce558eff3159a49ab96066d0a3bbe8, type: 3}
+  m_Script: {fileID: 11500000, guid: aabadc3267214e8449991ba47860fc9a, type: 3}
   m_Name: Cannon
-  m_EditorClassIdentifier: Assembly-CSharp::UpgradeModuleDefinition
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
   displayName: Cannon
   componentTypeName: ProjectileModule
   tags:
   - {fileID: 11400000, guid: 28af73c3530ab0548974d85091f934b0, type: 2}
   - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
   - {fileID: 11400000, guid: e7f46ea9b622afa45bbdae890f8c5508, type: 2}
+  key: weapon.cannon
+  description: A simple cannon. Fires single projectiles.
+  weaponPrefab: {fileID: 0}

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,9 @@ public class ModuleManager : MonoBehaviour
 {
     protected Ship ship;
     private List<ModuleBase> modules = new List<ModuleBase>();
+
+    public List<MovementModule> MovementModules => GetModules<MovementModule>();
+    public List<WeaponModule> WeaponModules => GetModules<WeaponModule>();
 
     public void Start()
     {
@@ -59,6 +63,29 @@ public class ModuleManager : MonoBehaviour
         return result;
     }
 
-    // Backward compatibility: expose movement modules through generic accessor
-    public List<MovementModule> MovementModules => GetModules<MovementModule>();
+    public bool HasModule(ModuleDefinition definition)
+    {
+        if (definition == null) return false;
+        foreach (var module in modules)
+        {
+            if (module != null && module.ModuleDefinition == definition)
+                return true;
+        }
+        return false;
+    }
+
+    public void AddWeapon(WeaponDefinition definition)
+    {
+        if (definition == null || definition.WeaponPrefab == null)
+            return;
+
+        Instantiate(definition.WeaponPrefab, transform);
+        StartCoroutine(RecalculateAfterFrame());
+    }
+
+    private IEnumerator RecalculateAfterFrame()
+    {
+        yield return null;
+        GetComponent<UpgradeManager>()?.RecalculateAllModules();
+    }
 }

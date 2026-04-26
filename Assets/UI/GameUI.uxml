@@ -13,7 +13,7 @@
 
         <ui:VisualElement name="PlayableArea" class="playable-area">
             <ui:VisualElement name="UpgradeOverlay" class="upgrade-overlay">
-                <ui:VisualElement class="upgrade-panel">
+                <ui:VisualElement name="UpgradePanel" class="upgrade-panel">
                     <ui:Label name="UpgradeHeader" text="Choose Upgrade" class="upgrade-header"/>
                     <ui:Button name="UpgradeOption1" class="upgrade-option" text="Option 1"/>
                     <ui:Button name="UpgradeOption2" class="upgrade-option" text="Option 2"/>
