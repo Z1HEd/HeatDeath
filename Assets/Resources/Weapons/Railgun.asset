@@ -12,9 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aabadc3267214e8449991ba47860fc9a, type: 3}
   m_Name: Railgun
   m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
-  displayName: 
-  componentTypeName: 
-  tags: []
-  key: 
-  description: 
+  displayName: Railgun
+  componentTypeName: ProjectileModule
+  tags:
+  - {fileID: 11400000, guid: 65c0da86c909fd34d9e0f9b5856da51d, type: 2}
+  - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
+  - {fileID: 11400000, guid: e7f46ea9b622afa45bbdae890f8c5508, type: 2}
+  key: weapon.railgun
+  description: Long - ranged weapon with high damage and slow fire rate. Can only
+    fire forward.
   weaponPrefab: {fileID: 0}

@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
 
-public abstract class ControlModule : ModuleBase
+public abstract class ControlBehaviour : MonoBehaviour
 {
-    protected override void ResetModifiers()
-    {
-    }
+    protected Ship ship;
 
-    protected override void ApplyModifiers(System.Collections.Generic.IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
+    protected virtual void Start()
     {
+        ship = GetComponent<Ship>();
     }
 
     public Vector3 ClampPositionToCameraBounds(Vector3 targetPosition)

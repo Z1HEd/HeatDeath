@@ -10,17 +10,26 @@ public class RangeDetector : MonoBehaviour
 
     public System.Action<Ship> OnShipExitedRange;
 
+    private void OnValidate()
+    {
+        var col = GetComponent<CircleCollider2D>();
+        if (col != null)
+            col.radius = range;
+    }
+
     public void Initialize(float range)
     {
-        this.range = range;
-
         circleCollider = GetComponent<CircleCollider2D>();
-        if (circleCollider == null)
-            circleCollider = gameObject.AddComponent<CircleCollider2D>();
-
         circleCollider.isTrigger = true;
-        circleCollider.radius = range;
         circleCollider.offset = Vector2.zero;
+        SetRadius(range);
+    }
+
+    public void SetRadius(float newRange)
+    {
+        range = newRange;
+        if (circleCollider != null)
+            circleCollider.radius = newRange;
     }
 
     public Ship GetClosestTarget(Transform origin)

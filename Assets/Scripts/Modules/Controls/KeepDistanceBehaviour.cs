@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-public class KeepDistanceModule : ControlModule
+public class KeepDistanceBehaviour : ControlBehaviour
 {
     [SerializeField]
     public float distanceMin = 4;

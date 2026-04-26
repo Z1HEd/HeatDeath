@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-public class FollowPlayerModule : ControlModule
+public class FollowPlayerBehaviour : ControlBehaviour
 {
     public void FixedUpdate()
     {

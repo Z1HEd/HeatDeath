@@ -1,6 +1,5 @@
 using UnityEngine;
 
-[RequireComponent (typeof(Rigidbody2D))]
 public abstract class MovementModule : ModuleBase
 {
     [SerializeField] 
@@ -9,7 +8,7 @@ public abstract class MovementModule : ModuleBase
     protected override void Start()
     {
         base.Start();
-        body = GetComponent<Rigidbody2D>();
+        body = GetComponentInParent<Rigidbody2D>();
         targetPosition = body.position;
     }
 }

@@ -20,4 +20,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e7f46ea9b622afa45bbdae890f8c5508, type: 2}
   key: weapon.cannon
   description: A simple cannon. Fires single projectiles.
-  weaponPrefab: {fileID: 0}
+  weaponPrefab: {fileID: 2658622645487082905, guid: a76816fe86019d847abc17418de99197, type: 3}

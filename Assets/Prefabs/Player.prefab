@@ -14,11 +14,8 @@ GameObject:
   - component: {fileID: 1281153770697153149}
   - component: {fileID: 6844445723049847256}
   - component: {fileID: 805480820789729827}
-  - component: {fileID: 5230723221530341101}
   - component: {fileID: 1683226674827135924}
-  - component: {fileID: 8031382927778479037}
   - component: {fileID: 4831795120304215577}
-  - component: {fileID: 4872993711872551110}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -38,7 +35,9 @@ Transform:
   m_LocalPosition: {x: 0.33, y: -1.73, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
-  m_Children: []
+  m_Children:
+  - {fileID: 511439242627636296}
+  - {fileID: 4813805275432025384}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6868709942148159323
@@ -143,7 +142,7 @@ CircleCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -189,31 +188,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Player
   moduleManager: {fileID: 0}
   knockbackFreezeDuration: 0.15
---- !u!114 &5230723221530341101
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3575443304599885754}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: baad76691ffcccc4296979df7c28d8fe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ThrusterModule
-  moduleDefinition: {fileID: 11400000, guid: a3f144a87eb1d22449ea79a4d0b8c12b, type: 2}
-  targetPosition: {x: 0, y: 0}
-  thrust:
-    type: 4
-    baseValue: 0.3
-    minValue: 0
-  maxSpeed:
-    type: 5
-    baseValue: 6
-    minValue: 0
-  thrustScale: 100
-  stopDistance: 0.1
-  brakingSafety: 0.9
 --- !u!114 &1683226674827135924
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -226,28 +200,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b64bd05e7bc9cff448d7d04b00097bd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FollowCursorModule
-  moduleDefinition: {fileID: 0}
---- !u!114 &8031382927778479037
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3575443304599885754}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6808db0d499ea1a4785aa51656879470, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RammingModule
-  moduleDefinition: {fileID: 11400000, guid: e9c980f1257f55646bf5bdc16e5e7810, type: 2}
-  damage:
-    type: 6
-    baseValue: 10
-    minValue: 0
-  knockbackPower:
-    type: 7
-    baseValue: 1
-    minValue: 0
 --- !u!114 &4831795120304215577
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -260,13 +212,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a94a72135a43194ca707b54ae1b48e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeManager
---- !u!114 &4872993711872551110
+--- !u!1 &8025037606409431645
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4813805275432025384}
+  - component: {fileID: 7373708254843740081}
+  m_Layer: 6
+  m_Name: ShipCore
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4813805275432025384
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8025037606409431645}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2971715066136385992}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7373708254843740081
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3575443304599885754}
+  m_GameObject: {fileID: 8025037606409431645}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eede7cedb1d541847bd05d4f273563b1, type: 3}
@@ -285,3 +269,68 @@ MonoBehaviour:
     type: 3
     baseValue: 2
     minValue: 0
+  rammingDamage:
+    type: 6
+    baseValue: 15
+    minValue: 0
+  rammingKnockback:
+    type: 7
+    baseValue: 2
+    minValue: 0
+--- !u!1 &9072220823849290492
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 511439242627636296}
+  - component: {fileID: 5158010296006968373}
+  m_Layer: 6
+  m_Name: Thruster
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &511439242627636296
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9072220823849290492}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.2705, y: 0.11445999, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2971715066136385992}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5158010296006968373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9072220823849290492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baad76691ffcccc4296979df7c28d8fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ThrusterModule
+  moduleDefinition: {fileID: 11400000, guid: a3f144a87eb1d22449ea79a4d0b8c12b, type: 2}
+  targetPosition: {x: 0, y: 0}
+  thrust:
+    type: 4
+    baseValue: 0.3
+    minValue: 0
+  maxSpeed:
+    type: 5
+    baseValue: 6
+    minValue: 0
+  thrustScale: 100
+  stopDistance: 0.1
+  brakingSafety: 0.9

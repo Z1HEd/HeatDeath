@@ -3,7 +3,6 @@ using System;
 
 [RequireComponent(typeof(ModuleManager))]
 [RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(ShipCoreModule))]
 public class Ship : MonoBehaviour, IHittable
 {
     public Action OnDeath;
@@ -19,14 +18,18 @@ public class Ship : MonoBehaviour, IHittable
 
     public bool IsKnockedBack => knockbackTimeRemaining > 0f;
     public bool IsDead => dead;
+    public ShipCoreModule CoreModule => coreModule;
+
+    protected virtual void Awake()
+    {
+        moduleManager = GetComponent<ModuleManager>();
+        shipRigidbody = GetComponent<Rigidbody2D>();
+        coreModule = GetComponentInChildren<ShipCoreModule>();
+    }
 
     public virtual void Start()
     {
-        moduleManager = GetComponent<ModuleManager>();
-        coreModule = GetComponent<ShipCoreModule>();
-
-        coreModule.Initialize();
-        shipRigidbody = GetComponent<Rigidbody2D>();
+        coreModule?.Initialize();
     }
 
     public virtual void Update()
@@ -42,7 +45,11 @@ public class Ship : MonoBehaviour, IHittable
         if (dead || hitter == null)
             return;
 
-        bool isDead = coreModule.ApplyDamage(hitter.Damage);
+        ShipCoreModule core = coreModule;
+        if (core == null)
+            return;
+
+        bool isDead = core.ApplyDamage(hitter.Damage);
         if (isDead)
             Die();
     }
@@ -85,6 +92,24 @@ public class Ship : MonoBehaviour, IHittable
         OnDeath?.Invoke();
         Destroy(gameObject);
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject == null || collision.gameObject.layer == gameObject.layer)
+            return;
+
+        ShipCoreModule core = coreModule;
+        if (core == null)
+            return;
+
+        var hittable = collision.gameObject.GetComponent<IHittable>();
+        if (hittable != null)
+        {
+            hittable.Hit(core);
+            hittable.ApplyKnockback(core, collision);
+        }
+    }
+
     public void AddModule(ModuleBase module)
     {
         if (moduleManager == null)
@@ -92,6 +117,7 @@ public class Ship : MonoBehaviour, IHittable
 
         moduleManager.AddModule(module);
     }
+
     public void SetTargetPosition(Vector3 targetPosition)
     {
         foreach (var module in moduleManager.MovementModules)

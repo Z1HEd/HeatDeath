@@ -2,13 +2,16 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(Ship))]
-public class ShipCoreModule : ModuleBase
+public class ShipCoreModule : ModuleBase, IHitter
 {
     [Header("Base Core Stats")]
     [SerializeField] private ResourceStat health = new ResourceStat(StatType.Health, 100f, 1f);
     [SerializeField] private ResourceStat shields = new ResourceStat(StatType.Shields, 100f, 0f);
     [SerializeField] private ScalarStat shieldRegen = new ScalarStat(StatType.ShieldRegen, 2f, 0f);
+
+    [Header("Ramming")]
+    [SerializeField] private ScalarStat rammingDamage = new ScalarStat(StatType.Damage, 10f, 0f);
+    [SerializeField] private ScalarStat rammingKnockback = new ScalarStat(StatType.Knockback, 1f, 0f);
 
     public event Action OnHPShieldsChanged;
 
@@ -17,11 +20,12 @@ public class ShipCoreModule : ModuleBase
     public int CurrentMaxHealth => Mathf.RoundToInt(health.MaxValue);
     public int CurrentMaxShields => Mathf.RoundToInt(shields.MaxValue);
     public float CurrentShieldRegen => shieldRegen.CurrentValue;
+    public float Damage => rammingDamage;
+    public float KnockbackPower => rammingKnockback;
 
     public void Initialize()
     {
         UpdateModifiers();
-        ResetModifiers();
     }
 
     private void Update()
@@ -48,11 +52,15 @@ public class ShipCoreModule : ModuleBase
         health.Recalculate(modifiers, true);
         shields.Recalculate(modifiers, true);
         shieldRegen.Recalculate(modifiers);
+        rammingDamage.Recalculate(modifiers);
+        rammingKnockback.Recalculate(modifiers);
 
         OnHPShieldsChanged?.Invoke();
     }
 
     protected override void ResetModifiers()
     {
+        rammingDamage.ResetToBase();
+        rammingKnockback.ResetToBase();
     }
 }

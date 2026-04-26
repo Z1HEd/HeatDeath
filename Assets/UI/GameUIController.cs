@@ -73,7 +73,7 @@ public class GameUIController : MonoBehaviour
         if (playerObject == null) return;
 
         player = playerObject.GetComponent<Player>();
-        playerCoreModule = playerObject.GetComponent<ShipCoreModule>();
+        playerCoreModule = player != null ? player.CoreModule : null;
         upgradeManager = playerObject.GetComponent<UpgradeManager>();
 
         upgradeDraftService = new UpgradeDraftService();

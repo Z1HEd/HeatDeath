@@ -12,15 +12,16 @@ public abstract class ModuleBase: MonoBehaviour
 
     protected virtual void Start()
     {
-        ship = GetComponent<Ship>();
-        upgradeManager = GetComponent<UpgradeManager>();
+        ship = GetComponentInParent<Ship>();
+        upgradeManager = GetComponentInParent<UpgradeManager>();
         ship.AddModule(this);
         ResetModifiers();
     }
 
     protected virtual void OnDestroy()
     {
-        ship.moduleManager.RemoveModule(this);
+        if (ship != null)
+            ship.moduleManager.RemoveModule(this);
     }
 
     protected IReadOnlyDictionary<StatType, StatModifierAggregate> GetCurrentModifiers()

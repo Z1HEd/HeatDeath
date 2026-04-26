@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+[RequireComponent(typeof(RangeDetector))]
 public class ProjectileModule : WeaponModule
 {
     [SerializeField] protected Projectile projectilePrefab;
@@ -20,20 +21,8 @@ public class ProjectileModule : WeaponModule
     protected override void Start()
     {
         base.Start();
-        EnsureRangeDetector();
-    }
-
-    private void EnsureRangeDetector()
-    {
-        if (rangeDetector != null)
-            return;
-
-        var detectorObject = new GameObject($"RangeDetector");
-        detectorObject.transform.SetParent(transform, false);
-        detectorObject.transform.localPosition = Vector3.zero;
-
-        detectorObject.layer = DetectLayer;
-        rangeDetector = detectorObject.AddComponent<RangeDetector>();
+        rangeDetector = GetComponent<RangeDetector>();
+        gameObject.layer = DetectLayer;
         rangeDetector.Initialize(range);
         rangeDetector.OnShipExitedRange += OnShipExitedRange;
     }
@@ -121,7 +110,7 @@ public class ProjectileModule : WeaponModule
         canAim.Recalculate(modifiers);
 
         if (rangeDetector != null)
-            rangeDetector.Initialize(range);
+            rangeDetector.SetRadius(range);
     }
 
     protected override void ResetModifiers()

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class FollowCursorModule : ControlModule
+public class FollowCursorBehaviour : ControlBehaviour
 {
     void OnGUI()
     {
