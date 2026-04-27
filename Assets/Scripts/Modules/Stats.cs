@@ -10,7 +10,7 @@ public struct StatModifierAggregate
 [System.Serializable]
 public class ResourceStat
 {
-    [SerializeField] private StatType type;
+    private StatType type;
     [SerializeField] private float baseValue = 1f;
     [SerializeField] private float minValue = 0f;
 
@@ -106,7 +106,7 @@ public class ResourceStat
 [System.Serializable]
 public class ScalarStat
 {
-    [SerializeField] private StatType type;
+    private StatType type;
     [SerializeField] private float baseValue;
     [SerializeField] private float minValue = 0f;
 
@@ -163,7 +163,7 @@ public class ScalarStat
 [System.Serializable]
 public class BoolStat
 {
-    [SerializeField] private StatType type;
+    private StatType type;
     [SerializeField] private bool baseValue;
 
     private bool currentValue;

@@ -20,4 +20,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e7f46ea9b622afa45bbdae890f8c5508, type: 2}
   key: weapon.shotgun
   description: A short-ranged cannon that fires multiple smaller bullets.
-  weaponPrefab: {fileID: 0}
+  weaponPrefab: {fileID: 2658622645487082905, guid: d580eac50893423418c2f17ee61f2f5b, type: 3}

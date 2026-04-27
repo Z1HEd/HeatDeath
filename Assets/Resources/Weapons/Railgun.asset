@@ -21,4 +21,4 @@ MonoBehaviour:
   key: weapon.railgun
   description: Long - ranged weapon with high damage and slow fire rate. Can only
     fire forward.
-  weaponPrefab: {fileID: 0}
+  weaponPrefab: {fileID: 2658622645487082905, guid: 26634ea0e8e58b5428035f4f1f4af67f, type: 3}
