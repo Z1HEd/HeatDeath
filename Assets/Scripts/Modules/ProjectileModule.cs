@@ -9,6 +9,7 @@ public class ProjectileModule : WeaponModule
     [SerializeField] protected ScalarStat projectileSpeed = new ScalarStat(StatType.ProjectileSpeed, 20f, 0f);
     [SerializeField] protected ScalarStat projectileDamage = new ScalarStat(StatType.ProjectileDamage, 10f, 0f);
     [SerializeField] protected ScalarStat projectileKnockback = new ScalarStat(StatType.ProjectileKnockback, 0f, 0f);
+    [SerializeField] protected ScalarStat projectilePiercing = new ScalarStat(StatType.ProjectilePiercing, 0f, -1f);
     [SerializeField] protected ScalarStat projectileCount = new ScalarStat(StatType.ProjectileCount, 1f, 1f);
     [SerializeField] protected ScalarStat projectileSpread = new ScalarStat(StatType.ProjectileSpread, 0f, 0f);
     [SerializeField] protected ScalarStat range = new ScalarStat(StatType.Range, 15f, 0f);
@@ -17,6 +18,9 @@ public class ProjectileModule : WeaponModule
     private Ship currentTarget;
 
     public float Range => range;
+    public float ProjectileDamage => projectileDamage;
+    public float ProjectileKnockback => projectileKnockback;
+    public float ProjectilePiercing => projectilePiercing;
 
     protected override void Start()
     {
@@ -84,10 +88,12 @@ public class ProjectileModule : WeaponModule
 
             Projectile projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
             projectile.gameObject.layer = DetectLayer;
-
-            projectile.Initialize(shotDirection * projectileSpeed, projectileDamage, projectileKnockback);
+            projectile.Initialize(shotDirection * projectileSpeed, this);
+            OnProjectileSpawned(projectile);
         }
     }
+
+    protected virtual void OnProjectileSpawned(Projectile projectile) { }
 
     private static float GetSpreadAngleOffset(float spreadDegrees)
     {
@@ -104,6 +110,7 @@ public class ProjectileModule : WeaponModule
         projectileSpeed.Recalculate(modifiers);
         projectileDamage.Recalculate(modifiers);
         projectileKnockback.Recalculate(modifiers);
+        projectilePiercing.Recalculate(modifiers);
         projectileCount.Recalculate(modifiers);
         projectileSpread.Recalculate(modifiers);
         range.Recalculate(modifiers);
@@ -120,6 +127,7 @@ public class ProjectileModule : WeaponModule
         projectileSpeed.ResetToBase();
         projectileDamage.ResetToBase();
         projectileKnockback.ResetToBase();
+        projectilePiercing.ResetToBase();
         projectileCount.ResetToBase();
         projectileSpread.ResetToBase();
         range.ResetToBase();

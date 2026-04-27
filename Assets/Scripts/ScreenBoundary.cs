@@ -8,7 +8,7 @@ public class ScreenBoundary : MonoBehaviour
         Projectile proj = other.GetComponent<Projectile>();
         if (proj != null)
         {
-            Destroy(other.gameObject);
+            proj.Kill();
         }
     }
 }

@@ -15,5 +15,6 @@ public enum StatType
 	ProjectileCount = 12,
 	Range = 13,
 	ProjectileSpread = 14,
-	CanAim = 15
+	CanAim = 15,
+	ProjectilePiercing = 16
 }

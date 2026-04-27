@@ -34,6 +34,11 @@ public class RangeDetector : MonoBehaviour
 
     public Ship GetClosestTarget(Transform origin)
     {
+        return GetClosestTargetTo(origin.position, null);
+    }
+
+    public Ship GetClosestTargetTo(Vector2 position, ICollection<Ship> exclude)
+    {
         CleanupTargets();
 
         Ship closest = null;
@@ -44,7 +49,10 @@ public class RangeDetector : MonoBehaviour
             if (ship == null)
                 continue;
 
-            float sqr = (ship.transform.position - origin.position).sqrMagnitude;
+            if (exclude != null && exclude.Contains(ship))
+                continue;
+
+            float sqr = ((Vector2)ship.transform.position - position).sqrMagnitude;
             if (sqr < closestSqr)
             {
                 closestSqr = sqr;

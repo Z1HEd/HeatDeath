@@ -4,44 +4,88 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class Projectile : MonoBehaviour, IHitter
 {
-    private float damage = 10f;
-    private float knockbackPower = 5f;
-    private Rigidbody2D rb;
+    public float Damage { get; protected set; } = 10f;
+    public float KnockbackPower { get; protected set; } = 0f;
+    protected Rigidbody2D rb;
+    protected bool isDead;
+    private int remainingPierceHits;
+    private bool hasInfinitePierce;
 
-    public float Damage { get => damage; set => damage = value; }
-    public float KnockbackPower { get => knockbackPower; set => knockbackPower = value; }
-
-    private void Awake()
+    protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        var collider = GetComponent<Collider2D>();
-        if (collider != null)
-            collider.isTrigger = true;
     }
 
-    public void Initialize(Vector2 velocity, float dmg, float knockback)
+    public virtual void Initialize(Vector2 velocity, ProjectileModule sourceModule)
     {
         if (rb != null)
             rb.linearVelocity = velocity;
-        damage = dmg;
-        knockbackPower = knockback;
+
+        Damage = sourceModule.ProjectileDamage;
+        KnockbackPower = sourceModule.ProjectileKnockback;
+        ConfigurePiercing(sourceModule.ProjectilePiercing);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void ConfigurePiercing(float piercing)
     {
-        if (collision.gameObject == null)
+        if (piercing < 0f)
+        {
+            hasInfinitePierce = true;
+            remainingPierceHits = 0;
+            return;
+        }
+
+        hasInfinitePierce = false;
+        remainingPierceHits = Mathf.Max(0, Mathf.FloorToInt(piercing));
+    }
+
+    public virtual void Kill()
+    {
+        if (isDead)
             return;
 
+        isDead = true;
+        Destroy(gameObject);
+    }
+
+    protected bool TryApplyHit(Collider2D collision)
+    {
+        if (isDead)
+            return false;
+
+        if (collision.gameObject == null)
+            return false;
+
         var hittable = collision.GetComponent<IHittable>();
-        if (hittable == null) return;
+        if (hittable == null)
+            return false;
 
         hittable.Hit(this);
         if (collision.GetComponent<Rigidbody2D>() != null)
-        {
-            // Store collision for knockback that might be applied
             hittable.ApplyKnockback(this, null);
-        }
-        Destroy(gameObject);
 
+        TryConsumeCharge();
+        return true;
+    }
+
+    // Returns true if a charge was available. Kills self when last charge is consumed.
+    protected bool TryConsumeCharge()
+    {
+        if (isDead) return false;
+        if (hasInfinitePierce) return true;
+
+        if (remainingPierceHits > 0)
+        {
+            remainingPierceHits--;
+            return true;
+        }
+
+        Kill();
+        return true;
+    }
+
+    protected virtual void OnTriggerEnter2D(Collider2D collision)
+    {
+        TryApplyHit(collision);
     }
 }
