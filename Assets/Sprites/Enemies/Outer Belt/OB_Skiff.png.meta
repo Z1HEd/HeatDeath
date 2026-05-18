@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: e2e57328842238541ba7d4673acc2f54
+guid: 8f3b13d577f7a3d4b8816e1fe148974d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5585277014552505075
-    second: Skiff  (#251f1f1)_0
+      213: -3691100365795813899
+    second: Skiff  (#292323)_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -113,7 +113,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Skiff  (#251f1f1)_0
+      name: Skiff  (#292323)_0
       rect:
         serializedVersion: 2
         x: 3
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3fa6e884ad3e28d40800000000000000
-      internalID: 5585277014552505075
+      spriteID: 5f51d6a06c396ccc0800000000000000
+      internalID: -3691100365795813899
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Skiff  (#251f1f1)_0: 5585277014552505075
+      Skiff  (#292323)_0: -3691100365795813899
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
