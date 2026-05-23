@@ -29,6 +29,7 @@ public class ProjectileModule : WeaponModule
         gameObject.layer = DetectLayer;
         rangeDetector.Initialize(range);
         rangeDetector.OnShipExitedRange += OnShipExitedRange;
+        firePoint = transform.GetChild(0);
     }
 
 
@@ -39,14 +40,23 @@ public class ProjectileModule : WeaponModule
         if (rangeDetector == null)
             return;
 
-        // If no target, try to acquire one
         if (currentTarget == null)
-        {
             currentTarget = rangeDetector.GetClosestTarget(transform);
+        
+        if (currentTarget == null)
+            return;
+
+        if (firePoint != null && canAim)
+        {
+            Vector3 towardsTarget = currentTarget.transform.position - transform.position;
+
+            Vector3 currentAim = firePoint.position - transform.position;
+
+            float angle = Vector2.SignedAngle(currentAim, towardsTarget);
+            transform.Rotate(0f, 0f, angle);
         }
 
-        // If we have a target, try to fire at it
-        if (currentTarget != null && CanFire)
+        if (CanFire)
         {
             lastFireTime = Time.time;
             Fire();
