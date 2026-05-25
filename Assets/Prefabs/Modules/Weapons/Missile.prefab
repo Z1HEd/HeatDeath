@@ -9,12 +9,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3653720032911491551}
-  - component: {fileID: 8870053307389157723}
   - component: {fileID: 4523388967571386294}
   - component: {fileID: 6361079174740784166}
-  - component: {fileID: 2650277690045577319}
+  - component: {fileID: 969041321684900178}
+  - component: {fileID: 4690979656978089763}
   m_Layer: 0
-  m_Name: Cannon
+  m_Name: Missile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28,55 +28,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2658622645487082905}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0.38268343, w: 0.92387956}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6463813337267142307}
+  - {fileID: 416210592748895249}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8870053307389157723
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2658622645487082905}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c743f8faaee6ec40b59bee7f55a932e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectileModule
-  moduleDefinition: {fileID: 11400000, guid: 12025bb4045e8b446bf8bb38f7229639, type: 2}
-  fireRate:
-    baseValue: 1
-    minValue: 0.0001
-  projectilePrefab: {fileID: 8872413515496322224, guid: 32fde49ac5ad8ea49a2d1db61f4fb5d4, type: 3}
-  firePoint: {fileID: 0}
-  projectileSpeed:
-    baseValue: 15
-    minValue: 0
-  projectileDamage:
-    baseValue: 10
-    minValue: 0
-  projectileKnockback:
-    baseValue: 0
-    minValue: 0
-  projectilePiercing:
-    baseValue: 0
-    minValue: -1
-  projectileCount:
-    baseValue: 1
-    minValue: 1
-  projectileSpread:
-    baseValue: 5
-    minValue: 0
-  range:
-    baseValue: 15
-    minValue: 0
-  canAim:
-    baseValue: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 45}
 --- !u!58 &4523388967571386294
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -112,7 +71,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 15
+  m_Radius: 8
 --- !u!114 &6361079174740784166
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125,8 +84,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e764ef61a77dbc94eaf78330889bb2b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RangeDetector
-  range: 15
---- !u!212 &2650277690045577319
+  range: 8
+--- !u!212 &969041321684900178
 SpriteRenderer:
   serializedVersion: 2
   m_ObjectHideFlags: 0
@@ -175,17 +134,60 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: a04624ca808e0e4449cc87cb13f974aa, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8efac6b2a71ff2049ad237d20bca2742, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.56, y: 2.56}
+  m_Size: {x: 1.28, y: 1.28}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!1 &4544291247537868235
+--- !u!114 &4690979656978089763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2658622645487082905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35ea3c94ab41ec8469b37525956e89c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MissileModule
+  moduleDefinition: {fileID: 11400000, guid: e5a9fd2dd18115740b0829833104fcfc, type: 2}
+  fireRate:
+    baseValue: 0.25
+    minValue: 0.0001
+  projectilePrefab: {fileID: 7383371667686300248, guid: 02383f17f405bb74ebe65694e48d20b1, type: 3}
+  firePoint: {fileID: 416210592748895249}
+  projectileSpeed:
+    baseValue: 20
+    minValue: 0
+  projectileDamage:
+    baseValue: 30
+    minValue: 0
+  projectileKnockback:
+    baseValue: 1
+    minValue: 0
+  projectilePiercing:
+    baseValue: 0
+    minValue: -1
+  projectileCount:
+    baseValue: 1
+    minValue: 1
+  projectileSpread:
+    baseValue: 0
+    minValue: 0
+  range:
+    baseValue: 15
+    minValue: 0
+  canAim:
+    baseValue: 0
+  textureWithRocket: {fileID: 21300000, guid: 8efac6b2a71ff2049ad237d20bca2742, type: 3}
+  textureWithoutRocket: {fileID: 21300000, guid: 91c95e7eaecf92f409fea676d191e5e9, type: 3}
+--- !u!1 &3748942623559639341
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -193,24 +195,24 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6463813337267142307}
+  - component: {fileID: 416210592748895249}
   m_Layer: 0
-  m_Name: firePoint
+  m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6463813337267142307
+--- !u!4 &416210592748895249
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4544291247537868235}
+  m_GameObject: {fileID: 3748942623559639341}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.15, y: 0.15, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.24, y: 0.24, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

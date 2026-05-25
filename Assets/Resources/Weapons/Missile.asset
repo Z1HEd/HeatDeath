@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aabadc3267214e8449991ba47860fc9a, type: 3}
+  m_Name: Missile
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
+  displayName: Missile
+  componentTypeName: MissileModule
+  tags:
+  - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
+  - {fileID: 11400000, guid: e7f46ea9b622afa45bbdae890f8c5508, type: 2}
+  - {fileID: 11400000, guid: 4cdf19654488b534c884978c57188286, type: 2}
+  key: weapon.missile
+  description: Launches missiles that explode and deal area damage.
+  weaponPrefab: {fileID: 2658622645487082905, guid: 333b2d7feaf8bb849a304d8ccafb9be8, type: 3}
