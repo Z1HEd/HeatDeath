@@ -1,10 +1,17 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections;
 
 [RequireComponent(typeof(ModuleManager))]
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(SpriteRenderer))]
 public class Ship : MonoBehaviour, IHittable
 {
+    private static readonly int FlashColorID =
+        Shader.PropertyToID("_FlashColor");
+
+    private static readonly int FlashAmountID =
+        Shader.PropertyToID("_FlashAmount");
     public Action OnDeath;
     [SerializeField]
     public ModuleManager moduleManager;
@@ -15,6 +22,8 @@ public class Ship : MonoBehaviour, IHittable
     private ShipCoreModule coreModule;
     private float knockbackTimeRemaining;
     protected bool dead;
+    protected Material _material;
+    protected SpriteRenderer spriteRenderer;
 
     public bool IsKnockedBack => knockbackTimeRemaining > 0f;
     public bool IsDead => dead;
@@ -29,7 +38,10 @@ public class Ship : MonoBehaviour, IHittable
 
     public virtual void Start()
     {
+        spriteRenderer = GetComponent<SpriteRenderer>();
         coreModule?.Initialize();
+        _material = Instantiate(spriteRenderer.sharedMaterial);
+        spriteRenderer.material = _material;
     }
 
     public virtual void Update()
@@ -49,9 +61,17 @@ public class Ship : MonoBehaviour, IHittable
         if (core == null)
             return;
 
-        bool isDead = core.ApplyDamage(hitter.Damage);
-        if (isDead)
+        bool tookDamage = core.ApplyDamage(hitter.Damage);
+        bool died = core.CurrentHealth<=0.0;
+
+        if (died){
             Die();
+            return;
+        }
+        if (tookDamage)
+        {
+            StartCoroutine(DamageFlash());
+        }
     }
 
     public void ApplyKnockback(IHitter hitter, Collision2D collision)
@@ -92,6 +112,40 @@ public class Ship : MonoBehaviour, IHittable
         OnDeath?.Invoke();
         Destroy(gameObject);
     }
+    public virtual IEnumerator DamageFlash()
+    {
+        _material.SetColor(FlashColorID, Color.white);
+        _material.SetFloat(FlashAmountID, 1f);
+
+        yield return new WaitForSeconds(0.03f);
+
+        // red damage fade
+
+        _material.SetColor(
+            FlashColorID,
+            new Color(1f, 0.2f, 0.2f)
+        );
+
+        float duration = 0.12f;
+        float t = 0f;
+
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+
+            float amount = 1f - (t / duration);
+
+            _material.SetFloat(
+                FlashAmountID,
+                amount
+            );
+
+            yield return null;
+        }
+
+        _material.SetFloat(FlashAmountID, 0f);
+    }
+    
 
     private void OnCollisionEnter2D(Collision2D collision)
     {

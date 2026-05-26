@@ -1,7 +1,9 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Collections;
 
+[RequireComponent(typeof(SpriteRenderer))]
 public class ShipCoreModule : ModuleBase, IHitter
 {
     [Header("Base Core Stats")]
@@ -12,6 +14,8 @@ public class ShipCoreModule : ModuleBase, IHitter
     [Header("Ramming")]
     [SerializeField] private ScalarStat rammingDamage = new ScalarStat(StatType.Damage, 10f, 0f);
     [SerializeField] private ScalarStat rammingKnockback = new ScalarStat(StatType.Knockback, 1f, 0f);
+
+    protected SpriteRenderer shieldRenderer;
 
     public event Action OnHPShieldsChanged;
 
@@ -26,6 +30,7 @@ public class ShipCoreModule : ModuleBase, IHitter
     public void Initialize()
     {
         UpdateModifiers();
+        shieldRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
@@ -42,9 +47,25 @@ public class ShipCoreModule : ModuleBase, IHitter
         float damage = shields.Consume(incomingDamage);
         if (damage > 0f)
             health.Consume(damage);
+        else
+        {
+            StopAllCoroutines();
+            StartCoroutine(FlashShield());
+        }
 
         OnHPShieldsChanged?.Invoke();
-        return health.CurrentValue <= 0f;
+        return damage>0;
+    }
+    
+    protected IEnumerator FlashShield()
+    {
+        const float SHIELD_FLASH_DURATION = 0.5f;
+        for (float a = 0.65f; a>0; a-=0.01f)
+        {
+            shieldRenderer.color = new Color(1,1,1,a);
+            yield return new WaitForSeconds(0.01f*SHIELD_FLASH_DURATION);
+        }
+        
     }
 
     protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
