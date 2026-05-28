@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 3653720032911491551}
   - component: {fileID: 8870053307389157723}
   - component: {fileID: 4523388967571386294}
-  - component: {fileID: 6361079174740784166}
   - component: {fileID: 969041321684900178}
   m_Layer: 0
   m_Name: Shotgun
@@ -53,7 +52,7 @@ MonoBehaviour:
     baseValue: 0.75
     minValue: 0.0001
   projectilePrefab: {fileID: 8872413515496322224, guid: 32fde49ac5ad8ea49a2d1db61f4fb5d4, type: 3}
-  firePoint: {fileID: 0}
+  firePoint: {fileID: 416210592748895249}
   projectileSpeed:
     baseValue: 10
     minValue: 0
@@ -107,25 +106,12 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 8
---- !u!114 &6361079174740784166
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2658622645487082905}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e764ef61a77dbc94eaf78330889bb2b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RangeDetector
-  range: 8
 --- !u!212 &969041321684900178
 SpriteRenderer:
   serializedVersion: 2

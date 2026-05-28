@@ -13,6 +13,7 @@ public abstract class ModuleBase: MonoBehaviour
     protected virtual void Start()
     {
         ship = GetComponentInParent<Ship>();
+        if (!ship) return;
         upgradeManager = GetComponentInParent<UpgradeManager>();
         ship.AddModule(this);
         ResetModifiers();

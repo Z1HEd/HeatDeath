@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(RangeDetector))]
+[ExecuteAlways]
 public class ProjectileModule : WeaponModule
 {
     [SerializeField] protected Projectile projectilePrefab;
@@ -14,6 +14,7 @@ public class ProjectileModule : WeaponModule
     [SerializeField] protected ScalarStat projectileSpread = new ScalarStat(StatType.ProjectileSpread, 0f, 0f);
     [SerializeField] protected ScalarStat range = new ScalarStat(StatType.Range, 15f, 0f);
     [SerializeField] protected BoolStat canAim = new BoolStat(StatType.CanAim, true);
+
     private RangeDetector rangeDetector;
     private Ship currentTarget;
 
@@ -25,13 +26,27 @@ public class ProjectileModule : WeaponModule
     protected override void Start()
     {
         base.Start();
-        rangeDetector = GetComponent<RangeDetector>();
+
+        EnsureRangeDetector();
         gameObject.layer = DetectLayer;
+
         rangeDetector.Initialize(range);
         rangeDetector.OnShipExitedRange += OnShipExitedRange;
+
         firePoint = transform.GetChild(0);
     }
 
+    private void EnsureRangeDetector()
+    {
+        if (rangeDetector == null)
+            rangeDetector = GetComponentInChildren<RangeDetector>(true);
+        if (rangeDetector == null)
+        {
+            GameObject detectorObject = new GameObject("RangeDetector");
+            detectorObject.transform.SetParent(transform, false);
+            rangeDetector = detectorObject.AddComponent<RangeDetector>();
+        }
+    }
 
     protected override void Update()
     {
@@ -49,7 +64,6 @@ public class ProjectileModule : WeaponModule
         if (firePoint != null && canAim)
         {
             Vector3 towardsTarget = currentTarget.transform.position - transform.position;
-
             Vector3 currentAim = firePoint.position - transform.position;
 
             float angle = Vector2.SignedAngle(currentAim, towardsTarget);
@@ -142,11 +156,4 @@ public class ProjectileModule : WeaponModule
         projectileSpread.ResetToBase();
         range.ResetToBase();
     }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-        if (rangeDetector != null) Destroy(rangeDetector.gameObject);
-    }
 }
-
