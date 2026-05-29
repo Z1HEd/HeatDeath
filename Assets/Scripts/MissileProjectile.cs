@@ -4,7 +4,9 @@ public class MissileProjectile : Projectile
 {
     [SerializeField] private float lockDelay = 0.5f;
     [SerializeField] private float turnSpeedDegrees = 540f;
-    [SerializeField] protected ScalarStat range = new ScalarStat(StatType.Range, 5f, 0f);
+    [SerializeField] protected ScalarStat targetLockRange = new ScalarStat(StatType.Range, 5f, 0f);
+    [SerializeField] protected float explosionRange = 1f;
+    [SerializeField] protected Explosion explosionPrefab;
 
     private RangeDetector rangeDetector;
     private Ship target;
@@ -16,8 +18,8 @@ public class MissileProjectile : Projectile
         base.Initialize(velocity, sourceModule);
         EnsureRangeDetector();
         rangeDetector.gameObject.layer = gameObject.layer;
-        rangeDetector.Initialize(range);
-        range.CurrentValueChanged += UpdateRange;
+        rangeDetector.Initialize(targetLockRange);
+        targetLockRange.CurrentValueChanged += UpdateRange;
 
         lockTime = Time.time + Mathf.Max(0f, lockDelay);
         speed = Mathf.Max(0.01f, velocity.magnitude);
@@ -56,9 +58,29 @@ public class MissileProjectile : Projectile
         rb.linearVelocity = steeredDirection * speed;
         transform.up = steeredDirection;
     }
+
+    protected override bool TryApplyHit(Collider2D collision)
+    {
+        if (isDead)
+            return false;
+
+        if (collision.gameObject == null)
+            return false;
+
+        var hittable = collision.GetComponent<IHittable>();
+        if (hittable == null)
+            return false;
+
+        Explosion explosion = Instantiate(explosionPrefab,transform.position,transform.rotation);
+        explosion.Initialize(Damage, KnockbackPower, explosionRange, gameObject.layer);
+            
+        TryConsumeCharge();
+        return true;
+    }
+
     protected void OnValidate()
     {
-        UpdateRange(range);
+        UpdateRange(targetLockRange);
     }
     private void UpdateRange(float range)
     {   

@@ -48,7 +48,7 @@ public class Projectile : MonoBehaviour, IHitter
         Destroy(gameObject);
     }
 
-    protected bool TryApplyHit(Collider2D collision)
+    protected virtual bool TryApplyHit(Collider2D collision)
     {
         if (isDead)
             return false;

@@ -15,7 +15,7 @@ TagManager:
   - Enemy
   - DetectPlayer
   - DetectEnemy
-  - 
+  - DetectDetectors
   - 
   - 
   - 

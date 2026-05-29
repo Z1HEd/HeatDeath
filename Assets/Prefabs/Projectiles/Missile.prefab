@@ -316,10 +316,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MissileProjectile
   lockDelay: 0.5
   turnSpeedDegrees: 120
-  range:
+  targetLockRange:
     type: 13
     baseValue: 5
     minValue: 0
+  explosionRange: 1
+  explosionPrefab: {fileID: 5675550285233396970, guid: 3a228cbda7b267348aea17b2327d9602, type: 3}
 --- !u!1 &7714627461330646715
 GameObject:
   m_ObjectHideFlags: 0
