@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2658622645487082905
+--- !u!1 &2564985082595506547
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,81 +8,38 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3653720032911491551}
-  - component: {fileID: 8870053307389157723}
-  - component: {fileID: 4523388967571386294}
-  - component: {fileID: 969041321684900178}
+  - component: {fileID: 6331773686439522701}
+  - component: {fileID: 313114001562503711}
+  - component: {fileID: 2738076568794476490}
   m_Layer: 0
-  m_Name: Shotgun
+  m_Name: RangeDetector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3653720032911491551
+--- !u!4 &6331773686439522701
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2658622645487082905}
+  m_GameObject: {fileID: 2564985082595506547}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 416210592748895249}
-  m_Father: {fileID: 0}
+  m_Children: []
+  m_Father: {fileID: 3653720032911491551}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8870053307389157723
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2658622645487082905}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c743f8faaee6ec40b59bee7f55a932e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectileModule
-  moduleDefinition: {fileID: 11400000, guid: 250a7571d34a251468762ef99fd40cad, type: 2}
-  fireRate:
-    baseValue: 0.75
-    minValue: 0.0001
-  projectilePrefab: {fileID: 8872413515496322224, guid: 32fde49ac5ad8ea49a2d1db61f4fb5d4, type: 3}
-  firePoint: {fileID: 416210592748895249}
-  projectileSpeed:
-    baseValue: 10
-    minValue: 0
-  projectileDamage:
-    baseValue: 8
-    minValue: 0
-  projectileKnockback:
-    baseValue: 0
-    minValue: 0
-  projectilePiercing:
-    baseValue: 0
-    minValue: -1
-  projectileCount:
-    baseValue: 3
-    minValue: 1
-  projectileSpread:
-    baseValue: 15
-    minValue: 0
-  range:
-    baseValue: 8
-    minValue: 0
-  canAim:
-    baseValue: 1
---- !u!58 &4523388967571386294
+--- !u!58 &313114001562503711
 CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2658622645487082905}
+  m_GameObject: {fileID: 2564985082595506547}
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
@@ -112,6 +69,104 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 8
+--- !u!114 &2738076568794476490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2564985082595506547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e764ef61a77dbc94eaf78330889bb2b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RangeDetector
+  range: 8
+--- !u!1 &2658622645487082905
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3653720032911491551}
+  - component: {fileID: 8870053307389157723}
+  - component: {fileID: 969041321684900178}
+  m_Layer: 0
+  m_Name: Shotgun
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3653720032911491551
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2658622645487082905}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 416210592748895249}
+  - {fileID: 6331773686439522701}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8870053307389157723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2658622645487082905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c743f8faaee6ec40b59bee7f55a932e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectileModule
+  moduleDefinition: {fileID: 11400000, guid: 250a7571d34a251468762ef99fd40cad, type: 2}
+  fireRate:
+    type: 8
+    baseValue: 0.75
+    minValue: 0.0001
+  projectilePrefab: {fileID: 8872413515496322224, guid: 32fde49ac5ad8ea49a2d1db61f4fb5d4, type: 3}
+  firePoint: {fileID: 416210592748895249}
+  projectileSpeed:
+    type: 9
+    baseValue: 10
+    minValue: 0
+  projectileDamage:
+    type: 10
+    baseValue: 8
+    minValue: 0
+  projectileKnockback:
+    type: 11
+    baseValue: 0
+    minValue: 0
+  projectilePiercing:
+    type: 16
+    baseValue: 0
+    minValue: -1
+  projectileCount:
+    type: 12
+    baseValue: 3
+    minValue: 1
+  projectileSpread:
+    type: 14
+    baseValue: 15
+    minValue: 0
+  range:
+    type: 13
+    baseValue: 8
+    minValue: 0
+  canAim:
+    type: 15
+    baseValue: 1
 --- !u!212 &969041321684900178
 SpriteRenderer:
   serializedVersion: 2

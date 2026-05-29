@@ -23,6 +23,11 @@ public class ProjectileModule : WeaponModule
     public float ProjectileKnockback => projectileKnockback;
     public float ProjectilePiercing => projectilePiercing;
 
+    protected void OnValidate()
+    {
+        UpdateRange(range);
+    }
+
     protected override void Start()
     {
         base.Start();
@@ -31,6 +36,7 @@ public class ProjectileModule : WeaponModule
         gameObject.layer = DetectLayer;
 
         rangeDetector.Initialize(range);
+        range.CurrentValueChanged += UpdateRange;
         rangeDetector.OnShipExitedRange += OnShipExitedRange;
 
         firePoint = transform.GetChild(0);
@@ -140,8 +146,7 @@ public class ProjectileModule : WeaponModule
         range.Recalculate(modifiers);
         canAim.Recalculate(modifiers);
 
-        if (rangeDetector != null)
-            rangeDetector.SetRadius(range);
+        UpdateRange(range);
     }
 
     protected override void ResetModifiers()
@@ -155,5 +160,10 @@ public class ProjectileModule : WeaponModule
         projectileCount.ResetToBase();
         projectileSpread.ResetToBase();
         range.ResetToBase();
+    }
+    private void UpdateRange(float newRange)
+    {
+        if (!rangeDetector) return;
+        rangeDetector.SetRadius(range);
     }
 }

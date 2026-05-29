@@ -1,5 +1,6 @@
-using UnityEngine;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public struct StatModifierAggregate
 {
@@ -7,37 +8,79 @@ public struct StatModifierAggregate
     public float Percent;
 }
 
-[System.Serializable]
-public class ResourceStat
+[Serializable]
+public abstract class StatBase<T>
 {
-    private StatType type;
+    [SerializeField] private StatType type;
+
+    [NonSerialized] private bool initialized;
+    [NonSerialized] private T currentValue;
+
+    public event Action<T> CurrentValueChanged;
+
+    public StatType Type => type;
+    protected bool IsInitialized => initialized;
+
+    protected StatBase() { }
+
+    protected StatBase(StatType type)
+    {
+        this.type = type;
+    }
+
+    protected T CurrentOr(T fallback)
+    {
+        return initialized ? currentValue : fallback;
+    }
+
+    protected void SetCurrentValue(T value)
+    {
+        bool changed = !initialized || !EqualityComparer<T>.Default.Equals(currentValue, value);
+        currentValue = value;
+        initialized = true;
+
+        if (changed)
+            CurrentValueChanged?.Invoke(currentValue);
+    }
+
+    protected static float CalculateModifiedValue(
+        float baseStatValue,
+        IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers,
+        StatType stat)
+    {
+        if (modifiers == null || stat == StatType.None)
+            return baseStatValue;
+
+        modifiers.TryGetValue(stat, out StatModifierAggregate modifier);
+        return (baseStatValue + modifier.Flat) * (1f + (modifier.Percent * 0.01f));
+    }
+}
+
+[Serializable]
+public sealed class ResourceStat : StatBase<float>
+{
     [SerializeField] private float baseValue = 1f;
     [SerializeField] private float minValue = 0f;
 
-    private float currentValue;
-    private float maxValue;
-    private bool initialized;
+    [NonSerialized] private float maxValue;
 
-    public ResourceStat()
-    {
-    }
+    public ResourceStat() { }
 
     public ResourceStat(float baseValue, float minValue)
     {
         this.baseValue = baseValue;
         this.minValue = minValue;
     }
-    public ResourceStat(StatType type, float baseValue, float minValue)
+
+    public ResourceStat(StatType type, float baseValue, float minValue) : base(type)
     {
-        this.type = type;
         this.baseValue = baseValue;
         this.minValue = minValue;
     }
 
-    public StatType Type => type;
     public float BaseValue => baseValue;
-    public float CurrentValue => initialized ? currentValue : Mathf.Max(minValue, baseValue);
-    public float MaxValue => initialized ? maxValue : Mathf.Max(minValue, baseValue);
+    public float CurrentValue => CurrentOr(Mathf.Max(minValue, baseValue));
+    public float MaxValue => IsInitialized ? maxValue : Mathf.Max(minValue, baseValue);
 
     public static implicit operator float(ResourceStat stat)
     {
@@ -46,92 +89,78 @@ public class ResourceStat
 
     public void Recalculate(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers, bool preserveCurrentRatio)
     {
-        float previousMax = initialized ? Mathf.Max(minValue, maxValue) : 0f;
-        float ratio = previousMax > 0f ? currentValue / previousMax : 1f;
+        float previousMax = IsInitialized ? Mathf.Max(minValue, maxValue) : 0f;
+        float ratio = previousMax > 0f ? CurrentValue / previousMax : 1f;
 
-        maxValue = Mathf.Max(minValue, CalculateModifiedValue(baseValue, modifiers, type));
+        maxValue = Mathf.Max(minValue, CalculateModifiedValue(baseValue, modifiers, Type));
 
-        if (!initialized || !preserveCurrentRatio)
-            currentValue = maxValue;
+        if (!IsInitialized || !preserveCurrentRatio)
+        {
+            SetCurrentValue(maxValue);
+        }
         else
-            currentValue = Mathf.Clamp(maxValue * ratio, 0f, maxValue);
-
-        initialized = true;
+        {
+            SetCurrentValue(Mathf.Clamp(maxValue * ratio, 0f, maxValue));
+        }
     }
 
     public void ResetToMax()
     {
-        if (!initialized)
+        if (!IsInitialized)
             maxValue = Mathf.Max(minValue, baseValue);
 
-        currentValue = maxValue;
-        initialized = true;
+        SetCurrentValue(maxValue);
     }
 
     public void AddCurrent(float value)
     {
-        if (!initialized)
+        if (!IsInitialized)
             ResetToMax();
 
-        currentValue = Mathf.Clamp(currentValue + value, 0f, maxValue);
+        SetCurrentValue(Mathf.Clamp(CurrentValue + value, 0f, MaxValue));
     }
 
     public float Consume(float value)
     {
-        if (!initialized)
+        if (!IsInitialized)
             ResetToMax();
 
         float amount = Mathf.Max(0f, value);
-        if (currentValue >= amount)
+
+        if (CurrentValue >= amount)
         {
-            currentValue -= amount;
+            SetCurrentValue(CurrentValue - amount);
             return 0f;
         }
 
-        float leftover = amount - currentValue;
-        currentValue = 0f;
+        float leftover = amount - CurrentValue;
+        SetCurrentValue(0f);
         return leftover;
-    }
-
-    private static float CalculateModifiedValue(float baseStatValue, IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers, StatType stat)
-    {
-        if (modifiers == null || stat == StatType.None)
-            return baseStatValue;
-
-        modifiers.TryGetValue(stat, out StatModifierAggregate modifier);
-        return (baseStatValue + modifier.Flat) * (1f + (modifier.Percent * 0.01f));
     }
 }
 
-[System.Serializable]
-public class ScalarStat
+[Serializable]
+public sealed class ScalarStat : StatBase<float>
 {
-    private StatType type;
     [SerializeField] private float baseValue;
     [SerializeField] private float minValue = 0f;
 
-    private float currentValue;
-    private bool initialized;
-
-    public ScalarStat()
-    {
-    }
+    public ScalarStat() { }
 
     public ScalarStat(float baseValue, float minValue)
     {
         this.baseValue = baseValue;
         this.minValue = minValue;
     }
-    public ScalarStat(StatType type, float baseValue, float minValue)
+
+    public ScalarStat(StatType type, float baseValue, float minValue) : base(type)
     {
-        this.type = type;
         this.baseValue = baseValue;
         this.minValue = minValue;
     }
 
-    public StatType Type => type;
     public float BaseValue => baseValue;
-    public float CurrentValue => initialized ? currentValue : Mathf.Max(minValue, baseValue);
+    public float CurrentValue => CurrentOr(Mathf.Max(minValue, baseValue));
 
     public static implicit operator float(ScalarStat stat)
     {
@@ -140,69 +169,54 @@ public class ScalarStat
 
     public void Recalculate(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
     {
-        currentValue = Mathf.Max(minValue, CalculateModifiedValue(baseValue, modifiers, type));
-        initialized = true;
+        SetCurrentValue(Mathf.Max(minValue, CalculateModifiedValue(baseValue, modifiers, Type)));
     }
 
     public void ResetToBase()
     {
-        currentValue = Mathf.Max(minValue, baseValue);
-        initialized = true;
-    }
-
-    private static float CalculateModifiedValue(float baseStatValue, IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers, StatType stat)
-    {
-        if (modifiers == null || stat == StatType.None)
-            return baseStatValue;
-
-        modifiers.TryGetValue(stat, out StatModifierAggregate modifier);
-        return (baseStatValue + modifier.Flat) * (1f + (modifier.Percent * 0.01f));
+        SetCurrentValue(Mathf.Max(minValue, baseValue));
     }
 }
 
-[System.Serializable]
-public class BoolStat
+[Serializable]
+public sealed class BoolStat : StatBase<bool>
 {
-    private StatType type;
     [SerializeField] private bool baseValue;
 
-    private bool currentValue;
-    private bool initialized;
-
-    public BoolStat()
-    {
-    }
+    public BoolStat() { }
 
     public BoolStat(bool baseValue)
     {
         this.baseValue = baseValue;
     }
-    public BoolStat(StatType type, bool baseValue)
+
+    public BoolStat(StatType type, bool baseValue) : base(type)
     {
-        this.type = type;
         this.baseValue = baseValue;
     }
 
-    public StatType Type => type;
     public bool BaseValue => baseValue;
-    public bool CurrentValue => initialized ? currentValue : baseValue;
+    public bool CurrentValue => CurrentOr(baseValue);
 
     public static implicit operator bool(BoolStat stat)
     {
-        return stat != null ? stat.CurrentValue : false;
+        return stat != null && stat.CurrentValue;
     }
 
     public void Recalculate(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
     {
-        if (modifiers == null || type == StatType.None)
+        if (modifiers == null || Type == StatType.None)
         {
-            currentValue = baseValue;
-            initialized = true;
+            SetCurrentValue(baseValue);
             return;
         }
 
-        modifiers.TryGetValue(type, out StatModifierAggregate modifier);
-        currentValue = modifier.Flat > 0f ? true : (modifier.Flat < 0f ? false : baseValue);
-        initialized = true;
+        modifiers.TryGetValue(Type, out StatModifierAggregate modifier);
+        SetCurrentValue(modifier.Flat > 0f ? true : (modifier.Flat < 0f ? false : baseValue));
+    }
+
+    public void ResetToBase()
+    {
+        SetCurrentValue(baseValue);
     }
 }
