@@ -18,9 +18,9 @@ public abstract class WeaponModule : ModuleBase
         fireRate.ResetToBase();
     }
 
-    protected override void Start()
+    protected override void Awake()
     {
-        base.Start();
+        base.Awake();
         DetermineWeaponLayer();
     }
 

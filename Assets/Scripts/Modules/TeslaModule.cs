@@ -16,9 +16,9 @@ public class TeslaModule : WeaponModule, IHitter
     public float Damage => damage;
     public float KnockbackPower => 0f;
 
-    protected override void Start()
+    protected override void Awake()
     {
-        base.Start();
+        base.Awake();
         rangeDetector = GetComponent<RangeDetector>();
         gameObject.layer = DetectLayer;
         rangeDetector.Initialize(range);

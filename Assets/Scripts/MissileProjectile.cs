@@ -1,11 +1,10 @@
 using UnityEngine;
-
-[RequireComponent(typeof(RangeDetector))]
+[ExecuteAlways]
 public class MissileProjectile : Projectile
 {
     [SerializeField] private float lockDelay = 0.5f;
     [SerializeField] private float turnSpeedDegrees = 540f;
-    [SerializeField] private float searchRadius = 100f;
+    [SerializeField] protected ScalarStat range = new ScalarStat(StatType.Range, 5f, 0f);
 
     private RangeDetector rangeDetector;
     private Ship target;
@@ -15,12 +14,10 @@ public class MissileProjectile : Projectile
     public override void Initialize(Vector2 velocity, ProjectileModule sourceModule)
     {
         base.Initialize(velocity, sourceModule);
-
-        if (rangeDetector == null)
-            rangeDetector = GetComponent<RangeDetector>();
-
-        if (rangeDetector != null)
-            rangeDetector.Initialize(searchRadius);
+        EnsureRangeDetector();
+        rangeDetector.gameObject.layer = gameObject.layer;
+        rangeDetector.Initialize(range);
+        range.CurrentValueChanged += UpdateRange;
 
         lockTime = Time.time + Mathf.Max(0f, lockDelay);
         speed = Mathf.Max(0.01f, velocity.magnitude);
@@ -30,7 +27,7 @@ public class MissileProjectile : Projectile
             transform.up = velocity.normalized;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (isDead)
             return;
@@ -58,5 +55,25 @@ public class MissileProjectile : Projectile
 
         rb.linearVelocity = steeredDirection * speed;
         transform.up = steeredDirection;
+    }
+    protected void OnValidate()
+    {
+        UpdateRange(range);
+    }
+    private void UpdateRange(float range)
+    {   
+        if (rangeDetector)
+            rangeDetector.SetRadius(range);
+    }
+    private void EnsureRangeDetector()
+    {
+        if (rangeDetector == null)
+            rangeDetector = GetComponentInChildren<RangeDetector>(true);
+        if (rangeDetector == null)
+        {
+            GameObject detectorObject = new GameObject("RangeDetector");
+            detectorObject.transform.SetParent(transform, false);
+            rangeDetector = detectorObject.AddComponent<RangeDetector>();
+        }
     }
 }

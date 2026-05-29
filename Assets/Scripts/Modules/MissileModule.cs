@@ -6,9 +6,9 @@ public class MissileModule : ProjectileModule
     public Sprite textureWithRocket;
     public Sprite textureWithoutRocket;
     protected SpriteRenderer spriteRenderer;
-    protected override void Start()
+    protected override void Awake()
     {
-        base.Start();
+        base.Awake();
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 

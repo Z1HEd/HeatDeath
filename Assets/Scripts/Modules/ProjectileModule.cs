@@ -28,12 +28,13 @@ public class ProjectileModule : WeaponModule
         UpdateRange(range);
     }
 
-    protected override void Start()
+    protected override void Awake()
     {
-        base.Start();
+        base.Awake();
 
         EnsureRangeDetector();
         gameObject.layer = DetectLayer;
+        rangeDetector.gameObject.layer = DetectLayer;
 
         rangeDetector.Initialize(range);
         range.CurrentValueChanged += UpdateRange;
@@ -95,9 +96,7 @@ public class ProjectileModule : WeaponModule
     {
         base.Fire();
         Vector3 spawnPosition = firePoint != null ? firePoint.position : transform.position;
-        Vector3 aimDirection = canAim
-            ? (currentTarget.transform.position - spawnPosition).normalized
-            : (firePoint != null ? firePoint.up : transform.up);
+        Vector3 aimDirection = (firePoint.position - transform.position).normalized;
         SpawnProjectiles(spawnPosition, aimDirection);
     }
 

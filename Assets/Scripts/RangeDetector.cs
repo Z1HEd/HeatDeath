@@ -6,6 +6,7 @@ public class RangeDetector : MonoBehaviour
 {
     [SerializeField] private float range = 15f;
     private CircleCollider2D circleCollider;
+    [SerializeField]
     private List<Ship> trackedShips = new List<Ship>();
 
     public System.Action<Ship> OnShipExitedRange;
@@ -19,6 +20,7 @@ public class RangeDetector : MonoBehaviour
 
     public void Initialize(float range)
     {
+        trackedShips.Clear();
         circleCollider = GetComponent<CircleCollider2D>();
         circleCollider.isTrigger = true;
         circleCollider.offset = Vector2.zero;
@@ -73,7 +75,7 @@ public class RangeDetector : MonoBehaviour
         if (other.gameObject == null)
             return;
 
-        var ship = other.GetComponentInParent<Ship>();
+        var ship = other.GetComponent<Ship>();
         if (ship == null)
             return;
 
@@ -86,7 +88,7 @@ public class RangeDetector : MonoBehaviour
         if (other.gameObject == null)
             return;
 
-        var ship = other.GetComponentInParent<Ship>();
+        var ship = other.GetComponent<Ship>();
         if (ship == null)
             return;
 

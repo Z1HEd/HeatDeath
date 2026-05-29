@@ -10,7 +10,7 @@ public abstract class ModuleBase: MonoBehaviour
     protected UpgradeManager upgradeManager;
     public ModuleDefinition ModuleDefinition => moduleDefinition;
 
-    protected virtual void Start()
+    protected virtual void Awake()
     {
         ship = GetComponentInParent<Ship>();
         if (!ship) return;

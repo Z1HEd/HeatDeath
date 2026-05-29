@@ -115,7 +115,7 @@ MonoBehaviour:
   firePoint: {fileID: 416210592748895249}
   projectileSpeed:
     type: 9
-    baseValue: 20
+    baseValue: 5
     minValue: 0
   projectileDamage:
     type: 10
@@ -228,6 +228,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RangeDetector
   range: 10
+  trackedShips: []
 --- !u!1 &3748942623559639341
 GameObject:
   m_ObjectHideFlags: 0
@@ -237,7 +238,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 416210592748895249}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
