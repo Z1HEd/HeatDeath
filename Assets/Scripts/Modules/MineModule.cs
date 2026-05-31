@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class MineModule : ProjectileModule
 {
-    private readonly List<MineProjectile> activeMines = new List<MineProjectile>();
+    [SerializeField]private readonly List<MineProjectile> activeMines = new List<MineProjectile>();
 
     protected override void OnProjectileSpawned(Projectile projectile)
     {
@@ -18,5 +18,25 @@ public class MineModule : ProjectileModule
             if (oldest != null)
                 oldest.ForceExplode();
         }
+    }
+    // No multiple mines spawning, projectileCount is treated as max num of mines on map.
+    protected override void SpawnProjectiles(Vector3 spawnPosition, Vector3 aimDirection)
+    {
+        if (projectilePrefab == null)
+        {
+            Debug.LogWarning("Projectile prefab not assigned on " + gameObject.name);
+            return;
+        }
+
+        int count = Mathf.Max(1, Mathf.FloorToInt(projectileCount));
+        float spreadDegrees = Mathf.Max(0f, projectileSpread);
+        
+        float angleOffset = GetSpreadAngleOffset(spreadDegrees);
+        Vector3 shotDirection = Quaternion.AngleAxis(angleOffset, Vector3.forward) * aimDirection;
+
+        Projectile projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
+        projectile.gameObject.layer = DetectLayer;
+        projectile.Initialize(shotDirection * projectileSpeed, this);
+        OnProjectileSpawned(projectile);
     }
 }

@@ -15,11 +15,11 @@ __# Heat Death To-Do List __
 
 - ✅Weapon Draft system
 - Add more gun modules:
-- - Missile
+- - ✅Missile
 - - ✅Railgun
 - - Laser
 - - Tesla
-- - Mines
+- - ✅Mines
 
 - Add damage types and resists
 - Make weapon modules display properly on the ship module

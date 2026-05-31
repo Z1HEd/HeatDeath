@@ -100,7 +100,7 @@ public class ProjectileModule : WeaponModule
         SpawnProjectiles(spawnPosition, aimDirection);
     }
 
-    private void SpawnProjectiles(Vector3 spawnPosition, Vector3 aimDirection)
+    protected virtual void SpawnProjectiles(Vector3 spawnPosition, Vector3 aimDirection)
     {
         if (projectilePrefab == null)
         {
@@ -124,7 +124,7 @@ public class ProjectileModule : WeaponModule
 
     protected virtual void OnProjectileSpawned(Projectile projectile) { }
 
-    private static float GetSpreadAngleOffset(float spreadDegrees)
+    protected static float GetSpreadAngleOffset(float spreadDegrees)
     {
         if (spreadDegrees <= 0f)
             return 0f;
