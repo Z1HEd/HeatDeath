@@ -11,7 +11,7 @@ public struct StatModifierAggregate
 [Serializable]
 public abstract class StatBase<T>
 {
-    [SerializeField] private StatType type;
+    private StatType type;
 
     [NonSerialized] private bool initialized;
     [NonSerialized] private T currentValue;

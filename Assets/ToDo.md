@@ -24,10 +24,6 @@ __# Heat Death To-Do List __
 - Add damage types and resists
 - Make weapon modules display properly on the ship module
 
-- General module draft system
-- Add more general modules:
-- - TODO: Transfer general modules from docs here
-
 - Add 3 base ships to choose from
 
 - Basic pause menu
@@ -49,3 +45,8 @@ __# Heat Death To-Do List __
 
 - Run statistics
 - Runs history
+
+OPTIONAL:
+- General module draft system
+- Add more general modules:
+- - TODO: Transfer general modules from docs here
