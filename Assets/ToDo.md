@@ -14,11 +14,11 @@ __# Heat Death To-Do List __
 - ✅Fill the basic upgrade data, double check upgrade system, polish
 
 - ✅Weapon Draft system
-- Add more gun modules:
+- ✅Add more gun modules:
 - - ✅Missile
 - - ✅Railgun
-- - Laser
-- - Tesla
+- - ✅Laser
+- - ✅Tesla
 - - ✅Mines
 
 - Add damage types and resists
