@@ -33,6 +33,10 @@ public class RangeDetector : MonoBehaviour
         if (circleCollider != null)
             circleCollider.radius = newRange;
     }
+    public Ship GetClosestTarget()
+    {
+        return GetClosestTargetTo(transform.position, null);
+    }
 
     public Ship GetClosestTarget(Transform origin)
     {

@@ -2,16 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(RangeDetector))]
+[ExecuteAlways]
 public class TeslaModule : WeaponModule, IHitter
 {
     [SerializeField] private ScalarStat damage = new ScalarStat(StatType.ProjectileDamage, 15f, 0f);
-    [SerializeField] private ScalarStat range = new ScalarStat(StatType.Range, 15f, 0f);
+    
     [SerializeField] private int maxChainTargets = 3;
     [SerializeField] private float lightningDuration = 0.1f;
     [SerializeField] private Material lightningMaterial;
-
-    private RangeDetector rangeDetector;
+    private const float CHAIN_RANGE_FALLOFF = 0.75f;
 
     public float Damage => damage;
     public float KnockbackPower => 0f;
@@ -19,9 +18,7 @@ public class TeslaModule : WeaponModule, IHitter
     protected override void Awake()
     {
         base.Awake();
-        rangeDetector = GetComponent<RangeDetector>();
         gameObject.layer = DetectLayer;
-        rangeDetector.Initialize(range);
     }
 
     protected override void Update()
@@ -50,19 +47,21 @@ public class TeslaModule : WeaponModule, IHitter
     private List<Ship> BuildChain()
     {
         var chain = new List<Ship>();
-        var hit = new HashSet<Ship>();
-
+        float curRange = range;
         Vector2 fromPosition = transform.position;
-
+        Ship next = rangeDetector.GetClosestTarget();
+        List<Collider2D> hits;
         for (int i = 0; i < maxChainTargets; i++)
         {
-            Ship next = rangeDetector.GetClosestTargetTo(fromPosition, hit);
-            if (next == null)
-                break;
+            if (next == null) break;
 
+            hits =new List<Collider2D>(Physics2D.OverlapCircleAll(next.transform.position, curRange, 1<<(DetectLayer-2)));
+            hits.RemoveAll(col => col.GetComponent<Ship>() == null || chain.Contains(col.GetComponent<Ship>()));
+            if (hits.Count<1) break;
+            next = GetClosest(hits,next.transform.position).gameObject.GetComponent<Ship>();
             chain.Add(next);
-            hit.Add(next);
             fromPosition = next.transform.position;
+            curRange *= CHAIN_RANGE_FALLOFF;
         }
 
         return chain;
@@ -114,6 +113,23 @@ public class TeslaModule : WeaponModule, IHitter
         }
     }
 
+    Collider2D GetClosest(List<Collider2D> hits, Vector3 pos)
+    {
+        if (hits.Count == 0) return null;
+
+        Collider2D closest = hits[0];
+        float sqrDist = (closest.transform.position - pos).sqrMagnitude;
+        foreach (Collider2D col in hits)
+        {
+            float currentDist = (col.transform.position - pos).sqrMagnitude;
+            if (currentDist < sqrDist)
+            {
+                closest = col;
+                sqrDist = currentDist;
+            }
+        }
+        return closest;
+    }
     protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
     {
         base.ApplyModifiers(modifiers);

@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-[ExecuteAlways]
 public class ProjectileModule : WeaponModule
 {
     [SerializeField] protected Projectile projectilePrefab;
@@ -12,48 +11,20 @@ public class ProjectileModule : WeaponModule
     [SerializeField] protected ScalarStat projectilePiercing = new ScalarStat(StatType.ProjectilePiercing, 0f, -1f);
     [SerializeField] protected ScalarStat projectileCount = new ScalarStat(StatType.ProjectileCount, 1f, 1f);
     [SerializeField] protected ScalarStat projectileSpread = new ScalarStat(StatType.ProjectileSpread, 0f, 0f);
-    [SerializeField] protected ScalarStat range = new ScalarStat(StatType.Range, 15f, 0f);
     [SerializeField] protected BoolStat canAim = new BoolStat(StatType.CanAim, true);
 
-    private RangeDetector rangeDetector;
     private Ship currentTarget;
-
-    public float Range => range;
     public float ProjectileDamage => projectileDamage;
     public float ProjectileKnockback => projectileKnockback;
     public float ProjectilePiercing => projectilePiercing;
 
-    protected void OnValidate()
-    {
-        UpdateRange(range);
-    }
-
     protected override void Awake()
     {
         base.Awake();
-
-        EnsureRangeDetector();
-        gameObject.layer = DetectLayer;
-        rangeDetector.gameObject.layer = DetectLayer;
-
-        rangeDetector.Initialize(range);
-        range.CurrentValueChanged += UpdateRange;
         rangeDetector.OnShipExitedRange += OnShipExitedRange;
-
         firePoint = transform.GetChild(0);
     }
 
-    private void EnsureRangeDetector()
-    {
-        if (rangeDetector == null)
-            rangeDetector = GetComponentInChildren<RangeDetector>(true);
-        if (rangeDetector == null)
-        {
-            GameObject detectorObject = new GameObject("RangeDetector");
-            detectorObject.transform.SetParent(transform, false);
-            rangeDetector = detectorObject.AddComponent<RangeDetector>();
-        }
-    }
 
     protected override void Update()
     {
@@ -142,10 +113,7 @@ public class ProjectileModule : WeaponModule
         projectilePiercing.Recalculate(modifiers);
         projectileCount.Recalculate(modifiers);
         projectileSpread.Recalculate(modifiers);
-        range.Recalculate(modifiers);
         canAim.Recalculate(modifiers);
-
-        UpdateRange(range);
     }
 
     protected override void ResetModifiers()
@@ -160,9 +128,5 @@ public class ProjectileModule : WeaponModule
         projectileSpread.ResetToBase();
         range.ResetToBase();
     }
-    private void UpdateRange(float newRange)
-    {
-        if (!rangeDetector) return;
-        rangeDetector.SetRadius(range);
-    }
+    
 }

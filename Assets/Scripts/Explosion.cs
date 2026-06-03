@@ -18,7 +18,6 @@ public class Explosion : MonoBehaviour, IHitter
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius, 1<<(detectLayer-2));
         foreach (Collider2D col in hits)
         {
-            Debug.Log(col);
             Ship ship = col.GetComponent<Ship>();
             if (ship == null || ship.IsDead)
                 continue;

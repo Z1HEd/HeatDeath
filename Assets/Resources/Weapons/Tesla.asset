@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aabadc3267214e8449991ba47860fc9a, type: 3}
+  m_Name: Tesla
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
+  displayName: Tesla
+  componentTypeName: TeslaModule
+  tags:
+  - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
+  - {fileID: 11400000, guid: b03028a4aa56fc64a8afacd5404ea678, type: 2}
+  key: weapon.tesla
+  description: Hits enemies with electricity. Chains 2 times.
+  weaponPrefab: {fileID: 2658622645487082905, guid: 386636682fee00e4a99ee49361a80efc, type: 3}
