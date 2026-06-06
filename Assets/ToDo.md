@@ -21,7 +21,7 @@ __# Heat Death To-Do List __
 - - ✅Tesla
 - - ✅Mines
 
-- Add damage types and resists
+- ✅Add damage types and resists
 - Make weapon modules display properly on the ship module
 - Add enemy HP/Shield bars
 
