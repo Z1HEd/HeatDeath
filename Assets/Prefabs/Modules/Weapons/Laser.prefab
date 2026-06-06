@@ -51,14 +51,23 @@ MonoBehaviour:
   fireRate:
     baseValue: 0.3
     minValue: 0.0001
+  range:
+    baseValue: 50
+    minValue: 0
   projectilePrefab: {fileID: 7021255584612261990, guid: c581d32c9c44cd5449cb6a575b253f92, type: 3}
   firePoint: {fileID: 3116449676911722161}
   projectileSpeed:
     baseValue: 0
     minValue: 0
   projectileDamage:
-    baseValue: 30
+    baseValue: 15
     minValue: 0
+  ShieldDamageMultiplier:
+    baseValue: 1.5
+    minValue: -1
+  HPDamageMultiplier:
+    baseValue: 0.8
+    minValue: -1
   projectileKnockback:
     baseValue: 0
     minValue: 0
@@ -70,9 +79,6 @@ MonoBehaviour:
     minValue: 1
   projectileSpread:
     baseValue: 0
-    minValue: 0
-  range:
-    baseValue: 50
     minValue: 0
   canAim:
     baseValue: 0

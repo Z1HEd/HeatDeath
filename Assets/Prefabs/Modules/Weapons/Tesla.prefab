@@ -115,6 +115,12 @@ MonoBehaviour:
   damage:
     baseValue: 15
     minValue: 0
+  shieldDamageMultiplier:
+    baseValue: -1
+    minValue: -1
+  hpDamageMultiplier:
+    baseValue: 1
+    minValue: -1
   maxChainTargets: 3
   lightningDuration: 0.1
   lightningMaterial: {fileID: 0}

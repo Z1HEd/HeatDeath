@@ -5,15 +5,20 @@ using UnityEngine;
 [ExecuteAlways]
 public class TeslaModule : WeaponModule, IHitter
 {
-    [SerializeField] private ScalarStat damage = new ScalarStat(StatType.ProjectileDamage, 15f, 0f);
-    
+    [SerializeField] protected ScalarStat damage = new ScalarStat(StatType.ProjectileDamage, 15f, 0f);
+    [SerializeField] protected ScalarStat shieldDamageMultiplier = new ScalarStat(StatType.ShieldDamageMultiplier, 1f, -1f);
+    [SerializeField] protected ScalarStat hpDamageMultiplier = new ScalarStat(StatType.HPDamageMultiplier, 1f, -1f);
+
+    public float KnockbackPower => 0f;
+    public float Damage =>damage;
+    public float ShieldDamageMultiplier => shieldDamageMultiplier;
+    public float HPDamageMultiplier => shieldDamageMultiplier;
     [SerializeField] private int maxChainTargets = 3;
     [SerializeField] private float lightningDuration = 0.1f;
     [SerializeField] private Material lightningMaterial;
-    private const float CHAIN_RANGE_FALLOFF = 0.75f;
 
-    public float Damage => damage;
-    public float KnockbackPower => 0f;
+
+    private const float CHAIN_RANGE_FALLOFF = 0.75f;
 
     protected override void Awake()
     {

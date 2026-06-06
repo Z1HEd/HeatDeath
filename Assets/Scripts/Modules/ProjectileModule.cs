@@ -3,20 +3,19 @@ using System.Collections.Generic;
 
 public class ProjectileModule : WeaponModule
 {
-    [SerializeField] protected Projectile projectilePrefab;
-    [SerializeField] protected Transform firePoint;
-    [SerializeField] protected ScalarStat projectileSpeed = new ScalarStat(StatType.ProjectileSpeed, 20f, 0f);
-    [SerializeField] protected ScalarStat projectileDamage = new ScalarStat(StatType.ProjectileDamage, 10f, 0f);
-    [SerializeField] protected ScalarStat projectileKnockback = new ScalarStat(StatType.ProjectileKnockback, 0f, 0f);
-    [SerializeField] protected ScalarStat projectilePiercing = new ScalarStat(StatType.ProjectilePiercing, 0f, -1f);
-    [SerializeField] protected ScalarStat projectileCount = new ScalarStat(StatType.ProjectileCount, 1f, 1f);
-    [SerializeField] protected ScalarStat projectileSpread = new ScalarStat(StatType.ProjectileSpread, 0f, 0f);
-    [SerializeField] protected BoolStat canAim = new BoolStat(StatType.CanAim, true);
+    [SerializeField] public Projectile projectilePrefab;
+    [SerializeField] public Transform firePoint;
+    [SerializeField] public ScalarStat projectileSpeed = new ScalarStat(StatType.ProjectileSpeed, 20f, 0f);
+    [SerializeField] public ScalarStat projectileDamage = new ScalarStat(StatType.ProjectileDamage, 10f, 0f);
+    [SerializeField] public ScalarStat ShieldDamageMultiplier = new ScalarStat(StatType.ShieldDamageMultiplier, 1f, -1f);
+    [SerializeField] public ScalarStat HPDamageMultiplier = new ScalarStat(StatType.HPDamageMultiplier, 1f, -1f);
+    [SerializeField] public ScalarStat projectileKnockback = new ScalarStat(StatType.ProjectileKnockback, 0f, 0f);
+    [SerializeField] public ScalarStat projectilePiercing = new ScalarStat(StatType.ProjectilePiercing, 0f, -1f);
+    [SerializeField] public ScalarStat projectileCount = new ScalarStat(StatType.ProjectileCount, 1f, 1f);
+    [SerializeField] public ScalarStat projectileSpread = new ScalarStat(StatType.ProjectileSpread, 0f, 0f);
+    [SerializeField] public BoolStat canAim = new BoolStat(StatType.CanAim, true);
 
     private Ship currentTarget;
-    public float ProjectileDamage => projectileDamage;
-    public float ProjectileKnockback => projectileKnockback;
-    public float ProjectilePiercing => projectilePiercing;
 
     protected override void Awake()
     {

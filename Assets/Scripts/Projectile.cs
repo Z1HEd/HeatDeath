@@ -5,6 +5,8 @@ using UnityEngine;
 public class Projectile : MonoBehaviour, IHitter
 {
     public float Damage { get; protected set; } = 10f;
+    public float ShieldDamageMultiplier { get; protected set; } = 1f;
+    public float HPDamageMultiplier { get; protected set; } = 1f;
     public float KnockbackPower { get; protected set; } = 0f;
     protected Rigidbody2D rb;
     protected bool isDead;
@@ -21,9 +23,9 @@ public class Projectile : MonoBehaviour, IHitter
         if (rb != null)
             rb.linearVelocity = velocity;
 
-        Damage = sourceModule.ProjectileDamage;
-        KnockbackPower = sourceModule.ProjectileKnockback;
-        ConfigurePiercing(sourceModule.ProjectilePiercing);
+        Damage = sourceModule.projectileDamage;
+        KnockbackPower = sourceModule.projectileKnockback;
+        ConfigurePiercing(sourceModule.projectilePiercing);
     }
 
     private void ConfigurePiercing(float piercing)

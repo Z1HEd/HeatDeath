@@ -120,22 +120,21 @@ public sealed class ResourceStat : StatBase<float>
         SetCurrentValue(Mathf.Clamp(CurrentValue + value, 0f, MaxValue));
     }
 
-    public float Consume(float value)
+    public float Consume(float value, float multiplier = 1f)
     {
         if (!IsInitialized)
             ResetToMax();
 
-        float amount = Mathf.Max(0f, value);
+        if (multiplier<0) return value;
 
-        if (CurrentValue >= amount)
+        if (CurrentValue >= value * multiplier)
         {
-            SetCurrentValue(CurrentValue - amount);
+            SetCurrentValue(CurrentValue - value*multiplier);
             return 0f;
         }
 
-        float leftover = amount - CurrentValue;
         SetCurrentValue(0f);
-        return leftover;
+        return value - CurrentValue/multiplier;;
     }
 }
 

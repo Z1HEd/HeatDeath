@@ -26,6 +26,8 @@ public class ShipCoreModule : ModuleBase, IHitter
     public float CurrentShieldRegen => shieldRegen.CurrentValue;
     public float Damage => rammingDamage;
     public float KnockbackPower => rammingKnockback;
+    public float ShieldDamageMultiplier => 1f;
+    public float HPDamageMultiplier => 1f;
 
     public void Initialize()
     {
@@ -42,9 +44,9 @@ public class ShipCoreModule : ModuleBase, IHitter
         OnHPShieldsChanged?.Invoke();
     }
 
-    public bool ApplyDamage(float incomingDamage)
+    public bool ApplyDamage(IHitter hitter)
     {
-        float damage = shields.Consume(incomingDamage);
+        float damage = shields.Consume(hitter.Damage);
         if (damage > 0f)
             health.Consume(damage);
         else

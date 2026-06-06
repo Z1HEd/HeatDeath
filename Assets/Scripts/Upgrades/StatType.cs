@@ -17,5 +17,7 @@ public enum StatType
 	ProjectileSpread = 14,
 	CanAim = 15,
 	ProjectilePiercing = 16,
-	Lifetime
+	Lifetime = 17,
+	ShieldDamageMultiplier = 18,
+	HPDamageMultiplier = 19
 }

@@ -108,41 +108,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MineModule
   moduleDefinition: {fileID: 11400000, guid: 56eed34eb1876394db226823338d1c74, type: 2}
   fireRate:
-    type: 8
     baseValue: 0.2
     minValue: 0.0001
+  range:
+    baseValue: 100
+    minValue: 0
   projectilePrefab: {fileID: 4529807675471374433, guid: 6362a540d7efa7e488c23f6277dad9e6, type: 3}
   firePoint: {fileID: 416210592748895249}
   projectileSpeed:
-    type: 9
     baseValue: 5
     minValue: 0
   projectileDamage:
-    type: 10
     baseValue: 20
     minValue: 0
+  ShieldDamageMultiplier:
+    baseValue: 0.8
+    minValue: -1
+  HPDamageMultiplier:
+    baseValue: 1
+    minValue: -1
   projectileKnockback:
-    type: 11
     baseValue: 0
     minValue: 0
   projectilePiercing:
-    type: 16
     baseValue: 0
     minValue: -1
   projectileCount:
-    type: 12
     baseValue: 3
     minValue: 1
   projectileSpread:
-    type: 14
     baseValue: 0
     minValue: 0
-  range:
-    type: 13
-    baseValue: 100
-    minValue: 0
   canAim:
-    type: 15
     baseValue: 0
 --- !u!1 &3014855846730604681
 GameObject:

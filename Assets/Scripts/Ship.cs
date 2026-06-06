@@ -61,7 +61,7 @@ public class Ship : MonoBehaviour, IHittable
         if (core == null)
             return;
 
-        bool tookDamage = core.ApplyDamage(hitter.Damage);
+        bool tookDamage = core.ApplyDamage(hitter);
         bool died = core.CurrentHealth<=0.0;
 
         if (died){

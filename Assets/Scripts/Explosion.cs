@@ -4,6 +4,8 @@ public class Explosion : MonoBehaviour, IHitter
 {
     public float Damage { get; private set; }
     public float KnockbackPower { get; private set; }
+    public float HPDamageMultiplier { get; private set; }
+    public float ShieldDamageMultiplier { get; private set; }
     public float timer = -1;
     public const float FADE_DURATION = 0.3f;
     private SpriteRenderer spriteRenderer;
