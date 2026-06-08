@@ -23,7 +23,7 @@ __# Heat Death To-Do List __
 
 - ✅Add damage types and resists
 - Make weapon modules display properly on the ship module
-- Add enemy HP/Shield bars
+- ✅Add enemy HP/Shield bars
 
 - Add 3 base ships to choose from
 
