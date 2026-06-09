@@ -46,9 +46,9 @@ public class ShipCoreModule : ModuleBase, IHitter
 
     public bool ApplyDamage(IHitter hitter)
     {
-        float damage = shields.Consume(hitter.Damage);
+        float damage = shields.Consume(hitter.Damage,hitter.ShieldDamageMultiplier);
         if (damage > 0f)
-            health.Consume(damage);
+            health.Consume(damage,hitter.HPDamageMultiplier);
         else
         {
             StopAllCoroutines();
@@ -56,6 +56,7 @@ public class ShipCoreModule : ModuleBase, IHitter
         }
 
         OnHPShieldsChanged?.Invoke();
+        Debug.Log("HP: "+health.CurrentValue+", Shields: "+shields.CurrentValue);
         return damage>0;
     }
     

@@ -60,13 +60,13 @@ MonoBehaviour:
     baseValue: 0
     minValue: 0
   projectileDamage:
-    baseValue: 15
+    baseValue: 20
     minValue: 0
   ShieldDamageMultiplier:
-    baseValue: 1.5
+    baseValue: -1
     minValue: -1
   HPDamageMultiplier:
-    baseValue: 0.8
+    baseValue: 1
     minValue: -1
   projectileKnockback:
     baseValue: 0

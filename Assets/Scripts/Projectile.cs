@@ -28,6 +28,8 @@ public class Projectile : MonoBehaviour, IHitter
 
         Damage = sourceModule.projectileDamage;
         KnockbackPower = sourceModule.projectileKnockback;
+        ShieldDamageMultiplier = sourceModule.ShieldDamageMultiplier;
+        HPDamageMultiplier = sourceModule.HPDamageMultiplier;
         ConfigurePiercing(sourceModule.projectilePiercing);
     }
 
