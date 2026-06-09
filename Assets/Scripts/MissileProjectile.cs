@@ -72,7 +72,7 @@ public class MissileProjectile : Projectile
             return false;
 
         Explosion explosion = Instantiate(explosionPrefab,transform.position,transform.rotation);
-        explosion.Initialize(Damage, KnockbackPower, explosionRange, gameObject.layer);
+        explosion.Initialize(this, explosionRange, gameObject.layer);
             
         TryConsumeCharge();
         return true;

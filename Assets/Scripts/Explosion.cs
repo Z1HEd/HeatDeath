@@ -10,10 +10,12 @@ public class Explosion : MonoBehaviour, IHitter
     public const float FADE_DURATION = 0.3f;
     private SpriteRenderer spriteRenderer;
 
-    public void Initialize(float damage, float knockbackPower, float radius, int detectLayer)
+    public void Initialize(IHitter hitter, float radius, int detectLayer)
     {
-        Damage = damage;
-        KnockbackPower = knockbackPower;
+        Damage = hitter.Damage;
+        KnockbackPower = hitter.KnockbackPower;
+        HPDamageMultiplier = hitter.HPDamageMultiplier;
+        ShieldDamageMultiplier=hitter.ShieldDamageMultiplier;
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         transform.localScale = new Vector3(radius,radius,radius);

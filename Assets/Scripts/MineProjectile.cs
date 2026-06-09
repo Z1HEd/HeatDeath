@@ -32,7 +32,7 @@ public class MineProjectile : Projectile
         if (explosionPrefab != null)
         {
             Explosion exp = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
-            exp.Initialize(Damage, KnockbackPower, explosionRadius, gameObject.layer);
+            exp.Initialize(this, explosionRadius, gameObject.layer);
         }
 
         TryConsumeCharge();
