@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -9,6 +10,7 @@ public class Projectile : MonoBehaviour, IHitter
     public float HPDamageMultiplier { get; protected set; } = 1f;
     public float KnockbackPower { get; protected set; } = 0f;
     protected Rigidbody2D rb;
+    protected SpriteRenderer spriteRenderer;
     protected bool isDead;
     private int remainingPierceHits;
     private bool hasInfinitePierce;
@@ -16,6 +18,7 @@ public class Projectile : MonoBehaviour, IHitter
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
     public virtual void Initialize(Vector2 velocity, ProjectileModule sourceModule)
@@ -41,12 +44,16 @@ public class Projectile : MonoBehaviour, IHitter
         remainingPierceHits = Mathf.Max(0, Mathf.FloorToInt(piercing));
     }
 
-    public virtual void Kill()
+    public virtual IEnumerator Kill()
     {
         if (isDead)
-            return;
+            yield break;
 
         isDead = true;
+        rb.linearVelocity = Vector3.zero;
+        spriteRenderer.enabled = false;
+
+        yield return new WaitForSeconds(0.2f); // Let trails and effects clear themselfes
         Destroy(gameObject);
     }
 
@@ -82,12 +89,13 @@ public class Projectile : MonoBehaviour, IHitter
             return true;
         }
 
-        Kill();
+        StartCoroutine(Kill());
         return true;
     }
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
+        if (isDead) return;
         TryApplyHit(collision);
     }
 }
