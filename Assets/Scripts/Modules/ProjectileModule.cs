@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+[ExecuteAlways]
 public class ProjectileModule : WeaponModule
 {
     [SerializeField] public Projectile projectilePrefab;

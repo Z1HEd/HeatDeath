@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class MineModule : ProjectileModule
 {
+    [SerializeField] public ScalarStat ExplosionRange = new ScalarStat(StatType.ExplosionRange,1f,0f);
     [SerializeField]private readonly List<MineProjectile> activeMines = new List<MineProjectile>();
 
     protected override void OnProjectileSpawned(Projectile projectile)
@@ -38,5 +39,16 @@ public class MineModule : ProjectileModule
         projectile.gameObject.layer = DetectLayer;
         projectile.Initialize(shotDirection * projectileSpeed, this);
         OnProjectileSpawned(projectile);
+    }
+    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
+    {
+        base.ApplyModifiers(modifiers);
+        ExplosionRange.Recalculate(modifiers);
+    }
+
+    protected override void ResetModifiers()
+    {
+        base.ResetModifiers();
+        ExplosionRange.ResetToBase();
     }
 }

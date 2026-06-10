@@ -68,7 +68,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 8
+  m_Radius: 6
 --- !u!114 &2738076568794476490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -81,7 +81,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e764ef61a77dbc94eaf78330889bb2b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RangeDetector
-  range: 8
+  range: 6
+  trackedShips: []
 --- !u!1 &2658622645487082905
 GameObject:
   m_ObjectHideFlags: 0
@@ -131,41 +132,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileModule
   moduleDefinition: {fileID: 11400000, guid: 250a7571d34a251468762ef99fd40cad, type: 2}
   fireRate:
-    type: 8
-    baseValue: 0.75
+    baseValue: 0.6
     minValue: 0.0001
+  range:
+    baseValue: 6
+    minValue: 0
   projectilePrefab: {fileID: 8872413515496322224, guid: 32fde49ac5ad8ea49a2d1db61f4fb5d4, type: 3}
   firePoint: {fileID: 416210592748895249}
   projectileSpeed:
-    type: 9
     baseValue: 10
     minValue: 0
   projectileDamage:
-    type: 10
     baseValue: 8
     minValue: 0
+  ShieldDamageMultiplier:
+    baseValue: 1
+    minValue: -1
+  HPDamageMultiplier:
+    baseValue: 1
+    minValue: -1
   projectileKnockback:
-    type: 11
     baseValue: 0
     minValue: 0
   projectilePiercing:
-    type: 16
     baseValue: 0
     minValue: -1
   projectileCount:
-    type: 12
-    baseValue: 3
+    baseValue: 4
     minValue: 1
   projectileSpread:
-    type: 14
-    baseValue: 15
-    minValue: 0
-  range:
-    type: 13
-    baseValue: 8
+    baseValue: 20
     minValue: 0
   canAim:
-    type: 15
     baseValue: 1
 --- !u!212 &969041321684900178
 SpriteRenderer:

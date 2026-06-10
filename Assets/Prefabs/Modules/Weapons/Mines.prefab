@@ -108,7 +108,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MineModule
   moduleDefinition: {fileID: 11400000, guid: 56eed34eb1876394db226823338d1c74, type: 2}
   fireRate:
-    baseValue: 0.2
+    baseValue: 0.5
     minValue: 0.0001
   range:
     baseValue: 100
@@ -119,13 +119,13 @@ MonoBehaviour:
     baseValue: 5
     minValue: 0
   projectileDamage:
-    baseValue: 20
+    baseValue: 25
     minValue: 0
   ShieldDamageMultiplier:
-    baseValue: 0.8
+    baseValue: 0.75
     minValue: -1
   HPDamageMultiplier:
-    baseValue: 1
+    baseValue: 1.4
     minValue: -1
   projectileKnockback:
     baseValue: 0
@@ -141,6 +141,9 @@ MonoBehaviour:
     minValue: 0
   canAim:
     baseValue: 0
+  ExplosionRange:
+    baseValue: 3
+    minValue: 0
 --- !u!1 &3014855846730604681
 GameObject:
   m_ObjectHideFlags: 0

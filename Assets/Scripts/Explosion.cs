@@ -28,7 +28,7 @@ public class Explosion : MonoBehaviour, IHitter
             
             ship.Hit(this);
             if (KnockbackPower > 0f)
-                ship.ApplyKnockback(this, null);
+                ship.ApplyKnockback(this, transform.position-ship.transform.position);
         }
         timer = FADE_DURATION;
         

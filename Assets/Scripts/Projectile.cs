@@ -11,7 +11,7 @@ public class Projectile : MonoBehaviour, IHitter
     public float KnockbackPower { get; protected set; } = 0f;
     protected Rigidbody2D rb;
     protected SpriteRenderer spriteRenderer;
-    protected bool isDead;
+    public bool isDead {get;protected set;}
     private int remainingPierceHits;
     private bool hasInfinitePierce;
 
@@ -73,7 +73,7 @@ public class Projectile : MonoBehaviour, IHitter
 
         hittable.Hit(this);
         if (collision.GetComponent<Rigidbody2D>() != null)
-            hittable.ApplyKnockback(this, null);
+            hittable.ApplyKnockback(this, transform.position-collision.transform.position);
 
         TryConsumeCharge();
         return true;

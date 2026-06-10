@@ -56,7 +56,6 @@ public class ShipCoreModule : ModuleBase, IHitter
         }
 
         OnHPShieldsChanged?.Invoke();
-        Debug.Log("HP: "+health.CurrentValue+", Shields: "+shields.CurrentValue);
         return damage>0;
     }
     

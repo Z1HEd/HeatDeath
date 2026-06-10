@@ -107,19 +107,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TeslaModule
   moduleDefinition: {fileID: 11400000, guid: c3f5e2a31b65fc54a940668ad06e4813, type: 2}
   fireRate:
-    baseValue: 0.4
+    baseValue: 0.5
     minValue: 0.0001
   range:
-    baseValue: 7
+    baseValue: 6
     minValue: 0
   damage:
     baseValue: 15
     minValue: 0
   shieldDamageMultiplier:
-    baseValue: 1.5
+    baseValue: 1.4
     minValue: -1
   hpDamageMultiplier:
-    baseValue: 0.5
+    baseValue: 0.75
     minValue: -1
   maxChainTargets: 3
   lightningDuration: 0.1

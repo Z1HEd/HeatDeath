@@ -108,7 +108,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MissileModule
   moduleDefinition: {fileID: 11400000, guid: e5a9fd2dd18115740b0829833104fcfc, type: 2}
   fireRate:
-    baseValue: 0.25
+    baseValue: 0.4
     minValue: 0.0001
   range:
     baseValue: 10
@@ -119,13 +119,13 @@ MonoBehaviour:
     baseValue: 5
     minValue: 0
   projectileDamage:
-    baseValue: 30
+    baseValue: 20
     minValue: 0
   ShieldDamageMultiplier:
-    baseValue: 0.8
+    baseValue: 0.75
     minValue: -1
   HPDamageMultiplier:
-    baseValue: 1
+    baseValue: 1.4
     minValue: -1
   projectileKnockback:
     baseValue: 1
@@ -141,6 +141,12 @@ MonoBehaviour:
     minValue: 0
   canAim:
     baseValue: 0
+  ExplosionRange:
+    baseValue: 2
+    minValue: 0
+  SeekingRange:
+    baseValue: 5
+    minValue: 0
   textureWithRocket: {fileID: 21300000, guid: 8efac6b2a71ff2049ad237d20bca2742, type: 3}
   textureWithoutRocket: {fileID: 21300000, guid: 91c95e7eaecf92f409fea676d191e5e9, type: 3}
 --- !u!1 &3014855846730604681

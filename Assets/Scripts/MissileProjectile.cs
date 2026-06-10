@@ -18,8 +18,7 @@ public class MissileProjectile : Projectile
         base.Initialize(velocity, sourceModule);
         EnsureRangeDetector();
         rangeDetector.gameObject.layer = gameObject.layer;
-        rangeDetector.Initialize(targetLockRange);
-        targetLockRange.CurrentValueChanged += UpdateRange;
+        
 
         lockTime = Time.time + Mathf.Max(0f, lockDelay);
         speed = Mathf.Max(0.01f, velocity.magnitude);
@@ -27,6 +26,16 @@ public class MissileProjectile : Projectile
 
         if (velocity.sqrMagnitude > 0f)
             transform.up = velocity.normalized;
+
+        if (sourceModule is MissileModule){
+            explosionRange = (sourceModule as MissileModule).ExplosionRange;
+            targetLockRange = (sourceModule as MissileModule).SeekingRange;
+        }
+        else
+            Debug.LogError("Missile expects MissileModule, got: "+ sourceModule);
+        
+        rangeDetector.Initialize(targetLockRange);
+        targetLockRange.CurrentValueChanged += UpdateRange;
     }
 
     private void FixedUpdate()
@@ -37,8 +46,7 @@ public class MissileProjectile : Projectile
         if (Time.time < lockTime)
             return;
 
-        if (target == null || target.IsDead)
-            target = rangeDetector != null ? rangeDetector.GetClosestTarget(transform) : null;
+        target = rangeDetector != null ? rangeDetector.GetClosestTarget(transform) : null;
 
         if (target == null || rb == null)
             return;

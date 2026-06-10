@@ -74,25 +74,13 @@ public class Ship : MonoBehaviour, IHittable
         }
     }
 
-    public void ApplyKnockback(IHitter hitter, Collision2D collision)
+    public void ApplyKnockback(IHitter hitter, Vector3 direction)
     {
         if (dead)
             return;
 
         if (shipRigidbody == null || hitter.KnockbackPower <= 0f)
             return;
-
-        Vector2 direction = Vector2.up;
-
-        if (collision != null)
-        {
-            ContactPoint2D contact = collision.GetContact(0);
-            direction = contact.normal;
-            if (direction.sqrMagnitude <= 0f)
-            {
-                direction = (Vector2)(transform.position - collision.transform.position).normalized;
-            }
-        }
 
         if (direction.sqrMagnitude <= 0f)
         {
@@ -101,6 +89,14 @@ public class Ship : MonoBehaviour, IHittable
 
         shipRigidbody.AddForce(-direction * hitter.KnockbackPower, ForceMode2D.Impulse);
         knockbackTimeRemaining = Mathf.Max(knockbackTimeRemaining, knockbackFreezeDuration);
+    }
+
+    public void ApplyKnockback(IHitter hitter, Collision2D collision)
+    {
+        ContactPoint2D contact = collision.GetContact(0);
+        Vector3 direction = contact.normal;
+
+        ApplyKnockback(hitter,direction);
     }
 
     public virtual void Die()

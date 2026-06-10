@@ -3,7 +3,7 @@ using UnityEngine;
 public class MineProjectile : Projectile
 {
     [SerializeField] private Explosion explosionPrefab;
-    [SerializeField] private float explosionRadius = 3f;
+    [SerializeField] private float explosionRange = 3f;
     [SerializeField] private float drag = 8f;
 
     protected override void Awake()
@@ -11,6 +11,14 @@ public class MineProjectile : Projectile
         base.Awake();
         if (rb != null)
             rb.linearDamping = drag;
+    }
+    public override void Initialize(Vector2 velocity, ProjectileModule sourceModule)
+    {
+        base.Initialize(velocity,sourceModule);
+        if (sourceModule is MineModule) 
+            explosionRange = (sourceModule as MineModule).ExplosionRange;
+        else
+            Debug.LogError("Mine expects MineModule, got: "+ sourceModule);
     }
 
     public void ForceExplode()
@@ -32,7 +40,7 @@ public class MineProjectile : Projectile
         if (explosionPrefab != null)
         {
             Explosion exp = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
-            exp.Initialize(this, explosionRadius, gameObject.layer);
+            exp.Initialize(this, explosionRange, gameObject.layer);
         }
 
         TryConsumeCharge();

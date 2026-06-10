@@ -6,9 +6,9 @@ public class ScreenBoundary : MonoBehaviour
     void OnTriggerExit2D(Collider2D other)
     {
         Projectile proj = other.GetComponent<Projectile>();
-        if (proj != null)
+        if (proj != null && !proj.isDead && proj.gameObject.activeInHierarchy)
         {
-            proj.Kill();
+            proj.StartCoroutine(proj.Kill());
         }
     }
 }

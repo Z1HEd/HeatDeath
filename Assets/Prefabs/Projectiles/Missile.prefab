@@ -92,7 +92,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 791837039338762687}
-  m_BodyType: 2
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -317,10 +317,9 @@ MonoBehaviour:
   lockDelay: 0.5
   turnSpeedDegrees: 120
   targetLockRange:
-    type: 13
     baseValue: 5
     minValue: 0
-  explosionRange: 1
+  explosionRange: 2.5
   explosionPrefab: {fileID: 5675550285233396970, guid: 3a228cbda7b267348aea17b2327d9602, type: 3}
 --- !u!1 &7714627461330646715
 GameObject:

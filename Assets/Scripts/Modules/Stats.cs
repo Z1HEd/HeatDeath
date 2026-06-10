@@ -127,14 +127,16 @@ public sealed class ResourceStat : StatBase<float>
 
         if (multiplier<0) return value;
 
+        float leftover = 0f;
+
         if (CurrentValue >= value * multiplier)
         {
             SetCurrentValue(CurrentValue - value*multiplier);
-            return 0f;
+            return leftover;
         }
-
+        leftover = value - CurrentValue/multiplier;
         SetCurrentValue(0f);
-        return value - CurrentValue/multiplier;;
+        return leftover;
     }
 }
 

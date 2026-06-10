@@ -170,5 +170,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MineProjectile
   explosionPrefab: {fileID: 5675550285233396970, guid: 3a228cbda7b267348aea17b2327d9602, type: 3}
-  explosionRadius: 3
+  explosionRadius: 2
   drag: 3
