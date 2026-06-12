@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(ModuleManager))]
 [RequireComponent(typeof(Rigidbody2D))]
@@ -13,10 +14,11 @@ public class Ship : MonoBehaviour, IHittable
     private static readonly int FlashAmountID =
         Shader.PropertyToID("_FlashAmount");
     public Action OnDeath;
-    [SerializeField]
     public ModuleManager moduleManager;
     [SerializeField]
     private float knockbackFreezeDuration = 0.15f;
+    [SerializeField]
+    public List<ParticleSystem> deathParticles = new List<ParticleSystem>();
 
     protected Rigidbody2D shipRigidbody;
     private ShipCoreModule coreModule;
@@ -106,6 +108,10 @@ public class Ship : MonoBehaviour, IHittable
 
         dead = true;
         OnDeath?.Invoke();
+        foreach (var particle in deathParticles)
+        {
+            Instantiate(particle,transform.position,Quaternion.identity);
+        }
         Destroy(gameObject);
     }
     public virtual IEnumerator DamageFlash()
@@ -160,13 +166,6 @@ public class Ship : MonoBehaviour, IHittable
         }
     }
 
-    public void AddModule(ModuleBase module)
-    {
-        if (moduleManager == null)
-            moduleManager = GetComponent<ModuleManager>();
-
-        moduleManager.AddModule(module);
-    }
 
     public void SetTargetPosition(Vector3 targetPosition)
     {
