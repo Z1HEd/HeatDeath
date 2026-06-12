@@ -412,7 +412,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1351382088666180293}
   m_Father: {fileID: 3035712108534689694}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1420081732694351909
@@ -429,15 +430,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ThrusterModule
   moduleDefinition: {fileID: 11400000, guid: a3f144a87eb1d22449ea79a4d0b8c12b, type: 2}
   targetPosition: {x: 0, y: 0}
-  thrust:
-    baseValue: 0.05
-    minValue: 0
   maxSpeed:
     baseValue: 3
     minValue: 0
-  thrustScale: 100
-  stopDistance: 0.1
-  brakingSafety: 0.9
+  body: {fileID: 0}
+  thrust:
+    baseValue: 0.05
+    minValue: 0
 --- !u!1 &7622125486683924137
 GameObject:
   m_ObjectHideFlags: 0
@@ -473,7 +472,6 @@ Transform:
   m_LocalScale: {x: -1, y: -1, z: -1}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 1351382088666180293}
   - {fileID: 878508704014828498}
   - {fileID: 6779506399939376970}
   - {fileID: 1613716491189270686}
@@ -658,6 +656,7 @@ GameObject:
   - component: {fileID: 1351382088666180293}
   - component: {fileID: 1680005353862930307}
   - component: {fileID: 8866618690837598430}
+  - component: {fileID: 2125750416858843144}
   m_Layer: 9
   m_Name: Particle System
   m_TagString: Untagged
@@ -678,7 +677,7 @@ Transform:
   m_LocalScale: {x: -1, y: -1, z: -1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3035712108534689694}
+  m_Father: {fileID: 878508704014828498}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &1680005353862930307
 ParticleSystem:
@@ -816,7 +815,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1.25
+      scalar: 0.5
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -2724,12 +2723,12 @@ ParticleSystem:
         m_RotationOrder: 4
     inWorldSpace: 0
   InheritVelocityModule:
-    enabled: 0
+    enabled: 1
     m_Mode: 0
     m_Curve:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: 0.2
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -5483,6 +5482,18 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &2125750416858843144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8587472816417817063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c7053ac4060c754e89f6aff2e98b91d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpeedParticlesScaler
 --- !u!1001 &8572060677602993169
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -23,7 +23,7 @@ __# Heat Death To-Do List __
 
 - ✅Add damage types and resists
 - ✅Add enemy HP/Shield bars
-- Better enemy AI (random movements, stay in topp of the screen)
+- Better enemy AI (random movements, stay in top of the screen)
 
 - Add 3 base ships to choose from
 - Make weapon modules display properly on the ship module
