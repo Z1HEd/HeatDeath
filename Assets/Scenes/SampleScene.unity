@@ -881,6 +881,9 @@ MonoBehaviour:
   - {fileID: 362748142000764873, guid: 0e630dcf34176da4a9c2d473abe6c325, type: 3}
   - {fileID: 362748142000764873, guid: f126ee99fc3e081428df0a3a0e563fe5, type: 3}
   - {fileID: 362748142000764873, guid: dae3405c2a5009d4eb2a61a0fed516a3, type: 3}
+  - {fileID: 362748142000764873, guid: 9343f78637b59a24fbf333c5fed56051, type: 3}
+  - {fileID: 362748142000764873, guid: 7d41aeaf1146e9842acf84602235018f, type: 3}
+  - {fileID: 362748142000764873, guid: cd849f38d0eafe94193eed3de24e10b3, type: 3}
 --- !u!61 &1304093821
 BoxCollider2D:
   m_ObjectHideFlags: 0

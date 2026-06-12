@@ -23,9 +23,12 @@ __# Heat Death To-Do List __
 
 - ✅Add damage types and resists
 - ✅Add enemy HP/Shield bars
+- Better enemy AI (random movements, stay in topp of the screen)
 
 - Add 3 base ships to choose from
 - Make weapon modules display properly on the ship module
+
+- Add enemy stat multipliers
 
 - Basic pause menu
 - Basic main menu
@@ -33,13 +36,11 @@ __# Heat Death To-Do List __
 
 - Update enemy spawning system
 - Add enemy locations:
-- - Outer Belt
+- - ✅Outer Belt
 - - Aegis Sector
 - - Hive Drift
 - - Iron Reach
 - - Storm Verge
-
-- Balance stuff
 
 - Add more upgrades
 - Weapon evolution system
