@@ -57,7 +57,7 @@ MonoBehaviour:
   projectilePrefab: {fileID: 8872413515496322224, guid: 32fde49ac5ad8ea49a2d1db61f4fb5d4, type: 3}
   firePoint: {fileID: 3116449676911722161}
   projectileSpeed:
-    baseValue: 15
+    baseValue: 25
     minValue: 0
   projectileDamage:
     baseValue: 25

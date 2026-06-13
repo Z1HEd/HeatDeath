@@ -4,12 +4,10 @@ public class ThrusterModule : MovementModule
 {
     [Header("Thruster Settings")]
     [SerializeField] private ScalarStat thrust = new ScalarStat(StatType.Thrust, 0.5f, 0f);
-    [SerializeField] private ScalarStat maxSpeed = new ScalarStat(StatType.MaxSpeed, 10f, 0f);
 
-    [Header("Internal")]
-    [SerializeField] private float thrustScale = 100.0f;
-    [SerializeField] private float stopDistance = 0.1f;
-    [SerializeField, Range(0f, 1f)] private float brakingSafety = 0.9f;
+    private float thrustScale = 100.0f;
+    private float stopDistance = 0.1f;
+    private float brakingSafety = 0.9f;
 
     public void FixedUpdate()
     {
@@ -63,13 +61,13 @@ public class ThrusterModule : MovementModule
 
     protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
     {
+        base.ApplyModifiers(modifiers);
         thrust.Recalculate(modifiers);
-        maxSpeed.Recalculate(modifiers);
     }
 
     protected override void ResetModifiers()
     {
+        base.ResetModifiers();
         thrust.ResetToBase();
-        maxSpeed.ResetToBase();
     }
 }
