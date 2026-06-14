@@ -25,16 +25,16 @@ __# Heat Death To-Do List __
 - ✅Add enemy HP/Shield bars
 - Better enemy AI (random movements, stay in top of the screen)
 
-- Add 3 base ships to choose from
+- Add 4 base ships to choose from
 - Make weapon modules display properly on the ship module
-
-- Add enemy stat multipliers
 
 - Basic pause menu
 - Basic main menu
 - Saving and continuing runs
+- Improve UI
 
 - Update enemy spawning system
+- Add enemy stat multipliers (based on current level)
 - Add enemy locations:
 - - ✅Outer Belt
 - - Aegis Sector
