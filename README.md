@@ -1,21 +1,16 @@
 HeatDeath is a roguelike space combat game made in Unity.
 
-Players fight through enemy encounters using customizable ships equipped with different weapons and upgrades. During each run, new modules and upgrades can be obtained to create different builds and playstyles.
+Defeat enemy ships, gather scraps to make new upgrades, install unique weapons to make the strongest build that fits your playstyle. Different starting ships to chose from, 21 total weapons, 5 areas with different themed enemies to make the gameplay challenging for different builds
 
 > HeatDeath is currently in active development.
 
 ## Features
 
 - Roguelike run-based progression
-- Ship combat with shields, health, and ramming mechanics
-- Multiple weapon types:
-  - Cannon
-  - Shotgun
-  - Railgun
-  - Missiles
-  - Lasers
-  - Tesla weapons
-  - Mines
+- Ship combat with health, shields, and ramming mechanics
+- 4 starting ships, with unique passive/active abilities
+- 5 basic weapon types with different properties and mechanics
+- When a weapon is fully upgraded, it can evolve into one of 2 more powerful variants
 - Upgrade drafting system with different rarities
-- Enemy encounters across multiple locations
+- Enemy waves system with 5 different locations
 - Run saving and statistics tracking
