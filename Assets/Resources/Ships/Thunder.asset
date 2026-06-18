@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84d7af1d86dc7ee4baf9ddb09b40c802, type: 3}
   m_Name: Thunder
   m_EditorClassIdentifier: Assembly-CSharp::ShipDefinition
-  DisplayName: 
-  Description: 
-  ShipPrefab: {fileID: 0}
+  DisplayName: Thunder
+  Description: A lightweight, high-tech ship. Increased speed, shields and damage
+    with electrical weapons.
+  ShipPrefab: {fileID: 3575443304599885754, guid: 6dc85ebccc1e09b4ebca5632c202e93f, type: 3}

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84d7af1d86dc7ee4baf9ddb09b40c802, type: 3}
   m_Name: Bulwark
   m_EditorClassIdentifier: Assembly-CSharp::ShipDefinition
-  DisplayName: 
-  Description: 
-  ShipPrefab: {fileID: 0}
+  DisplayName: Bulwark
+  Description: Heavy armored ship. Burst Truster instead of the standard one, increased
+    HP, shields, and ramming damage.
+  ShipPrefab: {fileID: 3575443304599885754, guid: e0c7f02db7a901742adee3ab8b90439c, type: 3}

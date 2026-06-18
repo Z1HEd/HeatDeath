@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84d7af1d86dc7ee4baf9ddb09b40c802, type: 3}
   m_Name: Yamato
   m_EditorClassIdentifier: Assembly-CSharp::ShipDefinition
-  DisplayName: 
-  Description: 
-  ShipPrefab: {fileID: 0}
+  DisplayName: Yamato
+  Description: Overwhelming firepower. Average speed, high HP, and an additional
+    turret.
+  ShipPrefab: {fileID: 3575443304599885754, guid: 8605f3ff03759e24c9e578f17ffc6d8b, type: 3}
