@@ -10,10 +10,14 @@ public class ModuleManager : MonoBehaviour
 
     public List<MovementModule> MovementModules => GetModules<MovementModule>();
     public List<WeaponModule> WeaponModules => GetModules<WeaponModule>();
+    [SerializeField]
+    protected Transform turretMounts;
 
     public void Start()
     {
         ship = GetComponent<Ship>();
+        if (turretMounts == null)
+            turretMounts = transform.Find("TurretMounts");
     }
 
     public void AddModule(ModuleBase module)
@@ -78,9 +82,13 @@ public class ModuleManager : MonoBehaviour
     {
         if (definition == null || definition.WeaponPrefab == null)
             return;
-
-        Instantiate(definition.WeaponPrefab, transform);
-        StartCoroutine(RecalculateAfterFrame());
+        foreach (Transform mount in turretMounts){
+            if (mount.childCount>0) continue;
+            Instantiate(definition.WeaponPrefab, mount);
+            StartCoroutine(RecalculateAfterFrame());
+            return;
+        }
+        Debug.LogError("Failed to add weapon: missing turret mount");
     }
 
     private IEnumerator RecalculateAfterFrame()

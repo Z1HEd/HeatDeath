@@ -10,10 +10,11 @@ public class GameController : MonoBehaviour
     private int currentLevel = 1;
     [SerializeField]
     private float currentXP = 0f;
-    [SerializeField]
-    private List<int> weaponDraftLevels = new List<int> { 1, 10, 20, 40 };
+    private List<int> weaponDraftLevels = new List<int> { 1, 5, 10, 20 };
     [SerializeField]
     private GameObject gameUIPrefab;
+    [SerializeField]
+    private Transform playerSpawnPoint;
     
     public Action OnXPChanged;
     public Action<int> OnLevelChanged;
@@ -33,12 +34,12 @@ public class GameController : MonoBehaviour
     {
         if (level <= 0 || weaponDraftLevels == null || weaponDraftLevels.Count == 0)
             return false;
-
-        return weaponDraftLevels.Contains(level);
+        return weaponDraftLevels.IndexOf(level) != -1;
     }
 
     private void Awake()
     {
+        Debug.Log(IsWeaponDraftLevel(5));
         if (instance != null && instance != this)
         {
             Destroy(gameObject);
@@ -50,12 +51,24 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         if (gameUIPrefab != null)
-        {
             Instantiate(gameUIPrefab);
-        }
     }
 
     public static GameController Instance => instance;
+
+    public GameObject SpawnPlayer(ShipDefinition shipDefinition)
+    {
+        if (shipDefinition == null || shipDefinition.ShipPrefab == null)
+        {
+            Debug.LogWarning("SpawnPlayer: ShipDefinition or its prefab is null.");
+            return null;
+        }
+
+        Vector3 spawnPos = playerSpawnPoint != null ? playerSpawnPoint.position : Vector3.zero;
+        Quaternion spawnRot = playerSpawnPoint != null ? playerSpawnPoint.rotation : Quaternion.identity;
+
+        return Instantiate(shipDefinition.ShipPrefab, spawnPos, spawnRot);
+    }
 
     public void AddXP(float xpAmount)
     {
@@ -73,7 +86,7 @@ public class GameController : MonoBehaviour
 
     private float CalculateXPRequiredForLevel(int level)
     {
-        return 5f * (level-1);
+        return 5f * (level - 1);
     }
 
     private void ProcessLevelUpsFromCurrentXP()
@@ -93,7 +106,6 @@ public class GameController : MonoBehaviour
         Debug.Log($"Level Up! Gained {levelsGained} levels. Now level {currentLevel}");
         Time.timeScale = 0f;
         OnLevelChanged?.Invoke(levelsGained);
-        
     }
 
     private void OnDestroy()
