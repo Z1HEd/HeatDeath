@@ -9,15 +9,19 @@ public class GameUIController : MonoBehaviour
     private const string RarityClassRare = "upgrade-option-rare";
     private const string RarityClassEpic = "upgrade-option-epic";
     private const string RarityClassLegendary = "upgrade-option-legendary";
+
     [SerializeField] private UIDocument uiDocument;
-    
+
     private ShipCoreModule playerCoreModule;
     private Player player;
     private UpgradeManager upgradeManager;
     private UpgradeDraftService upgradeDraftService;
     private WeaponDraftService weaponDraftService;
+    private ShipDraftService shipDraftService;
 
+    private List<ShipDefinition> currentShipOptions = new List<ShipDefinition>();
     private List<WeaponDefinition> currentWeaponOptions = new List<WeaponDefinition>();
+    private List<UpgradeDefinition> currentOptions = new List<UpgradeDefinition>();
 
     private VisualElement healthFill;
     private VisualElement shieldFill;
@@ -32,11 +36,11 @@ public class GameUIController : MonoBehaviour
     private Button[] optionButtons;
     private Action[] optionHandlers;
 
+    private int pendingShipDrafts;
     private int pendingUpgradeDrafts;
     private int pendingWeaponDrafts;
-    private List<UpgradeDefinition> currentOptions = new List<UpgradeDefinition>();
 
-    private void OnEnable()
+    private void Awake()
     {
         if (uiDocument == null)
             uiDocument = GetComponent<UIDocument>();
@@ -69,41 +73,28 @@ public class GameUIController : MonoBehaviour
 
         SetUpgradeOverlayVisible(false);
 
-        var playerObject = GameObject.FindGameObjectWithTag("Player");
-        if (playerObject == null) return;
-
-        player = playerObject.GetComponent<Player>();
-        playerCoreModule = player != null ? player.CoreModule : null;
-        upgradeManager = playerObject.GetComponent<UpgradeManager>();
-
+        shipDraftService = new ShipDraftService();
         upgradeDraftService = new UpgradeDraftService();
         weaponDraftService = new WeaponDraftService();
 
-        if (playerCoreModule == null) return;
-        
-        playerCoreModule.OnHPShieldsChanged += UpdateBars;
         GameController.Instance.OnXPChanged += UpdateXPBar;
         GameController.Instance.OnLevelChanged += UpdateLevelText;
         GameController.Instance.OnLevelChanged += StartDraftSequence;
-        
-        UpdateBars();
+
         UpdateXPBar();
         UpdateLevelText(0);
 
-        if (GameController.Instance.IsWeaponDraftLevel())
-        {
-            Time.timeScale = 0f;
-            pendingWeaponDrafts++;
-            ShowNextDraftOrResume();
-        }
+        
+        Time.timeScale = 0f;
+        pendingShipDrafts = 1;
+        pendingWeaponDrafts = 1;
+        ShowNextDraftOrResume();
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
         if (playerCoreModule != null)
-        {
             playerCoreModule.OnHPShieldsChanged -= UpdateBars;
-        }
 
         if (optionButtons != null && optionHandlers != null)
         {
@@ -122,45 +113,14 @@ public class GameUIController : MonoBehaviour
         }
     }
 
-    private void UpdateBars()
+    private void BindPlayer(GameObject playerObject)
     {
-        UpdateHealthBar();
-        UpdateShieldBar();
-    }
+        player = playerObject.GetComponent<Player>();
+        playerCoreModule = player != null ? player.CoreModule : null;
+        upgradeManager = playerObject.GetComponent<UpgradeManager>();
 
-    private void UpdateHealthBar()
-    {
-        float currentHealth = playerCoreModule.CurrentHealth;
-        float maxHealth = playerCoreModule.CurrentMaxHealth;
-
-        float fillPercent = maxHealth > 0 ? currentHealth / maxHealth : 0;
-        healthFill.style.width = Length.Percent(Mathf.Clamp01(fillPercent) * 100f);
-        healthText.text = $"{currentHealth:F0}/{maxHealth}";
-    }
-
-    private void UpdateShieldBar()
-    {
-        float currentShields = playerCoreModule.CurrentShields;
-        float maxShields = playerCoreModule.CurrentMaxShields;
-
-        float fillPercent = maxShields > 0 ? currentShields / maxShields : 0;
-        shieldFill.style.width = Length.Percent(Mathf.Clamp01(fillPercent) * 100f);
-        shieldText.text = $"{currentShields:F0}/{maxShields}";
-    }
-
-    private void UpdateXPBar()
-    {
-        float currentXP = GameController.Instance.CurrentXP;
-        float xpRequired = GameController.Instance.XPRequiredForNextLevel;
-
-        float fillPercent = xpRequired > 0 ? currentXP / xpRequired : 0;
-        xpFill.style.width = Length.Percent(Mathf.Clamp01(fillPercent) * 100f);
-        xpText.text = $"{currentXP:F0}/{xpRequired:F0}";
-    }
-
-    private void UpdateLevelText(int levelsIncrease)
-    {
-        levelText.text = $"Level {GameController.Instance.CurrentLevel}";
+        if (playerCoreModule != null)
+            playerCoreModule.OnHPShieldsChanged += UpdateBars;
     }
 
     private void StartDraftSequence(int levelsGained)
@@ -180,6 +140,12 @@ public class GameUIController : MonoBehaviour
 
     private void ShowNextDraftOrResume()
     {
+        if (pendingShipDrafts > 0)
+        {
+            ShowShipDraft();
+            return;
+        }
+
         if (pendingUpgradeDrafts <= 0 && pendingWeaponDrafts <= 0)
         {
             SetUpgradeOverlayVisible(false);
@@ -193,9 +159,34 @@ public class GameUIController : MonoBehaviour
             ShowUpgradeDraft();
     }
 
+    private void ShowShipDraft()
+    {
+        upgradePanel?.AddToClassList("ship-draft-active");
+        upgradePanel?.RemoveFromClassList("weapon-draft-active");
+
+        currentShipOptions = shipDraftService.GetDraftOptions(3);
+
+        if (currentShipOptions.Count == 0)
+        {
+            pendingShipDrafts--;
+            ShowNextDraftOrResume();
+            return;
+        }
+
+        PopulateDraftButtons("Choose Your Ship", currentShipOptions.Count,
+            i =>
+            {
+                ShipDefinition def = currentShipOptions[i];
+                ClearRarityClasses(optionButtons[i]);
+                optionButtons[i].text = $"{def.DisplayName}\n{def.Description}";
+            });
+    }
+
     private void ShowWeaponDraft()
     {
         upgradePanel?.AddToClassList("weapon-draft-active");
+        upgradePanel?.RemoveFromClassList("ship-draft-active");
+
         currentWeaponOptions = weaponDraftService.GetDraftOptions(player, 3);
 
         if (currentWeaponOptions.Count == 0)
@@ -221,7 +212,10 @@ public class GameUIController : MonoBehaviour
     private void ShowUpgradeDraft()
     {
         upgradePanel?.RemoveFromClassList("weapon-draft-active");
+        upgradePanel?.RemoveFromClassList("ship-draft-active");
+
         currentOptions = upgradeDraftService.GetDraftOptions(player, 3);
+
         if (currentOptions.Count == 0)
         {
             pendingUpgradeDrafts = 0;
@@ -272,7 +266,21 @@ public class GameUIController : MonoBehaviour
 
     private void OnUpgradeOptionClicked(int index)
     {
-        if (pendingWeaponDrafts > 0)
+        if (pendingShipDrafts > 0)
+        {
+            if (index < 0 || index >= currentShipOptions.Count)
+                return;
+
+            GameObject playerObject = GameController.Instance.SpawnPlayer(currentShipOptions[index]);
+            if (playerObject != null)
+            {
+                BindPlayer(playerObject);
+                UpdateBars();
+            }
+
+            pendingShipDrafts--;
+        }
+        else if (pendingWeaponDrafts > 0)
         {
             if (index < 0 || index >= currentWeaponOptions.Count)
                 return;
@@ -305,6 +313,61 @@ public class GameUIController : MonoBehaviour
                 pendingUpgradeDrafts++;
         }
     }
+
+    // -------------------------------------------------------------------------
+    // Bar updates
+    // -------------------------------------------------------------------------
+
+    private void UpdateBars()
+    {
+        UpdateHealthBar();
+        UpdateShieldBar();
+    }
+
+    private void UpdateHealthBar()
+    {
+        if (playerCoreModule == null)
+            return;
+
+        float currentHealth = playerCoreModule.CurrentHealth;
+        float maxHealth = playerCoreModule.CurrentMaxHealth;
+
+        float fillPercent = maxHealth > 0 ? currentHealth / maxHealth : 0;
+        healthFill.style.width = Length.Percent(Mathf.Clamp01(fillPercent) * 100f);
+        healthText.text = $"{currentHealth:F0}/{maxHealth}";
+    }
+
+    private void UpdateShieldBar()
+    {
+        if (playerCoreModule == null)
+            return;
+
+        float currentShields = playerCoreModule.CurrentShields;
+        float maxShields = playerCoreModule.CurrentMaxShields;
+
+        float fillPercent = maxShields > 0 ? currentShields / maxShields : 0;
+        shieldFill.style.width = Length.Percent(Mathf.Clamp01(fillPercent) * 100f);
+        shieldText.text = $"{currentShields:F0}/{maxShields}";
+    }
+
+    private void UpdateXPBar()
+    {
+        float currentXP = GameController.Instance.CurrentXP;
+        float xpRequired = GameController.Instance.XPRequiredForNextLevel;
+
+        float fillPercent = xpRequired > 0 ? currentXP / xpRequired : 0;
+        xpFill.style.width = Length.Percent(Mathf.Clamp01(fillPercent) * 100f);
+        xpText.text = $"{currentXP:F0}/{xpRequired:F0}";
+    }
+
+    private void UpdateLevelText(int levelsIncrease)
+    {
+        levelText.text = $"Level {GameController.Instance.CurrentLevel}";
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
 
     private void SetUpgradeOverlayVisible(bool visible)
     {
