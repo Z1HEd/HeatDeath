@@ -10,8 +10,7 @@ public class GameController : MonoBehaviour
     private int currentLevel = 1;
     [SerializeField]
     private float currentXP = 0f;
-    [SerializeField]
-    private List<int> weaponDraftLevels = new List<int> { 1, 10, 20, 40 };
+    private List<int> weaponDraftLevels = new List<int> { 1, 5, 10, 20 };
     [SerializeField]
     private GameObject gameUIPrefab;
     [SerializeField]
@@ -35,12 +34,12 @@ public class GameController : MonoBehaviour
     {
         if (level <= 0 || weaponDraftLevels == null || weaponDraftLevels.Count == 0)
             return false;
-
-        return weaponDraftLevels.Contains(level);
+        return weaponDraftLevels.IndexOf(level) != -1;
     }
 
     private void Awake()
     {
+        Debug.Log(IsWeaponDraftLevel(5));
         if (instance != null && instance != this)
         {
             Destroy(gameObject);
