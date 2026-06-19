@@ -21,5 +21,6 @@ public enum StatType
 	ShieldDamageMultiplier = 18,
 	HPDamageMultiplier = 19,
 	ExplosionRange = 20,
-	ProjectileRange = 21
+	ProjectileRange = 21,
+	BurstCooldown = 22
 }
