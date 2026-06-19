@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,7 @@ public class ModuleManager : MonoBehaviour
     public List<WeaponModule> WeaponModules => GetModules<WeaponModule>();
     [SerializeField]
     protected Transform turretMounts;
+    public event Action<WeaponDefinition> OnWeaponAdded;
 
     public void Start()
     {
@@ -86,6 +88,8 @@ public class ModuleManager : MonoBehaviour
             if (mount.childCount>0) continue;
             Instantiate(definition.WeaponPrefab, mount);
             StartCoroutine(RecalculateAfterFrame());
+            Debug.Log("ADD");
+            OnWeaponAdded?.Invoke(definition);
             return;
         }
         Debug.LogError("Failed to add weapon: missing turret mount");
