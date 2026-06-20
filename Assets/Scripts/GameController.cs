@@ -77,11 +77,6 @@ public class GameController : MonoBehaviour
         OnXPChanged?.Invoke();
     }
 
-    public void Resume()
-    {
-        Time.timeScale = 1f;
-    }
-
     private float CalculateXPRequiredForLevel(int level)
     {
         return 5f * (level - 1);
@@ -101,7 +96,6 @@ public class GameController : MonoBehaviour
         if (levelsGained <= 0)
             return;
 
-        Time.timeScale = 0f;
         OnLevelChanged?.Invoke(levelsGained);
     }
 
@@ -110,6 +104,5 @@ public class GameController : MonoBehaviour
         if (instance == this)
             instance = null;
 
-        Time.timeScale = 1f;
     }
 }

@@ -31,7 +31,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8346175009604082007}
   - {fileID: 2137022525525021128}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -107,28 +106,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TeslaModule
   moduleDefinition: {fileID: 11400000, guid: c3f5e2a31b65fc54a940668ad06e4813, type: 2}
-  firePoint: {fileID: 2137022525525021128}
   fireRate:
-    currentValue: 0
     baseValue: 0.5
     minValue: 0.0001
   range:
-    currentValue: 0
     baseValue: 6
     minValue: 0
-  canAim:
-    currentValue: 0
-    baseValue: 1
   damage:
-    currentValue: 0
     baseValue: 15
     minValue: 0
   shieldDamageMultiplier:
-    currentValue: 0
     baseValue: 1.4
     minValue: -1
   hpDamageMultiplier:
-    currentValue: 0
     baseValue: 0.75
     minValue: -1
   maxChainTargets: 3
@@ -202,7 +192,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 6
+  m_Radius: 7
 --- !u!114 &1472815519448370622
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -215,36 +205,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e764ef61a77dbc94eaf78330889bb2b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RangeDetector
-  range: 6
+  range: 7
   trackedShips: []
---- !u!1 &5588970842040439471
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8346175009604082007}
-  m_Layer: 0
-  m_Name: FirePoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8346175009604082007
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5588970842040439471}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.3, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3653720032911491551}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

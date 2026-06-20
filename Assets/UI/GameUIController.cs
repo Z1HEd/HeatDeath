@@ -30,6 +30,7 @@ public class GameUIController : MonoBehaviour
     private VisualElement xpFill;
     private Label xpText;
     private Label levelText;
+    private Label pausedText;
     private VisualElement upgradeOverlay;
     private VisualElement upgradePanel;
     private Label upgradeHeader;
@@ -53,9 +54,11 @@ public class GameUIController : MonoBehaviour
         xpFill = root.Q<VisualElement>("XPFill");
         xpText = root.Q<Label>("XPText");
         levelText = root.Q<Label>("LevelText");
+        pausedText = root.Q<Label>("PausedText");
         upgradeOverlay = root.Q<VisualElement>("UpgradeOverlay");
         upgradePanel = root.Q<VisualElement>("UpgradePanel");
         upgradeHeader = root.Q<Label>("UpgradeHeader");
+        root.Q<Button>("PauseButton").clicked += PauseUnpause;
         optionButtons = new[]
         {
             root.Q<Button>("UpgradeOption1"),
@@ -84,8 +87,6 @@ public class GameUIController : MonoBehaviour
         UpdateXPBar();
         UpdateLevelText(0);
 
-        
-        Time.timeScale = 0f;
         pendingShipDrafts = 1;
         pendingWeaponDrafts = 1;
         ShowNextDraftOrResume();
@@ -122,6 +123,10 @@ public class GameUIController : MonoBehaviour
         if (playerCoreModule != null)
             playerCoreModule.OnHPShieldsChanged += UpdateBars;
     }
+    private void PauseUnpause()
+    {
+        Time.timeScale = Time.timeScale == 0f?1f:0f;
+    }
 
     private void StartDraftSequence(int levelsGained)
     {
@@ -130,16 +135,17 @@ public class GameUIController : MonoBehaviour
 
         if (player == null)
         {
-            GameController.Instance.Resume();
+            
             return;
         }
-
+        
         QueueDraftPicks(levelsGained);
         ShowNextDraftOrResume();
     }
 
     private void ShowNextDraftOrResume()
     {
+        Time.timeScale = 0f;
         if (pendingShipDrafts > 0)
         {
             ShowShipDraft();
@@ -149,7 +155,7 @@ public class GameUIController : MonoBehaviour
         if (pendingUpgradeDrafts <= 0 && pendingWeaponDrafts <= 0)
         {
             SetUpgradeOverlayVisible(false);
-            GameController.Instance.Resume();
+            Time.timeScale = 1f;
             return;
         }
 
@@ -220,7 +226,7 @@ public class GameUIController : MonoBehaviour
         {
             pendingUpgradeDrafts = 0;
             SetUpgradeOverlayVisible(false);
-            GameController.Instance.Resume();
+            Time.timeScale = 1f;
             return;
         }
 
@@ -374,7 +380,7 @@ public class GameUIController : MonoBehaviour
         if (upgradeOverlay == null)
             return;
 
-        upgradeOverlay.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+        upgradeOverlay.style.visibility = visible ? Visibility.Visible : Visibility.Hidden;
     }
 
     private void ApplyRarityClass(Button button, UpgradeRarity rarity)

@@ -108,56 +108,43 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MissileModule
   moduleDefinition: {fileID: 11400000, guid: e5a9fd2dd18115740b0829833104fcfc, type: 2}
   fireRate:
-    currentValue: 0
     baseValue: 0.4
     minValue: 0.0001
   range:
-    currentValue: 0
     baseValue: 10
     minValue: 0
   projectilePrefab: {fileID: 7383371667686300248, guid: 02383f17f405bb74ebe65694e48d20b1, type: 3}
   firePoint: {fileID: 416210592748895249}
   projectileSpeed:
-    currentValue: 0
     baseValue: 5
     minValue: 0
   projectileDamage:
-    currentValue: 0
     baseValue: 20
     minValue: 0
   ShieldDamageMultiplier:
-    currentValue: 0
     baseValue: 0.75
     minValue: -1
   HPDamageMultiplier:
-    currentValue: 0
     baseValue: 1.4
     minValue: -1
   projectileKnockback:
-    currentValue: 0
     baseValue: 1
     minValue: 0
   projectilePiercing:
-    currentValue: 0
     baseValue: 0
     minValue: -1
   projectileCount:
-    currentValue: 0
     baseValue: 1
     minValue: 1
   projectileSpread:
-    currentValue: 0
     baseValue: 0
     minValue: 0
   canAim:
-    currentValue: 0
     baseValue: 0
   ExplosionRange:
-    currentValue: 0
-    baseValue: 1
+    baseValue: 2
     minValue: 0
   SeekingRange:
-    currentValue: 0
     baseValue: 5
     minValue: 0
   textureWithRocket: {fileID: 21300000, guid: 8efac6b2a71ff2049ad237d20bca2742, type: 3}
