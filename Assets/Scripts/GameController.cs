@@ -39,7 +39,6 @@ public class GameController : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log(IsWeaponDraftLevel(5));
         if (instance != null && instance != this)
         {
             Destroy(gameObject);
@@ -73,7 +72,6 @@ public class GameController : MonoBehaviour
     public void AddXP(float xpAmount)
     {
         currentXP += xpAmount;
-        Debug.Log($"Added {xpAmount} XP. Total: {currentXP}");
         
         ProcessLevelUpsFromCurrentXP();
         OnXPChanged?.Invoke();
@@ -103,7 +101,6 @@ public class GameController : MonoBehaviour
         if (levelsGained <= 0)
             return;
 
-        Debug.Log($"Level Up! Gained {levelsGained} levels. Now level {currentLevel}");
         Time.timeScale = 0f;
         OnLevelChanged?.Invoke(levelsGained);
     }

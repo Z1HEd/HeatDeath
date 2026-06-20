@@ -14,7 +14,7 @@ public abstract class StatBase<T>
     private StatType type;
 
     [NonSerialized] private bool initialized;
-    [NonSerialized] private T currentValue;
+    [SerializeField] private T currentValue;
 
     public event Action<T> CurrentValueChanged;
 

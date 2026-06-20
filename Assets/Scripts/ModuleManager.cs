@@ -88,7 +88,6 @@ public class ModuleManager : MonoBehaviour
             if (mount.childCount>0) continue;
             Instantiate(definition.WeaponPrefab, mount);
             StartCoroutine(RecalculateAfterFrame());
-            Debug.Log("ADD");
             OnWeaponAdded?.Invoke(definition);
             return;
         }

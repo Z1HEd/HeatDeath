@@ -5,7 +5,7 @@ using UnityEngine;
 [ExecuteAlways]
 public class TeslaModule : WeaponModule, IHitter
 {
-    [SerializeField] protected ScalarStat damage = new ScalarStat(StatType.ProjectileDamage, 15f, 0f);
+    [SerializeField] protected ScalarStat damage = new ScalarStat(StatType.Damage, 15f, 0f);
     [SerializeField] protected ScalarStat shieldDamageMultiplier = new ScalarStat(StatType.ShieldDamageMultiplier, 1f, -1f);
     [SerializeField] protected ScalarStat hpDamageMultiplier = new ScalarStat(StatType.HPDamageMultiplier, 1f, -1f);
 

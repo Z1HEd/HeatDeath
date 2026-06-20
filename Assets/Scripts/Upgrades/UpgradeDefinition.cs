@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public enum UpgradeRarity
 {
@@ -10,6 +11,7 @@ public enum UpgradeRarity
 }
 
 [CreateAssetMenu(fileName = "UpgradeDefinition", menuName = "HeatDeath/Upgrade Definition")]
+[Serializable]
 public class UpgradeDefinition : ScriptableObject
 {
     [SerializeField] private string displayName;

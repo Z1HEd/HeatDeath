@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public struct ActiveStatModifier
 {
     public StatModifier Modifier;
@@ -39,6 +40,16 @@ public class UpgradeManager : MonoBehaviour
 
     public event Action OnChanged;
     public IReadOnlyList<ActiveStatModifier> ActiveEffects => activeEffects;
+    private bool shouldRecalculate = false;
+
+    public void FixedUpdate()
+    {
+        if (shouldRecalculate){
+            RecalculateAllModules();
+            OnChanged?.Invoke();
+            shouldRecalculate = false;
+        }
+    }
 
     public bool CanAddUpgrade(UpgradeDefinition upgrade)
     {
@@ -49,7 +60,7 @@ public class UpgradeManager : MonoBehaviour
         return !upgrade.IsMaxStacks(current);
     }
 
-    public void AddUpgrade(UpgradeDefinition upgrade)
+    public void AddUpgrade(UpgradeDefinition upgrade, int stackCount = 1)
     {
         if (!CanAddUpgrade(upgrade))
         {
@@ -58,9 +69,8 @@ public class UpgradeManager : MonoBehaviour
         }
 
         int current = GetStackCount(upgrade);
-        stackCounts[upgrade] = current + 1;
-        RecalculateAllModules();
-        OnChanged?.Invoke();
+        stackCounts[upgrade] = current + stackCount;
+        shouldRecalculate = true;
     }
 
     public int GetStackCount(UpgradeDefinition upgrade)
@@ -122,8 +132,7 @@ public class UpgradeManager : MonoBehaviour
             return;
 
         stackCounts.Clear();
-        RecalculateAllModules();
-        OnChanged?.Invoke();
+        shouldRecalculate = true;
     }
 
     public void RecalculateAllModules()

@@ -7,7 +7,7 @@ public class ProjectileModule : WeaponModule
     [SerializeField] public Projectile projectilePrefab;
     [SerializeField] public Transform firePoint;
     [SerializeField] public ScalarStat projectileSpeed = new ScalarStat(StatType.ProjectileSpeed, 20f, 0f);
-    [SerializeField] public ScalarStat projectileDamage = new ScalarStat(StatType.ProjectileDamage, 10f, 0f);
+    [SerializeField] public ScalarStat projectileDamage = new ScalarStat(StatType.Damage, 10f, 0f);
     [SerializeField] public ScalarStat ShieldDamageMultiplier = new ScalarStat(StatType.ShieldDamageMultiplier, 1f, -1f);
     [SerializeField] public ScalarStat HPDamageMultiplier = new ScalarStat(StatType.HPDamageMultiplier, 1f, -1f);
     [SerializeField] public ScalarStat projectileKnockback = new ScalarStat(StatType.ProjectileKnockback, 0f, 0f);

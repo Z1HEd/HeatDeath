@@ -58,9 +58,10 @@ public abstract class ModuleBase: MonoBehaviour
         StatModifier data = modifierData.Modifier;
         if (!map.TryGetValue(data.stat, out StatModifierAggregate modifier))
             modifier = default;
-
+        modifier.Percent = 1f;
+        
         if (data.operation == ModifierOperation.AddPercent)
-            modifier.Percent += data.value;
+            modifier.Percent *= data.value;
         else
             modifier.Flat += data.value;
 

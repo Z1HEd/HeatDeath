@@ -72,6 +72,7 @@ public class ShipCoreModule : ModuleBase, IHitter
 
     protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
     {
+
         health.Recalculate(modifiers, true);
         shields.Recalculate(modifiers, true);
         shieldRegen.Recalculate(modifiers);

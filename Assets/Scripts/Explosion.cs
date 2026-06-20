@@ -16,7 +16,7 @@ public class Explosion : MonoBehaviour, IHitter
         KnockbackPower = hitter.KnockbackPower;
         HPDamageMultiplier = hitter.HPDamageMultiplier;
         ShieldDamageMultiplier=hitter.ShieldDamageMultiplier;
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
         transform.localScale = new Vector3(radius,radius,radius);
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius, 1<<(detectLayer-2));

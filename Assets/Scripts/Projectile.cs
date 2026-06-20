@@ -5,6 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class Projectile : MonoBehaviour, IHitter
 {
+    [field: SerializeField]
     public float Damage { get; protected set; } = 10f;
     public float ShieldDamageMultiplier { get; protected set; } = 1f;
     public float HPDamageMultiplier { get; protected set; } = 1f;
