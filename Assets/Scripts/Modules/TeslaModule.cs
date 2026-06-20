@@ -32,6 +32,15 @@ public class TeslaModule : WeaponModule, IHitter
 
         if (rangeDetector == null)
             return;
+        var currentTarget = rangeDetector.GetClosestTarget();
+        if (firePoint != null && currentTarget != null)
+        {
+            Vector3 towardsTarget = currentTarget.transform.position - transform.position;
+            Vector3 currentAim = firePoint.position - transform.position;
+
+            float angle = Vector2.SignedAngle(currentAim, towardsTarget);
+            transform.Rotate(0f, 0f, angle);
+        }
 
         if (rangeDetector.GetClosestTarget(transform) != null && CanFire)
             Fire();

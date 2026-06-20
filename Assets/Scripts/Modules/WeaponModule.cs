@@ -4,8 +4,11 @@ using System.Collections.Generic;
 [ExecuteAlways]
 public abstract class WeaponModule : ModuleBase
 {
+    [SerializeField] public Transform firePoint;
     [SerializeField] protected ScalarStat fireRate = new ScalarStat(StatType.FireRate, 1f, 0.0001f);
     [SerializeField] protected ScalarStat range = new ScalarStat(StatType.Range, 15f, 0f);
+    
+    [SerializeField] public BoolStat canAim = new BoolStat(StatType.CanAim, true);
     
     protected RangeDetector rangeDetector;
     protected float lastFireTime;
@@ -37,6 +40,7 @@ public abstract class WeaponModule : ModuleBase
 
         rangeDetector.Initialize(range);
         range.CurrentValueChanged += UpdateRange;
+        firePoint = transform.GetChild(0);
     }
 
     protected virtual float FireDelay => 1f / fireRate;

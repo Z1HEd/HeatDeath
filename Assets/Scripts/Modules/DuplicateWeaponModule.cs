@@ -6,7 +6,6 @@ public class DuplicateWeaponModule : ModuleBase
     protected override void Awake()
     {
         base.Awake();
-        Debug.Log("Duplicate");
         ship.moduleManager.OnWeaponAdded += DuplicateWeapon;
     }
     protected void DuplicateWeapon(WeaponDefinition definition)

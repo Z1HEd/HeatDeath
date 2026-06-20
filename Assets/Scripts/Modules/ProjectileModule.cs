@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class ProjectileModule : WeaponModule
 {
     [SerializeField] public Projectile projectilePrefab;
-    [SerializeField] public Transform firePoint;
     [SerializeField] public ScalarStat projectileSpeed = new ScalarStat(StatType.ProjectileSpeed, 20f, 0f);
     [SerializeField] public ScalarStat projectileDamage = new ScalarStat(StatType.Damage, 10f, 0f);
     [SerializeField] public ScalarStat ShieldDamageMultiplier = new ScalarStat(StatType.ShieldDamageMultiplier, 1f, -1f);
@@ -14,7 +13,6 @@ public class ProjectileModule : WeaponModule
     [SerializeField] public ScalarStat projectilePiercing = new ScalarStat(StatType.ProjectilePiercing, 0f, -1f);
     [SerializeField] public ScalarStat projectileCount = new ScalarStat(StatType.ProjectileCount, 1f, 1f);
     [SerializeField] public ScalarStat projectileSpread = new ScalarStat(StatType.ProjectileSpread, 0f, 0f);
-    [SerializeField] public BoolStat canAim = new BoolStat(StatType.CanAim, true);
 
     private Ship currentTarget;
 
@@ -22,7 +20,6 @@ public class ProjectileModule : WeaponModule
     {
         base.Awake();
         rangeDetector.OnShipExitedRange += OnShipExitedRange;
-        firePoint = transform.GetChild(0);
     }
 
 

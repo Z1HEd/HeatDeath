@@ -34,7 +34,7 @@ __# Heat Death To-Do List __
 - Improve UI
 
 - Update enemy spawning system
-- Add enemy stat multipliers (based on current level)
+- ✅Add enemy stat multipliers (based on current level)
 - Add enemy locations:
 - - ✅Outer Belt
 - - Aegis Sector
