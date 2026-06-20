@@ -8,28 +8,50 @@ public class BurstThrusterModule : MovementModule
 
     [Header("Burst Settings")]
     [SerializeField] private ScalarStat burstCooldown = new ScalarStat(StatType.BurstCooldown, 3f, 0f);
-    [SerializeField] private float burstDistance = 3f;
 
     private const float ThrustScale        = 100.0f;
-    private const float StopDistance       = 0.1f;
+    private const float StopDistance       = 0.2f;
     private const float BrakingSafety      = 0.9f;
     private const float SteeringSpeedRatio = 0.25f;
 
     private float cooldownTimer = 0f;
+
+    public void Update()
+    {
+        cooldownTimer -= Time.deltaTime;
+
+        if (cooldownTimer > 0f)
+            return;
+
+        if (Time.timeScale <= 0f)
+            return;
+
+        if (!UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame)
+            return;
+
+        Vector2 toTarget = targetPosition - body.position;
+        if (toTarget.magnitude > StopDistance*maxSpeed)
+        {
+            body.linearVelocity = toTarget.normalized * maxSpeed;
+            cooldownTimer = burstCooldown;
+        }
+    }
+
+    public void SetTargetPosition(Vector2 newTarget)
+    {
+        targetPosition = newTarget;
+    }
 
     public void FixedUpdate()
     {
         if (ship != null && ship.IsKnockedBack)
             return;
 
-        cooldownTimer -= Time.fixedDeltaTime;
-
-        Vector2 toTarget       = targetPosition - body.position;
-        float   dist           = toTarget.magnitude;
+        Vector2 toTarget         = targetPosition - body.position;
+        float   dist             = toTarget.magnitude;
         float   steeringMaxSpeed = maxSpeed * SteeringSpeedRatio;
-        float   maxAccel       = (steeringThrust * ThrustScale) / Mathf.Max(body.mass, 0.0001f);
+        float   maxAccel         = (steeringThrust * ThrustScale) / Mathf.Max(body.mass, 0.0001f);
 
-        // Soft stop when already at target.
         if (dist <= StopDistance)
         {
             Vector2 stopAccel = -body.linearVelocity / Mathf.Max(Time.fixedDeltaTime, 0.0001f);
@@ -40,16 +62,6 @@ public class BurstThrusterModule : MovementModule
             return;
         }
 
-        // Burst: snap velocity to full maxSpeed toward the target.
-        // Steering runs afterwards and will gradually bleed it back to
-        // steeringMaxSpeed over the following frames.
-        if (dist >= burstDistance && cooldownTimer <= 0f)
-        {
-            body.linearVelocity = toTarget.normalized * maxSpeed;
-            cooldownTimer = burstCooldown;
-        }
-
-        // Slow continuous steering, capped at 1/4 of maxSpeed.
         float   allowedSpeed  = Mathf.Sqrt(2.0f * maxAccel * dist) * BrakingSafety;
         float   desiredSpeed  = Mathf.Min(steeringMaxSpeed, allowedSpeed);
         Vector2 desiredVel    = toTarget.normalized * desiredSpeed;
@@ -59,11 +71,6 @@ public class BurstThrusterModule : MovementModule
             requiredAccel = requiredAccel.normalized * maxAccel;
 
         body.AddForce(requiredAccel * body.mass, ForceMode2D.Force);
-    }
-
-    public void SetTargetPosition(Vector2 newTarget)
-    {
-        targetPosition = newTarget;
     }
 
     protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)

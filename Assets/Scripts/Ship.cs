@@ -129,7 +129,7 @@ public class Ship : MonoBehaviour, IHittable
             new Color(1f, 0.2f, 0.2f)
         );
 
-        float duration = 0.12f;
+        float duration = 0.08f;
         float t = 0f;
 
         while (t < duration)
