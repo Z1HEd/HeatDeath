@@ -1,35 +1,31 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/Style.uss?fileID=7433441132597879392&amp;guid=455ad7f7bf01ad84b8487fb033edc018&amp;type=3#Style"/>
-    <ui:VisualElement class="screen-root" style="align-items: stretch;">
-        <ui:VisualElement name="TopArea" style="flex-grow: 0; height: 0; min-height: 0; bottom: auto; align-self: stretch; flex-direction: row;">
-            <ui:VisualElement name="Info" style="flex-grow: 1;">
-                <ui:Label name="LevelText" text="Level 1" class="level-text" style="height: 8px;"/>
-                <ui:Label name="LocationText" text="Outer Belt&#10;" class="level-text" style="height: 8px; font-size: 11px;"/>
-            </ui:VisualElement>
-            <ui:Button text="" name="PauseButton" style="background-image: url(&quot;project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=5866165431930342980&amp;guid=ef8f01ad8bba4844c8c04f60c57b3674&amp;type=3#Remove@2x&quot;); min-width: 30px; min-height: 30px; padding-bottom: 0; padding-right: 0; padding-top: 0; padding-left: 0; margin-bottom: 0; margin-left: 0; margin-top: 0; margin-right: 0;"/>
+    <ui:VisualElement name="TopArea" style="flex-grow: 0; height: 0; min-height: 0; bottom: auto; align-self: stretch; flex-direction: row;">
+        <ui:VisualElement name="Info" style="flex-grow: 1;">
+            <ui:Label name="LevelText" text="Level 1" picking-mode="Ignore" class="level-text" style="height: 8px;"/>
+            <ui:Label name="LocationText" text="Outer Belt&#10;" picking-mode="Ignore" class="level-text" style="height: 8px; font-size: 11px;"/>
         </ui:VisualElement>
-        <ui:Label text="Paused" name="PausedText" enabled="true" style="color: rgb(255, 255, 255); flex-shrink: 1; flex-grow: 1; margin-left: 0; margin-bottom: 0; padding-bottom: 0; margin-right: 0; padding-right: 0; padding-top: 0; padding-left: 0; margin-top: 0; -unity-text-align: upper-center; display: flex; visibility: hidden; top: 50px;"/>
-        <ui:VisualElement name="UpgradeOverlay" class="upgrade-overlay" style="display: flex; visibility: hidden; bottom: 68px; align-items: auto;">
-            <ui:VisualElement name="UpgradePanel" class="upgrade-panel">
-                <ui:Label name="UpgradeHeader" text="Choose Upgrade" class="upgrade-header"/>
-                <ui:Button name="UpgradeOption1" text="Option 1" class="upgrade-option"/>
-                <ui:Button name="UpgradeOption2" text="Option 2" class="upgrade-option"/>
-                <ui:Button name="UpgradeOption3" text="Option 3" class="upgrade-option"/>
-            </ui:VisualElement>
+        <ui:Button text="" name="PauseButton" style="background-image: url(&quot;project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=5866165431930342980&amp;guid=ef8f01ad8bba4844c8c04f60c57b3674&amp;type=3#Remove@2x&quot;); min-width: 30px; min-height: 30px; padding-bottom: 0; padding-right: 0; padding-top: 0; padding-left: 0; margin-bottom: 0; margin-left: 0; margin-top: 0; margin-right: 0;"/>
+    </ui:VisualElement>
+    <ui:Label text="Paused" name="PausedText" enabled="true" picking-mode="Ignore" style="color: rgb(255, 255, 255); flex-shrink: 1; flex-grow: 1; margin-left: 0; margin-bottom: 0; padding-bottom: 0; margin-right: 0; padding-right: 0; padding-top: 0; padding-left: 0; margin-top: 0; -unity-text-align: upper-center; display: flex; visibility: hidden; top: 50px;"/>
+    <ui:VisualElement name="UpgradePanel" picking-mode="Ignore" class="upgrade-panel" style="visibility: hidden;">
+        <ui:Label name="UpgradeHeader" text="Choose Upgrade" picking-mode="Position" class="upgrade-header"/>
+        <ui:Button name="UpgradeOption1" text="Option 1" picking-mode="Position" class="upgrade-option"/>
+        <ui:Button name="UpgradeOption2" text="Option 2" picking-mode="Position" class="upgrade-option"/>
+        <ui:Button name="UpgradeOption3" text="Option 3" picking-mode="Position" class="upgrade-option"/>
+    </ui:VisualElement>
+    <ui:VisualElement name="HudPanel" class="hud-container" style="left: 0; right: 0; width: auto; bottom: 0; justify-content: center; align-content: auto; flex-grow: 0;">
+        <ui:VisualElement name="XPBar" class="bar-background" style="height: 12px; margin-bottom: 4px;">
+            <ui:VisualElement name="XPFill" class="bar-fill xp-bar"/>
+            <ui:Label name="XPText" text="0/200" class="xp-text" style="padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; height: auto; font-size: 10px;"/>
         </ui:VisualElement>
-        <ui:VisualElement name="HudPanel" class="hud-container" style="left: 0; right: 0; width: auto; bottom: 0; justify-content: center; align-content: auto;">
-            <ui:VisualElement name="XPBar" class="bar-background" style="height: 12px; margin-bottom: 4px;">
-                <ui:VisualElement name="XPFill" class="bar-fill xp-bar"/>
-                <ui:Label name="XPText" text="0/200" class="xp-text" style="padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; height: auto; font-size: 10px;"/>
-            </ui:VisualElement>
-            <ui:VisualElement name="ShieldBar" class="bar-background" style="margin-bottom: 4px;">
-                <ui:VisualElement name="ShieldFill" class="bar-fill shield-bar" style="-unity-text-align: upper-center;"/>
-                <ui:Label name="ShieldText" text="100/100" class="bar-text" style="font-size: 10px; -unity-paragraph-spacing: 0; height: auto; top: 0; left: 0; -unity-text-align: middle-center; width: auto; min-width: auto; max-width: none; right: 0; bottom: 0; padding-bottom: 0; padding-top: 0;"/>
-            </ui:VisualElement>
-            <ui:VisualElement name="HPBar" class="bar-background" style="height: 20px;">
-                <ui:VisualElement name="HealthFill" class="bar-fill health-bar" style="height: 100%; -unity-text-outline-width: 0; width: 50%; align-items: stretch; align-self: flex-start;"/>
-                <ui:Label name="HealthText" text="100/100" class="bar-text" style="height: auto; width: auto; font-size: 10px; top: 0; -unity-text-align: middle-center; left: 0; flex-grow: 0; -unity-text-outline-width: 0; right: 0; bottom: 0; padding-top: 0; padding-bottom: 0;"/>
-            </ui:VisualElement>
+        <ui:VisualElement name="ShieldBar" class="bar-background" style="margin-bottom: 4px;">
+            <ui:VisualElement name="ShieldFill" class="bar-fill shield-bar" style="-unity-text-align: upper-center;"/>
+            <ui:Label name="ShieldText" text="100/100" class="bar-text" style="font-size: 10px; -unity-paragraph-spacing: 0; height: auto; top: 0; left: 0; -unity-text-align: middle-center; width: auto; min-width: auto; max-width: none; right: 0; bottom: 0; padding-bottom: 0; padding-top: 0;"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="HPBar" class="bar-background" style="height: 20px;">
+            <ui:VisualElement name="HealthFill" class="bar-fill health-bar" style="height: 100%; -unity-text-outline-width: 0; width: 50%; align-items: stretch; align-self: flex-start;"/>
+            <ui:Label name="HealthText" text="100/100" class="bar-text" style="height: auto; width: auto; font-size: 10px; top: 0; -unity-text-align: middle-center; left: 0; flex-grow: 0; -unity-text-outline-width: 0; right: 0; bottom: 0; padding-top: 0; padding-bottom: 0;"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

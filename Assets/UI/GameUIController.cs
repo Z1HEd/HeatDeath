@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class GameUIController : MonoBehaviour
 {
+    public static GameUIController Instance { get; private set; }
+
     private const string RarityClassCommon = "upgrade-option-common";
     private const string RarityClassRare = "upgrade-option-rare";
     private const string RarityClassEpic = "upgrade-option-epic";
@@ -31,7 +33,6 @@ public class GameUIController : MonoBehaviour
     private Label xpText;
     private Label levelText;
     private Label pausedText;
-    private VisualElement upgradeOverlay;
     private VisualElement upgradePanel;
     private Label upgradeHeader;
     private Button[] optionButtons;
@@ -43,6 +44,8 @@ public class GameUIController : MonoBehaviour
 
     private void Awake()
     {
+        Instance = this;
+
         if (uiDocument == null)
             uiDocument = GetComponent<UIDocument>();
 
@@ -55,7 +58,6 @@ public class GameUIController : MonoBehaviour
         xpText = root.Q<Label>("XPText");
         levelText = root.Q<Label>("LevelText");
         pausedText = root.Q<Label>("PausedText");
-        upgradeOverlay = root.Q<VisualElement>("UpgradeOverlay");
         upgradePanel = root.Q<VisualElement>("UpgradePanel");
         upgradeHeader = root.Q<Label>("UpgradeHeader");
         root.Q<Button>("PauseButton").clicked += PauseUnpause;
@@ -126,6 +128,7 @@ public class GameUIController : MonoBehaviour
     private void PauseUnpause()
     {
         Time.timeScale = Time.timeScale == 0f?1f:0f;
+        pausedText.visible = Time.timeScale == 0f;
     }
 
     private void StartDraftSequence(int levelsGained)
@@ -375,12 +378,28 @@ public class GameUIController : MonoBehaviour
     // Helpers
     // -------------------------------------------------------------------------
 
+    public bool IsCursorOverUI()
+    {
+        var root = uiDocument.rootVisualElement;
+        var screenPos = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
+        screenPos.y = Screen.height - screenPos.y; // flip bottom-up -> top-down
+        var panelPos = RuntimePanelUtils.ScreenToPanel(root.panel, screenPos);
+        var picked = root.panel.Pick(panelPos);
+        var hudPanel = root.Q<VisualElement>("HudPanel");
+        
+        if (picked == null || !picked.visible) return false;
+        
+        if (!upgradePanel.visible && upgradePanel.Contains(picked))
+            return false;
+        return true;
+    }
+
     private void SetUpgradeOverlayVisible(bool visible)
     {
-        if (upgradeOverlay == null)
+        if (upgradePanel == null)
             return;
-
-        upgradeOverlay.style.visibility = visible ? Visibility.Visible : Visibility.Hidden;
+        upgradePanel.visible = visible;
+        pausedText.visible = false;
     }
 
     private void ApplyRarityClass(Button button, UpgradeRarity rarity)

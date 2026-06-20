@@ -13,8 +13,8 @@ public class FollowCursorBehaviour : ControlBehaviour
 
         if (type == EventType.MouseDown)
         {
-            if (Time.timeScale <= 0f)
-                return; // don't begin a drag while paused (e.g. upgrade overlay)
+            if (Time.timeScale <= 0f || GameUIController.Instance.IsCursorOverUI())
+                return;
 
             isDragging = true;
         }

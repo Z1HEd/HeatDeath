@@ -23,7 +23,7 @@ public class BurstThrusterModule : MovementModule
         if (cooldownTimer > 0f)
             return;
 
-        if (Time.timeScale <= 0f)
+        if (Time.timeScale <= 0f || GameUIController.Instance.IsCursorOverUI())
             return;
 
         if (!UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame)
