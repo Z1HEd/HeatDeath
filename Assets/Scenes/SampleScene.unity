@@ -645,6 +645,7 @@ MonoBehaviour:
   - {fileID: 362748142000764873, guid: 9343f78637b59a24fbf333c5fed56051, type: 3}
   - {fileID: 362748142000764873, guid: 7d41aeaf1146e9842acf84602235018f, type: 3}
   - {fileID: 362748142000764873, guid: cd849f38d0eafe94193eed3de24e10b3, type: 3}
+  enemyScalerUpgradeDefinition: {fileID: 11400000, guid: 163bb0a716d99c244bb9ba23eaa8ef9e, type: 2}
 --- !u!61 &1304093821
 BoxCollider2D:
   m_ObjectHideFlags: 0

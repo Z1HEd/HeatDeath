@@ -10103,18 +10103,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShipCoreModule
   moduleDefinition: {fileID: 11400000, guid: f4b1836a0ae68c6498413a6f2ec0caef, type: 2}
   health:
-    baseValue: 125
+    currentValue: 0
+    baseValue: 100
     minValue: 1
   shields:
-    baseValue: 50
+    currentValue: 0
+    baseValue: 75
     minValue: 0
   shieldRegen:
+    currentValue: 0
     baseValue: 2
     minValue: 0
   rammingDamage:
+    currentValue: 0
     baseValue: 15
     minValue: 0
   rammingKnockback:
+    currentValue: 0
     baseValue: 1
     minValue: 0
 --- !u!212 &573201795644266485
@@ -10287,9 +10292,11 @@ MonoBehaviour:
   moduleDefinition: {fileID: 11400000, guid: a3f144a87eb1d22449ea79a4d0b8c12b, type: 2}
   targetPosition: {x: 0, y: 0}
   maxSpeed:
+    currentValue: 0
     baseValue: 5
     minValue: 0
   body: {fileID: 0}
   thrust:
+    currentValue: 0
     baseValue: 0.15
     minValue: 0
