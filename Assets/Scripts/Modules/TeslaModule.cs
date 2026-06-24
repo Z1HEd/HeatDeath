@@ -8,11 +8,13 @@ public class TeslaModule : WeaponModule, IHitter
     [SerializeField] protected ScalarStat damage = new ScalarStat(StatType.Damage, 15f, 0f);
     [SerializeField] protected ScalarStat shieldDamageMultiplier = new ScalarStat(StatType.ShieldDamageMultiplier, 1f, -1f);
     [SerializeField] protected ScalarStat hpDamageMultiplier = new ScalarStat(StatType.HPDamageMultiplier, 1f, -1f);
+    [SerializeField] protected ScalarStat backstabMultiplier = new ScalarStat(StatType.BackstabMultiplier, 1f, 0f);
 
     public float KnockbackPower => 0f;
     public float Damage =>damage;
     public float ShieldDamageMultiplier => shieldDamageMultiplier;
     public float HPDamageMultiplier => shieldDamageMultiplier;
+    public float BackstabMultiplier => backstabMultiplier;
     [SerializeField] private int maxChainTargets = 3;
     [SerializeField] private float lightningDuration = 0.1f;
     [SerializeField] private Material lightningMaterial;

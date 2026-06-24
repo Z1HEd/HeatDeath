@@ -4896,6 +4896,7 @@ GameObject:
   - component: {fileID: 805480820789729827}
   - component: {fileID: 1683226674827135924}
   - component: {fileID: 4831795120304215577}
+  - component: {fileID: 2735005139785217404}
   m_Layer: 6
   m_Name: Reaper
   m_TagString: Player
@@ -5069,6 +5070,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   moduleManager: {fileID: 0}
+  upgradeManager: {fileID: 0}
+  effectManager: {fileID: 0}
   knockbackFreezeDuration: 0.15
   deathParticles: []
 --- !u!114 &1683226674827135924
@@ -5095,6 +5098,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a94a72135a43194ca707b54ae1b48e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeManager
+--- !u!114 &2735005139785217404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3575443304599885754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0218620d8b9dcdd4eb062618f82253fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EffectManager
+  activeEffects:
+  - stat: 10
+    statModifier:
+      Flat: 0
+      Percent: 100
+    targetTags:
+    - {fileID: 11400000, guid: 65c2c2d09c4c8984097657f3721a900c, type: 2}
+    - {fileID: 11400000, guid: e7f46ea9b622afa45bbdae890f8c5508, type: 2}
+    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
 --- !u!1 &4005121729113178305
 GameObject:
   m_ObjectHideFlags: 0
@@ -5281,11 +5305,15 @@ MonoBehaviour:
     currentValue: 0
     baseValue: 3
     minValue: 0
-  rammingDamage:
+  damage:
     currentValue: 0
     baseValue: 10
     minValue: 0
-  rammingKnockback:
+  knockbackPower:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0
+  backstabMultiplier:
     currentValue: 0
     baseValue: 1
     minValue: 0

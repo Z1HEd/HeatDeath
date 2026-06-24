@@ -16,6 +16,7 @@ MonoBehaviour:
   componentTypeName: MinesModule
   tags:
   - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
+  - {fileID: 11400000, guid: 65c2c2d09c4c8984097657f3721a900c, type: 2}
   - {fileID: 11400000, guid: 69e6dfaa9f2c4564198e1eb8d225a1ce, type: 2}
   key: weapon.mines
   description: Creates mines that explode on contact.

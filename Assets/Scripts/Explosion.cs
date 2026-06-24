@@ -6,6 +6,7 @@ public class Explosion : MonoBehaviour, IHitter
     public float KnockbackPower { get; private set; }
     public float HPDamageMultiplier { get; private set; }
     public float ShieldDamageMultiplier { get; private set; }
+    public float BackstabMultiplier { get; private set; }
     public float timer = -1;
     public const float FADE_DURATION = 0.3f;
     private SpriteRenderer spriteRenderer;
@@ -16,6 +17,7 @@ public class Explosion : MonoBehaviour, IHitter
         KnockbackPower = hitter.KnockbackPower;
         HPDamageMultiplier = hitter.HPDamageMultiplier;
         ShieldDamageMultiplier=hitter.ShieldDamageMultiplier;
+        BackstabMultiplier=hitter.ShieldDamageMultiplier;
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
         transform.localScale = new Vector3(radius,radius,radius);

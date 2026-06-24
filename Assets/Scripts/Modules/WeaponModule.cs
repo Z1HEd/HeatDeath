@@ -79,13 +79,15 @@ public abstract class WeaponModule : ModuleBase
     {
         fireRate.Recalculate(modifiers);
         range.Recalculate(modifiers);
-        
+        canAim.Recalculate(modifiers);
         UpdateRange(range);
     }
 
     protected override void ResetModifiers()
     {
         fireRate.ResetToBase();
+        range.ResetToBase();
+        canAim.ResetToBase();
     }
 }
 

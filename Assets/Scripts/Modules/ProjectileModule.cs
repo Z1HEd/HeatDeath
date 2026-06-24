@@ -9,6 +9,7 @@ public class ProjectileModule : WeaponModule
     [SerializeField] public ScalarStat projectileDamage = new ScalarStat(StatType.Damage, 10f, 0f);
     [SerializeField] public ScalarStat ShieldDamageMultiplier = new ScalarStat(StatType.ShieldDamageMultiplier, 1f, -1f);
     [SerializeField] public ScalarStat HPDamageMultiplier = new ScalarStat(StatType.HPDamageMultiplier, 1f, -1f);
+    [SerializeField] public ScalarStat BackstabMultiplier = new ScalarStat(StatType.BackstabMultiplier, 1f, 0f);
     [SerializeField] public ScalarStat projectileKnockback = new ScalarStat(StatType.ProjectileKnockback, 0f, 0f);
     [SerializeField] public ScalarStat projectilePiercing = new ScalarStat(StatType.ProjectilePiercing, 0f, -1f);
     [SerializeField] public ScalarStat projectileCount = new ScalarStat(StatType.ProjectileCount, 1f, 1f);
@@ -104,13 +105,16 @@ public class ProjectileModule : WeaponModule
     protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
     {
         base.ApplyModifiers(modifiers);
+        
         projectileSpeed.Recalculate(modifiers);
         projectileDamage.Recalculate(modifiers);
+        HPDamageMultiplier.Recalculate(modifiers);
+        ShieldDamageMultiplier.Recalculate(modifiers);
+        BackstabMultiplier.Recalculate(modifiers);
         projectileKnockback.Recalculate(modifiers);
         projectilePiercing.Recalculate(modifiers);
         projectileCount.Recalculate(modifiers);
         projectileSpread.Recalculate(modifiers);
-        canAim.Recalculate(modifiers);
     }
 
     protected override void ResetModifiers()
@@ -119,11 +123,13 @@ public class ProjectileModule : WeaponModule
 
         projectileSpeed.ResetToBase();
         projectileDamage.ResetToBase();
+        HPDamageMultiplier.ResetToBase();
+        ShieldDamageMultiplier.ResetToBase();
+        BackstabMultiplier.ResetToBase();
         projectileKnockback.ResetToBase();
         projectilePiercing.ResetToBase();
         projectileCount.ResetToBase();
         projectileSpread.ResetToBase();
-        range.ResetToBase();
     }
     
 }

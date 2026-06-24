@@ -16,6 +16,7 @@ MonoBehaviour:
   componentTypeName: ProjectileModule
   tags:
   - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
+  - {fileID: 11400000, guid: 2c382f2690590cb48a53051168322d54, type: 2}
   - {fileID: 11400000, guid: 8457aa4a11e42bc40aa468ef37e131da, type: 2}
   key: weapon.laser
   description: A weapon that fires a powerful beam of light that travels and pierces

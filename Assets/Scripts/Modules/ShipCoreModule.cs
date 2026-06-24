@@ -12,8 +12,9 @@ public class ShipCoreModule : ModuleBase, IHitter
     [SerializeField] private ScalarStat shieldRegen = new ScalarStat(StatType.ShieldRegen, 2f, 0f);
 
     [Header("Ramming")]
-    [SerializeField] private ScalarStat rammingDamage = new ScalarStat(StatType.Damage, 10f, 0f);
-    [SerializeField] private ScalarStat rammingKnockback = new ScalarStat(StatType.Knockback, 1f, 0f);
+    [SerializeField] private ScalarStat damage = new ScalarStat(StatType.Damage, 10f, 0f);
+    [SerializeField] private ScalarStat knockbackPower = new ScalarStat(StatType.Knockback, 1f, 0f);
+    [SerializeField] private ScalarStat backstabMultiplier = new ScalarStat(StatType.BackstabMultiplier, 1f, 0f);
 
     protected SpriteRenderer shieldRenderer;
 
@@ -24,10 +25,11 @@ public class ShipCoreModule : ModuleBase, IHitter
     public int CurrentMaxHealth => Mathf.RoundToInt(health.MaxValue);
     public int CurrentMaxShields => Mathf.RoundToInt(shields.MaxValue);
     public float CurrentShieldRegen => shieldRegen.CurrentValue;
-    public float Damage => rammingDamage;
-    public float KnockbackPower => rammingKnockback;
+    public float Damage => damage;
+    public float KnockbackPower => knockbackPower;
     public float ShieldDamageMultiplier => 1f;
     public float HPDamageMultiplier => 1f;
+    public float BackstabMultiplier => backstabMultiplier;
 
     protected override void Awake()
     {
@@ -46,7 +48,12 @@ public class ShipCoreModule : ModuleBase, IHitter
 
     public bool ApplyDamage(IHitter hitter)
     {
-        float damage = shields.Consume(hitter.Damage,hitter.ShieldDamageMultiplier);
+        float damage = hitter.Damage;
+
+        if (hitter.transform.position.y>transform.position.y) 
+            damage *= hitter.BackstabMultiplier;
+        
+        damage = shields.Consume(damage,hitter.ShieldDamageMultiplier);
         if (damage > 0f)
             health.Consume(damage,hitter.HPDamageMultiplier);
         else
@@ -76,15 +83,15 @@ public class ShipCoreModule : ModuleBase, IHitter
         health.Recalculate(modifiers, true);
         shields.Recalculate(modifiers, true);
         shieldRegen.Recalculate(modifiers);
-        rammingDamage.Recalculate(modifiers);
-        rammingKnockback.Recalculate(modifiers);
+        damage.Recalculate(modifiers);
+        knockbackPower.Recalculate(modifiers);
 
         OnHPShieldsChanged?.Invoke();
     }
 
     protected override void ResetModifiers()
     {
-        rammingDamage.ResetToBase();
-        rammingKnockback.ResetToBase();
+        damage.ResetToBase();
+        knockbackPower.ResetToBase();
     }
 }

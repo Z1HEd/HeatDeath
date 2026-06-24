@@ -10,7 +10,7 @@ public enum StatType
 	Knockback = 7,
 	FireRate = 8,
 	ProjectileSpeed = 9,
-	UNUSED = 10,
+	BackstabMultiplier = 10,
 	ProjectileKnockback = 11,
 	ProjectileCount = 12,
 	Range = 13,

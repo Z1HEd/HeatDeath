@@ -9,6 +9,7 @@ public class Projectile : MonoBehaviour, IHitter
     public float Damage { get; protected set; } = 10f;
     public float ShieldDamageMultiplier { get; protected set; } = 1f;
     public float HPDamageMultiplier { get; protected set; } = 1f;
+    public float BackstabMultiplier { get; protected set; } = 1f;
     public float KnockbackPower { get; protected set; } = 0f;
     protected Rigidbody2D rb;
     protected SpriteRenderer spriteRenderer;
@@ -31,6 +32,7 @@ public class Projectile : MonoBehaviour, IHitter
         KnockbackPower = sourceModule.projectileKnockback;
         ShieldDamageMultiplier = sourceModule.ShieldDamageMultiplier;
         HPDamageMultiplier = sourceModule.HPDamageMultiplier;
+        BackstabMultiplier = sourceModule.BackstabMultiplier;
         ConfigurePiercing(sourceModule.projectilePiercing);
     }
 
@@ -71,8 +73,9 @@ public class Projectile : MonoBehaviour, IHitter
         var hittable = collision.GetComponent<IHittable>();
         if (hittable == null)
             return false;
-
+        
         hittable.Hit(this);
+        
         if (collision.GetComponent<Rigidbody2D>() != null)
             hittable.ApplyKnockback(this, transform.position-collision.transform.position);
 

@@ -5,8 +5,8 @@ using UnityEngine;
 [RequireComponent(typeof(Ship))]
 public class EffectManager : MonoBehaviour
 {
-    
-    private readonly List<Effect> activeEffects = new List<Effect>();
+    [SerializeField]
+    private List<Effect> activeEffects = new List<Effect>();
 
     public event Action OnChanged;
     private bool shouldRecalculate = false;
