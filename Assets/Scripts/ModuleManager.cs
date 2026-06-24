@@ -97,6 +97,6 @@ public class ModuleManager : MonoBehaviour
     private IEnumerator RecalculateAfterFrame()
     {
         yield return null;
-        GetComponent<UpgradeManager>()?.RecalculateAllModules();
+        GetComponent<EffectManager>().RecalculateAllModules();
     }
 }

@@ -120,7 +120,6 @@ public class GameUIController : MonoBehaviour
     {
         player = playerObject.GetComponent<Player>();
         playerCoreModule = player != null ? player.CoreModule : null;
-        upgradeManager = playerObject.GetComponent<UpgradeManager>();
 
         if (playerCoreModule != null)
             playerCoreModule.OnHPShieldsChanged += UpdateBars;
@@ -302,7 +301,7 @@ public class GameUIController : MonoBehaviour
             if (index < 0 || index >= currentOptions.Count)
                 return;
 
-            upgradeManager.AddUpgrade(currentOptions[index]);
+            player.upgradeManager.AddUpgrade(currentOptions[index]);
             pendingUpgradeDrafts--;
         }
 

@@ -144,7 +144,7 @@ public class TeslaModule : WeaponModule, IHitter
         }
         return closest;
     }
-    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
+    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
     {
         base.ApplyModifiers(modifiers);
         damage.Recalculate(modifiers);

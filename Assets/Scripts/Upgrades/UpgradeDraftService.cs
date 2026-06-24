@@ -106,7 +106,7 @@ public class UpgradeDraftService
             if (upgrade != null && upgrade.IsBoundTo(moduleDefinition))
                 return true;
 
-            if (upgrade != null && upgrade.IsGeneral && IsApplicableToModule(upgrade, moduleDefinition))
+            if (upgrade != null && upgrade.IsGeneral && upgrade.IsApplicableTo( moduleDefinition))
                 return true;
         }
 
@@ -115,43 +115,11 @@ public class UpgradeDraftService
 
     private static bool IsApplicableToAnyInstalledModule(UpgradeDefinition upgrade, ModuleManager moduleManager)
     {
-        if (upgrade == null || moduleManager == null)
-            return false;
-
         HashSet<ModuleDefinition> installedModules = moduleManager.GetInstalledModuleDefinitions();
-        if (installedModules.Count == 0)
-            return false;
 
-        IReadOnlyList<StatModifier> effects = upgrade.Modifiers;
-        for (int i = 0; i < effects.Count; i++)
+        foreach (var module in installedModules)
         {
-            StatModifier effect = effects[i];
-            if (effect.stat == StatType.None)
-                continue;
-
-            foreach (ModuleDefinition module in installedModules)
-            {
-                if (effect.MatchesModule(module))
-                    return true;
-            }
-        }
-
-        return false;
-    }
-
-    private static bool IsApplicableToModule(UpgradeDefinition upgrade, ModuleDefinition moduleDefinition)
-    {
-        if (upgrade == null || moduleDefinition == null)
-            return false;
-
-        IReadOnlyList<StatModifier> effects = upgrade.Modifiers;
-        for (int i = 0; i < effects.Count; i++)
-        {
-            StatModifier effect = effects[i];
-            if (effect.stat == StatType.None)
-                continue;
-
-            if (effect.MatchesModule(moduleDefinition))
+            if (upgrade.IsApplicableTo(module))
                 return true;
         }
 

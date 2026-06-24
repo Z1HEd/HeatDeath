@@ -101,7 +101,7 @@ public class ProjectileModule : WeaponModule
         return Random.Range(-halfSpread, halfSpread);
     }
 
-    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
+    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
     {
         base.ApplyModifiers(modifiers);
         projectileSpeed.Recalculate(modifiers);

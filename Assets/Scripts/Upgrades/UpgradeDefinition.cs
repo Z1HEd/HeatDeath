@@ -20,7 +20,7 @@ public class UpgradeDefinition : ScriptableObject
     [SerializeField] private ModuleDefinition boundModule;
     [SerializeField] private UpgradeRarity rarity;
     [SerializeField] private int maxStacks = 1;
-    [SerializeField] private List<StatModifier> modifiers = new List<StatModifier>();
+    [SerializeField] private List<Effect> effects = new List<Effect>();
 
     public string DisplayName => displayName;
     public string Key => key;
@@ -29,7 +29,7 @@ public class UpgradeDefinition : ScriptableObject
     public bool IsGeneral => boundModule == null;
     public UpgradeRarity Rarity => rarity;
     public int MaxStacks => maxStacks;
-    public IReadOnlyList<StatModifier> Modifiers => modifiers;
+    public IReadOnlyList<Effect> Effects => effects;
 
     public bool IsBoundTo(ModuleDefinition module)
     {
@@ -42,5 +42,14 @@ public class UpgradeDefinition : ScriptableObject
             return false;
 
         return currentCount >= maxStacks;
+    }
+    public bool IsApplicableTo(ModuleDefinition module)
+    {
+        if (boundModule == module) return true;
+        foreach (var effect in effects)
+        {
+            if (effect.IsApplicableTo(module)) return true;
+        }
+        return false;
     }
 }

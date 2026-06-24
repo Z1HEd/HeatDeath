@@ -2,12 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct StatModifierAggregate
-{
-    public float Flat;
-    public float Percent;
-}
-
 [Serializable]
 public abstract class StatBase<T>
 {
@@ -45,13 +39,13 @@ public abstract class StatBase<T>
 
     protected static float CalculateModifiedValue(
         float baseStatValue,
-        IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers,
+        IReadOnlyDictionary<StatType, StatModifier> modifiers,
         StatType stat)
     {
         if (modifiers == null || stat == StatType.None)
             return baseStatValue;
 
-        modifiers.TryGetValue(stat, out StatModifierAggregate modifier);
+        modifiers.TryGetValue(stat, out StatModifier modifier);
         return (baseStatValue + modifier.Flat) * (1f + (modifier.Percent * 0.01f));
     }
 }
@@ -87,7 +81,7 @@ public sealed class ResourceStat : StatBase<float>
         return stat != null ? stat.CurrentValue : 0f;
     }
 
-    public void Recalculate(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers, bool preserveCurrentRatio)
+    public void Recalculate(IReadOnlyDictionary<StatType, StatModifier> modifiers, bool preserveCurrentRatio)
     {
         float previousMax = IsInitialized ? Mathf.Max(minValue, maxValue) : 0f;
         float ratio = previousMax > 0f ? CurrentValue / previousMax : 1f;
@@ -168,7 +162,7 @@ public sealed class ScalarStat : StatBase<float>
         return stat != null ? stat.CurrentValue : 0f;
     }
 
-    public void Recalculate(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
+    public void Recalculate(IReadOnlyDictionary<StatType, StatModifier> modifiers)
     {
         SetCurrentValue(Mathf.Max(minValue, CalculateModifiedValue(baseValue, modifiers, Type)));
     }
@@ -204,7 +198,7 @@ public sealed class BoolStat : StatBase<bool>
         return stat != null && stat.CurrentValue;
     }
 
-    public void Recalculate(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
+    public void Recalculate(IReadOnlyDictionary<StatType, StatModifier> modifiers)
     {
         if (modifiers == null || Type == StatType.None)
         {
@@ -212,7 +206,7 @@ public sealed class BoolStat : StatBase<bool>
             return;
         }
 
-        modifiers.TryGetValue(Type, out StatModifierAggregate modifier);
+        modifiers.TryGetValue(Type, out StatModifier modifier);
         SetCurrentValue(modifier.Flat > 0f ? true : (modifier.Flat < 0f ? false : baseValue));
     }
 

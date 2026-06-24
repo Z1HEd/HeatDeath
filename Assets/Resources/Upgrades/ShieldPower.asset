@@ -14,16 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeDefinition
   displayName: Shield power
   key: upgrade.shipcore.shieldpower
-  description: Maximum shield capacity +20%, Shield regen +1/sec
+  description: Maximum shield capacity +20%, Shield regen +25%
   boundModule: {fileID: 11400000, guid: f4b1836a0ae68c6498413a6f2ec0caef, type: 2}
   rarity: 1
   maxStacks: 5
-  modifiers:
+  effects:
   - stat: 2
-    operation: 1
-    value: 20
-    targetTags: []
+    statModifier:
+      Flat: 0
+      Percent: 20
+    targetTags:
+    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
   - stat: 3
-    operation: 0
-    value: 1
-    targetTags: []
+    statModifier:
+      Flat: 0
+      Percent: 25
+    targetTags:
+    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}

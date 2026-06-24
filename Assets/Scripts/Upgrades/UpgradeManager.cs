@@ -2,82 +2,69 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public struct ActiveStatModifier
-{
-    public StatModifier Modifier;
-    public bool IsUpgradeBound;
-    public ModuleDefinition BoundModule;
-
-    public bool AppliesToModule(ModuleDefinition module)
-    {
-        if (module == null || Modifier.stat == StatType.None)
-            return false;
-
-        if (IsUpgradeBound)
-        {
-            if (BoundModule == null || module != BoundModule)
-                return false;
-
-            if (!Modifier.HasTargetTags)
-                return true;
-
-            return Modifier.MatchesModule(module);
-        }
-
-        if (!Modifier.HasTargetTags)
-            return false;
-
-        return Modifier.MatchesModule(module);
-    }
-}
-
 [RequireComponent(typeof(Ship))]
 public class UpgradeManager : MonoBehaviour
 {
+    private Ship ship;
     private readonly Dictionary<UpgradeDefinition, int> stackCounts = new Dictionary<UpgradeDefinition, int>();
-    private readonly List<ActiveStatModifier> activeEffects = new List<ActiveStatModifier>();
-
-    public event Action OnChanged;
-    public IReadOnlyList<ActiveStatModifier> ActiveEffects => activeEffects;
-    private bool shouldRecalculate = false;
-
-    public void FixedUpdate()
+    private readonly Dictionary<UpgradeDefinition,List<Effect>> relatedEffects = new Dictionary<UpgradeDefinition, List<Effect>>();
+    public void Awake()
     {
-        if (shouldRecalculate){
-            RecalculateAllModules();
-            OnChanged?.Invoke();
-            shouldRecalculate = false;
-        }
-    }
+        ship = GetComponent<Ship>();
 
+    }
     public bool CanAddUpgrade(UpgradeDefinition upgrade)
     {
-        if (upgrade == null)
-            return false;
-
         int current = GetStackCount(upgrade);
         return !upgrade.IsMaxStacks(current);
     }
-
     public void AddUpgrade(UpgradeDefinition upgrade, int stackCount = 1)
     {
         if (!CanAddUpgrade(upgrade))
         {
-            Debug.LogWarning("Cannot add upgrade. Draft filtering should prevent this case.", this);
+            Debug.LogWarning("Cannot add upgrade. Forgot to check CanAddUpgrade()?.");
             return;
         }
 
         int current = GetStackCount(upgrade);
         stackCounts[upgrade] = current + stackCount;
-        shouldRecalculate = true;
+        UpdateRelatedEffects(upgrade);
+    }
+    public void ClearAll()
+    {
+        if (stackCounts.Count == 0)
+            return;
+
+        stackCounts.Clear();
+        ClearRelatedEffects();
+    }
+    private void ClearRelatedEffects()
+    {
+        foreach (var upgrade in relatedEffects.Keys)
+            foreach (var effect in relatedEffects[upgrade])
+                ship.effectManager.RemoveEffect(effect);
+    }
+
+    private void UpdateRelatedEffects(UpgradeDefinition upgrade)
+    {
+        if (relatedEffects.ContainsKey(upgrade))
+            foreach (var effect in relatedEffects[upgrade])
+                ship.effectManager.RemoveEffect(effect);
+        int stacks = stackCounts[upgrade];
+        List<Effect> newEffects = new List<Effect>();
+        foreach (var effect in upgrade.Effects)
+        {
+            newEffects.Add(effect.Stacked(stacks));
+        }
+        foreach (var newEffect in newEffects)
+        {
+            ship.effectManager.AddEffect(newEffect);
+        }
+        relatedEffects[upgrade] = newEffects;
     }
 
     public int GetStackCount(UpgradeDefinition upgrade)
     {
-        if (upgrade == null)
-            return 0;
-
         return stackCounts.TryGetValue(upgrade, out int count) ? count : 0;
     }
 
@@ -86,99 +73,20 @@ public class UpgradeManager : MonoBehaviour
         return GetStackCount(upgrade) > 0;
     }
 
-    public bool IsFullUpgraded(ModuleDefinition module, IReadOnlyList<UpgradeDefinition> allUpgrades)
+    public bool IsFullUpgraded(ModuleDefinition module)
     {
-        if (module == null || allUpgrades == null)
-            return false;
-
-        bool hasBoundUpgrade = false;
-        for (int i = 0; i < allUpgrades.Count; i++)
+        foreach (var upgradeStack in stackCounts)
         {
-            UpgradeDefinition upgrade = allUpgrades[i];
-            if (upgrade == null || !upgrade.IsBoundTo(module))
+            UpgradeDefinition upgrade = upgradeStack.Key;
+            if (!upgrade.IsBoundTo(module))
                 continue;
 
-            hasBoundUpgrade = true;
-            if (!upgrade.IsMaxStacks(GetStackCount(upgrade)))
+            if (!upgrade.IsMaxStacks(upgradeStack.Value))
                 return false;
         }
 
-        return hasBoundUpgrade;
+        return true;
     }
 
-    public IReadOnlyDictionary<UpgradeDefinition, int> GetAllUpgrades()
-    {
-        return stackCounts;
-    }
-
-    // Converts runtime upgrade references to stable keys for save/export payloads.
-    public Dictionary<string, int> BuildKeySnapshot()
-    {
-        var snapshot = new Dictionary<string, int>();
-        foreach (var pair in stackCounts)
-        {
-            if (pair.Key == null || string.IsNullOrWhiteSpace(pair.Key.Key) || pair.Value <= 0)
-                continue;
-
-            snapshot[pair.Key.Key] = pair.Value;
-        }
-
-        return snapshot;
-    }
-
-    public void ClearAll()
-    {
-        if (stackCounts.Count == 0)
-            return;
-
-        stackCounts.Clear();
-        shouldRecalculate = true;
-    }
-
-    public void RecalculateAllModules()
-    {
-        ModuleManager moduleManager = GetComponent<ModuleManager>();
-        if (moduleManager == null)
-            return;
-
-        List<ModuleBase> modules = moduleManager.GetModules<ModuleBase>();
-        RebuildActiveEffects();
-        for (int i = 0; i < modules.Count; i++)
-        {
-            ModuleBase module = modules[i];
-            if (module == null)
-                continue;
-
-            module.UpdateModifiers();
-        }
-    }
-
-    private void RebuildActiveEffects()
-    {
-        activeEffects.Clear();
-
-        foreach (var pair in stackCounts)
-        {
-            UpgradeDefinition upgrade = pair.Key;
-            int stacks = pair.Value;
-            if (upgrade == null || stacks <= 0)
-                continue;
-
-            IReadOnlyList<StatModifier> effects = upgrade.Modifiers;
-            for (int i = 0; i < effects.Count; i++)
-            {
-                StatModifier effect = effects[i];
-                if (effect.stat == StatType.None)
-                    continue;
-
-                effect.value *= stacks;
-                activeEffects.Add(new ActiveStatModifier
-                {
-                    Modifier = effect,
-                    IsUpgradeBound = upgrade.BoundModule != null,
-                    BoundModule = upgrade.BoundModule
-                });
-            }
-        }
-    }
+    
 }

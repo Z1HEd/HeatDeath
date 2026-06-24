@@ -73,7 +73,7 @@ public class BurstThrusterModule : MovementModule
         body.AddForce(requiredAccel * body.mass, ForceMode2D.Force);
     }
 
-    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
+    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
     {
         base.ApplyModifiers(modifiers);
         steeringThrust.Recalculate(modifiers);

@@ -18,12 +18,16 @@ MonoBehaviour:
   boundModule: {fileID: 11400000, guid: a3f144a87eb1d22449ea79a4d0b8c12b, type: 2}
   rarity: 0
   maxStacks: 4
-  modifiers:
+  effects:
   - stat: 5
-    operation: 1
-    value: 25
-    targetTags: []
+    statModifier:
+      Flat: 0
+      Percent: 25
+    targetTags:
+    - {fileID: 11400000, guid: 46fd95cd7afab1d4995cfbc4038ac37b, type: 2}
   - stat: 4
-    operation: 1
-    value: 25
-    targetTags: []
+    statModifier:
+      Flat: 0
+      Percent: 25
+    targetTags:
+    - {fileID: 11400000, guid: 46fd95cd7afab1d4995cfbc4038ac37b, type: 2}

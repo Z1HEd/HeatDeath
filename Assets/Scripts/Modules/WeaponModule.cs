@@ -15,19 +15,6 @@ public abstract class WeaponModule : ModuleBase
 
     protected int DetectLayer { get; private set; }
 
-    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
-    {
-        fireRate.Recalculate(modifiers);
-        range.Recalculate(modifiers);
-        
-        UpdateRange(range);
-    }
-
-    protected override void ResetModifiers()
-    {
-        fireRate.ResetToBase();
-    }
-
     protected override void Awake()
     {
         base.Awake();
@@ -87,6 +74,18 @@ public abstract class WeaponModule : ModuleBase
     {
         if (!rangeDetector) return;
         rangeDetector.SetRadius(range);
+    }
+    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
+    {
+        fireRate.Recalculate(modifiers);
+        range.Recalculate(modifiers);
+        
+        UpdateRange(range);
+    }
+
+    protected override void ResetModifiers()
+    {
+        fireRate.ResetToBase();
     }
 }
 

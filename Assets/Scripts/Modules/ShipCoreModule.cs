@@ -29,9 +29,9 @@ public class ShipCoreModule : ModuleBase, IHitter
     public float ShieldDamageMultiplier => 1f;
     public float HPDamageMultiplier => 1f;
 
-    public void Initialize()
+    protected override void Awake()
     {
-        UpdateModifiers();
+        base.Awake();
         shieldRenderer = GetComponent<SpriteRenderer>();
     }
 
@@ -70,7 +70,7 @@ public class ShipCoreModule : ModuleBase, IHitter
         
     }
 
-    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
+    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
     {
 
         health.Recalculate(modifiers, true);

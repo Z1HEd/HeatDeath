@@ -24,7 +24,7 @@ public class MissileModule : ProjectileModule
             spriteRenderer.sprite = textureWithoutRocket;
     }
 
-    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
+    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
     {
         base.ApplyModifiers(modifiers);
         ExplosionRange.Recalculate(modifiers);

@@ -14,7 +14,7 @@ public class DuplicateWeaponModule : ModuleBase
         ship.moduleManager.AddWeapon(definition);
     }
 
-    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
+    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
     {
     }
 

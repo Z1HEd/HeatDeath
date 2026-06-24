@@ -20,7 +20,7 @@ public class MineModule : ProjectileModule
                 oldest.ForceExplode();
         }
     }
-    // No multiple mines spawning, projectileCount is treated as max num of mines on map.
+    // projectileCount is treated as max num of mines on map.
     protected override void SpawnProjectiles(Vector3 spawnPosition, Vector3 aimDirection)
     {
         if (projectilePrefab == null)
@@ -40,7 +40,7 @@ public class MineModule : ProjectileModule
         projectile.Initialize(shotDirection * projectileSpeed, this);
         OnProjectileSpawned(projectile);
     }
-    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers)
+    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
     {
         base.ApplyModifiers(modifiers);
         ExplosionRange.Recalculate(modifiers);

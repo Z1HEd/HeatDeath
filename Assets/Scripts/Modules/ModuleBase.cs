@@ -13,8 +13,11 @@ public abstract class ModuleBase: MonoBehaviour
     protected virtual void Awake()
     {
         ship = GetComponentInParent<Ship>();
-        if (!ship) return;
-        upgradeManager = GetComponentInParent<UpgradeManager>();
+        if (!ship) 
+        {
+            Debug.LogError("Module not in ship!");
+            return;
+        }
         ResetModifiers();
     }
     protected virtual void Start()
@@ -24,51 +27,31 @@ public abstract class ModuleBase: MonoBehaviour
 
     protected virtual void OnDestroy()
     {
-        if (ship != null)
-            ship.moduleManager.RemoveModule(this);
+        ship.moduleManager.RemoveModule(this);
     }
 
-    protected IReadOnlyDictionary<StatType, StatModifierAggregate> GetCurrentModifiers()
+    protected IReadOnlyDictionary<StatType, StatModifier> GetApplicableModifiers(IReadOnlyList<Effect> effects)
     {
-        var result = new Dictionary<StatType, StatModifierAggregate>();
-        if (upgradeManager == null || moduleDefinition == null)
-            return result;
+        var result = new Dictionary<StatType, StatModifier>();
 
-        IReadOnlyList<ActiveStatModifier> effects = upgradeManager.ActiveEffects;
-        for (int i = 0; i < effects.Count; i++)
+        foreach (var effect in effects)
         {
-            ActiveStatModifier effect = effects[i];
-            if (!effect.AppliesToModule(moduleDefinition))
+            if (!effect.IsApplicableTo(moduleDefinition))
                 continue;
 
-            AddModifier(result, effect);
+            effect.ApplyToMap(result);
         }
 
         return result;
     }
 
-    public virtual void UpdateModifiers()
+    public void UpdateEffects(IReadOnlyList<Effect> effects)
     {
         ResetModifiers();
-        ApplyModifiers(GetCurrentModifiers());
-    }
-
-    private static void AddModifier(Dictionary<StatType, StatModifierAggregate> map, ActiveStatModifier modifierData)
-    {
-        StatModifier data = modifierData.Modifier;
-        if (!map.TryGetValue(data.stat, out StatModifierAggregate modifier))
-            modifier = default;
-        modifier.Percent = 1f;
-        
-        if (data.operation == ModifierOperation.AddPercent)
-            modifier.Percent *= data.value;
-        else
-            modifier.Flat += data.value;
-
-        map[data.stat] = modifier;
+        ApplyModifiers(GetApplicableModifiers(effects));
     }
 
     protected abstract void ResetModifiers();
 
-    protected abstract void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifierAggregate> modifiers);
+    protected abstract void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers);
 }
