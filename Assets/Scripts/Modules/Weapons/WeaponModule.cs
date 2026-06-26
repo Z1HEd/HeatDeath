@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Collections.Generic;
 
 [ExecuteAlways]
@@ -12,6 +13,7 @@ public abstract class WeaponModule : ModuleBase
     
     protected RangeDetector rangeDetector;
     protected float lastFireTime;
+    public event Action<float> updateCooldownOverlay;
 
     protected int DetectLayer { get; private set; }
 
@@ -32,8 +34,12 @@ public abstract class WeaponModule : ModuleBase
 
     protected virtual float FireDelay => 1f / fireRate;
     protected virtual bool CanFire => Time.time >= lastFireTime + FireDelay;
+    protected virtual float CooldownProgress => Mathf.Clamp((Time.time-lastFireTime)/FireDelay,0f,1f);
 
-    protected virtual void Update() {}
+    protected virtual void Update()
+    {
+        updateCooldownOverlay?.Invoke(CooldownProgress);
+    }
 
     protected virtual void Fire() { lastFireTime = Time.time; }
 

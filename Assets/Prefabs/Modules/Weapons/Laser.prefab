@@ -48,40 +48,55 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileModule
   moduleDefinition: {fileID: 11400000, guid: eac5fc4af100cc34b8ee896e3cf22781, type: 2}
+  firePoint: {fileID: 3116449676911722161}
   fireRate:
+    currentValue: 0
     baseValue: 0.5
     minValue: 0.0001
   range:
+    currentValue: 0
     baseValue: 50
     minValue: 0
+  canAim:
+    currentValue: 0
+    baseValue: 0
   projectilePrefab: {fileID: 7021255584612261990, guid: c581d32c9c44cd5449cb6a575b253f92, type: 3}
-  firePoint: {fileID: 3116449676911722161}
   projectileSpeed:
+    currentValue: 0
     baseValue: 0
     minValue: 0
   projectileDamage:
+    currentValue: 0
     baseValue: 20
     minValue: 0
   ShieldDamageMultiplier:
+    currentValue: 0
     baseValue: -1
     minValue: -1
   HPDamageMultiplier:
+    currentValue: 0
     baseValue: 1
     minValue: -1
+  BackstabMultiplier:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0
   projectileKnockback:
+    currentValue: 0
     baseValue: 0
     minValue: 0
   projectilePiercing:
+    currentValue: 0
     baseValue: -1
     minValue: -1
   projectileCount:
+    currentValue: 0
     baseValue: 1
     minValue: 1
   projectileSpread:
+    currentValue: 0
     baseValue: 0
     minValue: 0
-  canAim:
-    baseValue: 0
 --- !u!212 &6659646579570941113
 SpriteRenderer:
   serializedVersion: 2

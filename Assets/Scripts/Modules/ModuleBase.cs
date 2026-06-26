@@ -33,7 +33,7 @@ public abstract class ModuleBase: MonoBehaviour
     protected IReadOnlyDictionary<StatType, StatModifier> GetApplicableModifiers(IReadOnlyList<Effect> effects)
     {
         var result = new Dictionary<StatType, StatModifier>();
-
+        if (moduleDefinition == null) return result;
         foreach (var effect in effects)
         {
             if (!effect.IsApplicableTo(moduleDefinition))

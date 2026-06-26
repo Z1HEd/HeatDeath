@@ -36,6 +36,10 @@ public class GameUIController : MonoBehaviour
     private VisualElement upgradePanel;
     private Label upgradeHeader;
     private Button[] optionButtons;
+    public Button[] weaponButtons;
+    public UICooldownOverlay[] weaponCooldownOverlays;
+    public Button abilityButton;
+    public UICooldownOverlay abilityCooldownOverlay;
     private Action[] optionHandlers;
 
     private int pendingShipDrafts;
@@ -44,29 +48,7 @@ public class GameUIController : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
-
-        if (uiDocument == null)
-            uiDocument = GetComponent<UIDocument>();
-
-        var root = uiDocument.rootVisualElement;
-        healthFill = root.Q<VisualElement>("HealthFill");
-        shieldFill = root.Q<VisualElement>("ShieldFill");
-        healthText = root.Q<Label>("HealthText");
-        shieldText = root.Q<Label>("ShieldText");
-        xpFill = root.Q<VisualElement>("XPFill");
-        xpText = root.Q<Label>("XPText");
-        levelText = root.Q<Label>("LevelText");
-        pausedText = root.Q<Label>("PausedText");
-        upgradePanel = root.Q<VisualElement>("UpgradePanel");
-        upgradeHeader = root.Q<Label>("UpgradeHeader");
-        root.Q<Button>("PauseButton").clicked += PauseUnpause;
-        optionButtons = new[]
-        {
-            root.Q<Button>("UpgradeOption1"),
-            root.Q<Button>("UpgradeOption2"),
-            root.Q<Button>("UpgradeOption3")
-        };
+        BindRefferences();
         optionHandlers = new Action[optionButtons.Length];
         for (int i = 0; i < optionButtons.Length; i++)
         {
@@ -94,6 +76,49 @@ public class GameUIController : MonoBehaviour
         ShowNextDraftOrResume();
     }
 
+    private void BindRefferences()
+    {
+        Instance = this;
+
+        if (uiDocument == null)
+            uiDocument = GetComponent<UIDocument>();
+
+        var root = uiDocument.rootVisualElement;
+        healthFill = root.Q<VisualElement>("HealthFill");
+        shieldFill = root.Q<VisualElement>("ShieldFill");
+        healthText = root.Q<Label>("HealthText");
+        shieldText = root.Q<Label>("ShieldText");
+        xpFill = root.Q<VisualElement>("XPFill");
+        xpText = root.Q<Label>("XPText");
+        levelText = root.Q<Label>("LevelText");
+        pausedText = root.Q<Label>("PausedText");
+        upgradePanel = root.Q<VisualElement>("UpgradePanel");
+        upgradeHeader = root.Q<Label>("UpgradeHeader");
+        root.Q<Button>("PauseButton").clicked += PauseUnpause;
+        optionButtons = new[]
+        {
+            root.Q<Button>("UpgradeOption1"),
+            root.Q<Button>("UpgradeOption2"),
+            root.Q<Button>("UpgradeOption3")
+        };
+        weaponButtons = new[]
+        {
+            root.Q<Button>("Weapon1"),
+            root.Q<Button>("Weapon2"),
+            root.Q<Button>("Weapon3"),
+            root.Q<Button>("Weapon4")
+        };
+        weaponCooldownOverlays = new[]
+        {
+            new UICooldownOverlay(root.Q<VisualElement>("Cooldown1")),
+            new UICooldownOverlay(root.Q<VisualElement>("Cooldown2")),
+            new UICooldownOverlay(root.Q<VisualElement>("Cooldown3")),
+            new UICooldownOverlay(root.Q<VisualElement>("Cooldown4"))
+        };
+        abilityButton = root.Q<Button>("Cooldown5");
+        abilityCooldownOverlay = new UICooldownOverlay(root.Q<VisualElement>("Cooldown5"));
+    }
+
     private void OnDestroy()
     {
         if (playerCoreModule != null)
@@ -114,6 +139,12 @@ public class GameUIController : MonoBehaviour
             GameController.Instance.OnLevelChanged -= UpdateLevelText;
             GameController.Instance.OnLevelChanged -= StartDraftSequence;
         }
+    }
+    public void BindWeaponButton(GameObject weapon, int index){
+        weapon.GetComponent<WeaponModule>().updateCooldownOverlay+=
+                weaponCooldownOverlays[index].SetUpdateFill;
+        weaponButtons[index].style.backgroundImage = 
+                new StyleBackground(weapon.GetComponent<SpriteRenderer>().sprite);
     }
 
     private void BindPlayer(GameObject playerObject)

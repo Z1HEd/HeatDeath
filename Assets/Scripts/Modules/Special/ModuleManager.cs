@@ -8,6 +8,7 @@ public class ModuleManager : MonoBehaviour
 {
     protected Ship ship;
     private List<ModuleBase> modules = new List<ModuleBase>();
+    private List<WeaponDefinition> weaponDefinitions = new List<WeaponDefinition>();
 
     public List<MovementModule> MovementModules => GetModules<MovementModule>();
     public List<WeaponModule> WeaponModules => GetModules<WeaponModule>();
@@ -86,7 +87,11 @@ public class ModuleManager : MonoBehaviour
             return;
         foreach (Transform mount in turretMounts){
             if (mount.childCount>0) continue;
-            Instantiate(definition.WeaponPrefab, mount);
+            var weapon = Instantiate(definition.WeaponPrefab, mount);
+            if (!weaponDefinitions.Contains(definition)){
+                GameUIController.Instance.BindWeaponButton(weapon,weaponDefinitions.Count);
+                weaponDefinitions.Add(definition);
+            }
             StartCoroutine(RecalculateAfterFrame());
             OnWeaponAdded?.Invoke(definition);
             return;
