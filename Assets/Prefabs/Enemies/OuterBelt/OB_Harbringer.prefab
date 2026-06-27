@@ -48,40 +48,59 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileModule
   moduleDefinition: {fileID: 11400000, guid: 12025bb4045e8b446bf8bb38f7229639, type: 2}
-  fireRate:
-    baseValue: 0.75
-    minValue: 0.0001
+  firePoint: {fileID: 4029245818587827056}
+  fireCooldown:
+    currentValue: 0
+    baseValue: 1.4
+    minValue: 0
+  timeScale:
+    currentValue: 1
+    baseValue: 1
+    minValue: 0
   range:
+    currentValue: 8
     baseValue: 8
     minValue: 0
+  canAim:
+    currentValue: 1
+    baseValue: 1
   projectilePrefab: {fileID: 8872413515496322224, guid: 32fde49ac5ad8ea49a2d1db61f4fb5d4, type: 3}
-  firePoint: {fileID: 4029245818587827056}
   projectileSpeed:
+    currentValue: 10
     baseValue: 10
     minValue: 0
   projectileDamage:
+    currentValue: 15
     baseValue: 15
     minValue: 0
   ShieldDamageMultiplier:
+    currentValue: 1
     baseValue: 1
     minValue: -1
   HPDamageMultiplier:
+    currentValue: 1
     baseValue: 1
     minValue: -1
+  BackstabMultiplier:
+    currentValue: 1
+    baseValue: 1
+    minValue: 0
   projectileKnockback:
+    currentValue: 0
     baseValue: 0
     minValue: 0
   projectilePiercing:
+    currentValue: 0
     baseValue: 0
     minValue: -1
   projectileCount:
+    currentValue: 1
     baseValue: 1
     minValue: 1
   projectileSpread:
+    currentValue: 10
     baseValue: 10
     minValue: 0
-  canAim:
-    baseValue: 1
 --- !u!212 &64666392978661299
 SpriteRenderer:
   serializedVersion: 2
@@ -5204,40 +5223,59 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileModule
   moduleDefinition: {fileID: 11400000, guid: 12025bb4045e8b446bf8bb38f7229639, type: 2}
-  fireRate:
-    baseValue: 0.75
-    minValue: 0.0001
+  firePoint: {fileID: 1415212342813086038}
+  fireCooldown:
+    currentValue: 0
+    baseValue: 1.4
+    minValue: 0
+  timeScale:
+    currentValue: 1
+    baseValue: 1
+    minValue: 0
   range:
+    currentValue: 8
     baseValue: 8
     minValue: 0
+  canAim:
+    currentValue: 1
+    baseValue: 1
   projectilePrefab: {fileID: 8872413515496322224, guid: 32fde49ac5ad8ea49a2d1db61f4fb5d4, type: 3}
-  firePoint: {fileID: 1415212342813086038}
   projectileSpeed:
+    currentValue: 10
     baseValue: 10
     minValue: 0
   projectileDamage:
+    currentValue: 15
     baseValue: 15
     minValue: 0
   ShieldDamageMultiplier:
+    currentValue: 1
     baseValue: 1
     minValue: -1
   HPDamageMultiplier:
+    currentValue: 1
     baseValue: 1
     minValue: -1
+  BackstabMultiplier:
+    currentValue: 1
+    baseValue: 1
+    minValue: 0
   projectileKnockback:
+    currentValue: 0
     baseValue: 0
     minValue: 0
   projectilePiercing:
+    currentValue: 0
     baseValue: 0
     minValue: -1
   projectileCount:
+    currentValue: 1
     baseValue: 1
     minValue: 1
   projectileSpread:
+    currentValue: 10
     baseValue: 10
     minValue: 0
-  canAim:
-    baseValue: 1
 --- !u!212 &7336778078453810057
 SpriteRenderer:
   serializedVersion: 2
@@ -5428,40 +5466,59 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileModule
   moduleDefinition: {fileID: 11400000, guid: 12025bb4045e8b446bf8bb38f7229639, type: 2}
-  fireRate:
-    baseValue: 0.75
-    minValue: 0.0001
+  firePoint: {fileID: 8774167210518566561}
+  fireCooldown:
+    currentValue: 0
+    baseValue: 1.2
+    minValue: 0
+  timeScale:
+    currentValue: 1
+    baseValue: 1
+    minValue: 0
   range:
+    currentValue: 8
     baseValue: 8
     minValue: 0
+  canAim:
+    currentValue: 1
+    baseValue: 1
   projectilePrefab: {fileID: 8872413515496322224, guid: 32fde49ac5ad8ea49a2d1db61f4fb5d4, type: 3}
-  firePoint: {fileID: 8774167210518566561}
   projectileSpeed:
+    currentValue: 10
     baseValue: 10
     minValue: 0
   projectileDamage:
+    currentValue: 15
     baseValue: 15
     minValue: 0
   ShieldDamageMultiplier:
+    currentValue: 1
     baseValue: 1
     minValue: -1
   HPDamageMultiplier:
+    currentValue: 1
     baseValue: 1
     minValue: -1
+  BackstabMultiplier:
+    currentValue: 1
+    baseValue: 1
+    minValue: 0
   projectileKnockback:
+    currentValue: 0
     baseValue: 0
     minValue: 0
   projectilePiercing:
+    currentValue: 0
     baseValue: 0
     minValue: -1
   projectileCount:
+    currentValue: 1
     baseValue: 1
     minValue: 1
   projectileSpread:
+    currentValue: 10
     baseValue: 10
     minValue: 0
-  canAim:
-    baseValue: 1
 --- !u!212 &2820354622978104848
 SpriteRenderer:
   serializedVersion: 2
@@ -5628,44 +5685,65 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MissileModule
   moduleDefinition: {fileID: 11400000, guid: e5a9fd2dd18115740b0829833104fcfc, type: 2}
-  fireRate:
-    baseValue: 0.2
-    minValue: 0.0001
+  firePoint: {fileID: 1378227089662196627}
+  fireCooldown:
+    currentValue: 0
+    baseValue: 2.5
+    minValue: 0
+  timeScale:
+    currentValue: 1
+    baseValue: 1
+    minValue: 0
   range:
+    currentValue: 12
     baseValue: 12
     minValue: 0
+  canAim:
+    currentValue: 1
+    baseValue: 1
   projectilePrefab: {fileID: 7383371667686300248, guid: 02383f17f405bb74ebe65694e48d20b1, type: 3}
-  firePoint: {fileID: 1378227089662196627}
   projectileSpeed:
+    currentValue: 8
     baseValue: 8
     minValue: 0
   projectileDamage:
+    currentValue: 30
     baseValue: 30
     minValue: 0
   ShieldDamageMultiplier:
+    currentValue: 0.75
     baseValue: 0.75
     minValue: -1
   HPDamageMultiplier:
+    currentValue: 1.4
     baseValue: 1.4
     minValue: -1
+  BackstabMultiplier:
+    currentValue: 1
+    baseValue: 1
+    minValue: 0
   projectileKnockback:
+    currentValue: 1
     baseValue: 1
     minValue: 0
   projectilePiercing:
+    currentValue: 0
     baseValue: 0
     minValue: -1
   projectileCount:
+    currentValue: 1
     baseValue: 1
     minValue: 1
   projectileSpread:
+    currentValue: 0
     baseValue: 0
     minValue: 0
-  canAim:
-    baseValue: 1
   ExplosionRange:
+    currentValue: 1
     baseValue: 1
     minValue: 0
   SeekingRange:
+    currentValue: 5
     baseValue: 5
     minValue: 0
   textureWithRocket: {fileID: 21300000, guid: 8efac6b2a71ff2049ad237d20bca2742, type: 3}
@@ -5748,19 +5826,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShipCoreModule
   moduleDefinition: {fileID: 11400000, guid: f4b1836a0ae68c6498413a6f2ec0caef, type: 2}
   health:
+    currentValue: 0
     baseValue: 100
     minValue: 1
   shields:
+    currentValue: 0
     baseValue: 100
     minValue: 0
   shieldRegen:
+    currentValue: 0
     baseValue: 0
     minValue: 0
-  rammingDamage:
-    baseValue: 20
+  hpRegen:
+    currentValue: 0
+    baseValue: 0
     minValue: 0
-  rammingKnockback:
-    baseValue: 3
+  invincibility:
+    currentValue: 0
+    baseValue: 0
+  damage:
+    currentValue: 0
+    baseValue: 10
+    minValue: 0
+  knockbackPower:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0
+  backstabMultiplier:
+    currentValue: 0
+    baseValue: 1
     minValue: 0
 --- !u!212 &1729788425180369425
 SpriteRenderer:
@@ -5931,10 +6025,12 @@ MonoBehaviour:
   moduleDefinition: {fileID: 11400000, guid: a3f144a87eb1d22449ea79a4d0b8c12b, type: 2}
   targetPosition: {x: 0, y: 0}
   maxSpeed:
+    currentValue: 0
     baseValue: 2.5
     minValue: 0
   body: {fileID: 0}
   thrust:
+    currentValue: 0
     baseValue: 0.04
     minValue: 0
 --- !u!1 &7622125486683924137
@@ -5952,6 +6048,8 @@ GameObject:
   - component: {fileID: 5476989254142831800}
   - component: {fileID: 362748142000764873}
   - component: {fileID: 928230739474773828}
+  - component: {fileID: 7315353507716852863}
+  - component: {fileID: 7033119405330998455}
   m_Layer: 7
   m_Name: OB_Harbringer
   m_TagString: Untagged
@@ -6115,6 +6213,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55f2aab24582e8e4aa61a41fa4c55adc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  turretMounts: {fileID: 0}
 --- !u!114 &362748142000764873
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6128,6 +6227,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   moduleManager: {fileID: 5476989254142831800}
+  upgradeManager: {fileID: 0}
+  effectManager: {fileID: 0}
   knockbackFreezeDuration: 0.15
   deathParticles:
   - {fileID: 7581100874683839773, guid: 8680070470f266d429545b15a390b54d, type: 3}
@@ -6148,6 +6249,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KeepDistanceModule
   distanceMin: 4
   distanceMax: 8
+--- !u!114 &7315353507716852863
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7622125486683924137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0218620d8b9dcdd4eb062618f82253fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EffectManager
+  ship: {fileID: 0}
+  shouldRecalculate: 0
+--- !u!114 &7033119405330998455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7622125486683924137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a94a72135a43194ca707b54ae1b48e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeManager
 --- !u!1 &8264807769582482616
 GameObject:
   m_ObjectHideFlags: 0

@@ -49,10 +49,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileModule
   moduleDefinition: {fileID: 11400000, guid: eac5fc4af100cc34b8ee896e3cf22781, type: 2}
   firePoint: {fileID: 3116449676911722161}
-  fireRate:
+  fireCooldown:
     currentValue: 0
-    baseValue: 0.5
-    minValue: 0.0001
+    baseValue: 2
+    minValue: 0
+  timeScale:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0
   range:
     currentValue: 0
     baseValue: 50

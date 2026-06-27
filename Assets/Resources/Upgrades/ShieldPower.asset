@@ -19,15 +19,26 @@ MonoBehaviour:
   rarity: 1
   maxStacks: 5
   effects:
-  - stat: 2
-    statModifier:
-      Flat: 0
-      Percent: 20
-    targetTags:
-    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
-  - stat: 3
-    statModifier:
-      Flat: 0
-      Percent: 25
-    targetTags:
-    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
+  - rid: 7560140318346838739
+  - rid: 7560140318346838740
+  references:
+    version: 2
+    RefIds:
+    - rid: 7560140318346838739
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        stat: 2
+        statModifier:
+          Flat: 0
+          Percent: 20
+        targetTags:
+        - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
+    - rid: 7560140318346838740
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        stat: 3
+        statModifier:
+          Flat: 0
+          Percent: 25
+        targetTags:
+        - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}

@@ -12,12 +12,16 @@ public abstract class MovementModule : ModuleBase
         body = GetComponentInParent<Rigidbody2D>();
         targetPosition = body.position;
     }
-    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
+    protected override void ApplyModifiers()
     {
-        maxSpeed.Recalculate(modifiers);
+        base.ApplyModifiers();
+
+        maxSpeed.Recalculate(currentModifiers);
     }
     protected override void ResetModifiers()
     {
+        base.ResetModifiers();
+
         maxSpeed.ResetToBase();
     }
     

@@ -146,11 +146,11 @@ public class TeslaModule : WeaponModule, IHitter
         }
         return closest;
     }
-    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
+    protected override void ApplyModifiers()
     {
-        base.ApplyModifiers(modifiers);
-        damage.Recalculate(modifiers);
-        range.Recalculate(modifiers);
+        base.ApplyModifiers();
+        damage.Recalculate(currentModifiers);
+        range.Recalculate(currentModifiers);
 
         if (rangeDetector != null)
             rangeDetector.SetRadius(range);

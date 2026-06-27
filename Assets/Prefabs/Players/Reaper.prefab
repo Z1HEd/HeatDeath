@@ -4897,6 +4897,7 @@ GameObject:
   - component: {fileID: 1683226674827135924}
   - component: {fileID: 4831795120304215577}
   - component: {fileID: 2735005139785217404}
+  - component: {fileID: 3896390485701810768}
   m_Layer: 6
   m_Name: Reaper
   m_TagString: Player
@@ -5000,7 +5001,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -5111,14 +5112,95 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EffectManager
   activeEffects:
-  - stat: 10
-    statModifier:
-      Flat: 0
-      Percent: 100
-    targetTags:
-    - {fileID: 11400000, guid: 65c2c2d09c4c8984097657f3721a900c, type: 2}
-    - {fileID: 11400000, guid: e7f46ea9b622afa45bbdae890f8c5508, type: 2}
-    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
+  - rid: 7560140318346838967
+  ship: {fileID: 0}
+  shouldRecalculate: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 7560140318346838967
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        stat: 10
+        statModifier:
+          Flat: 0
+          Percent: 100
+        targetTags:
+        - {fileID: 11400000, guid: e7f46ea9b622afa45bbdae890f8c5508, type: 2}
+        - {fileID: 11400000, guid: 65c2c2d09c4c8984097657f3721a900c, type: 2}
+--- !u!114 &3896390485701810768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3575443304599885754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6dfdf2f835ec9247b2ae47ef8bedfac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimedEffectAbility
+  moduleDefinition: {fileID: 0}
+  cooldown:
+    currentValue: 0
+    baseValue: 20
+    minValue: 0
+  duration:
+    currentValue: 0
+    baseValue: 1.5
+    minValue: 0
+  effectMultiplier:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0.01
+  baseEffects:
+  - rid: 7560140318346838961
+  - rid: 7560140318346838963
+  - rid: 7560140318346838964
+  - rid: 7560140318346838965
+  - rid: 7560140318346838966
+  references:
+    version: 2
+    RefIds:
+    - rid: 7560140318346838961
+      type: {class: GhostEffect, ns: , asm: Assembly-CSharp}
+      data: 
+    - rid: 7560140318346838963
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        stat: 5
+        statModifier:
+          Flat: 0
+          Percent: -75
+        targetTags:
+        - {fileID: 11400000, guid: 46fd95cd7afab1d4995cfbc4038ac37b, type: 2}
+    - rid: 7560140318346838964
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        stat: 22
+        statModifier:
+          Flat: 0
+          Percent: -100
+        targetTags:
+        - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
+    - rid: 7560140318346838965
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        stat: 3
+        statModifier:
+          Flat: 0
+          Percent: 500
+        targetTags:
+        - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
+    - rid: 7560140318346838966
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        stat: 23
+        statModifier:
+          Flat: 10
+          Percent: 0
+        targetTags:
+        - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
 --- !u!1 &4005121729113178305
 GameObject:
   m_ObjectHideFlags: 0
@@ -5305,6 +5387,13 @@ MonoBehaviour:
     currentValue: 0
     baseValue: 3
     minValue: 0
+  hpRegen:
+    currentValue: 0
+    baseValue: 0
+    minValue: 0
+  invincibility:
+    currentValue: 0
+    baseValue: 0
   damage:
     currentValue: 0
     baseValue: 10

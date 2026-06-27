@@ -4896,6 +4896,8 @@ GameObject:
   - component: {fileID: 805480820789729827}
   - component: {fileID: 1683226674827135924}
   - component: {fileID: 4831795120304215577}
+  - component: {fileID: 2735005139785217404}
+  - component: {fileID: 628116781386659854}
   m_Layer: 6
   m_Name: Bulwark
   m_TagString: Player
@@ -5069,6 +5071,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   moduleManager: {fileID: 0}
+  upgradeManager: {fileID: 0}
+  effectManager: {fileID: 0}
   knockbackFreezeDuration: 0.15
   deathParticles: []
 --- !u!114 &1683226674827135924
@@ -5095,6 +5099,69 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a94a72135a43194ca707b54ae1b48e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeManager
+--- !u!114 &2735005139785217404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3575443304599885754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0218620d8b9dcdd4eb062618f82253fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EffectManager
+  ship: {fileID: 0}
+  shouldRecalculate: 0
+--- !u!114 &628116781386659854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3575443304599885754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6dfdf2f835ec9247b2ae47ef8bedfac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimedEffectAbility
+  moduleDefinition: {fileID: 0}
+  cooldown:
+    currentValue: 0
+    baseValue: 20
+    minValue: 0
+  duration:
+    currentValue: 0
+    baseValue: 5
+    minValue: 0
+  effectMultiplier:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0.01
+  baseEffects:
+  - rid: 7560140318346838959
+  - rid: 7560140318346838960
+  references:
+    version: 2
+    RefIds:
+    - rid: 7560140318346838959
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        stat: 26
+        statModifier:
+          Flat: 1
+          Percent: 0
+        targetTags:
+        - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
+    - rid: 7560140318346838960
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        stat: 6
+        statModifier:
+          Flat: 0
+          Percent: 100
+        targetTags:
+        - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
 --- !u!1 &6853425191156878356
 GameObject:
   m_ObjectHideFlags: 0
@@ -5208,19 +5275,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShipCoreModule
   moduleDefinition: {fileID: 11400000, guid: f4b1836a0ae68c6498413a6f2ec0caef, type: 2}
   health:
+    currentValue: 0
     baseValue: 125
     minValue: 1
   shields:
+    currentValue: 0
     baseValue: 100
     minValue: 0
   shieldRegen:
-    baseValue: 3
+    currentValue: 0
+    baseValue: 6
     minValue: 0
-  rammingDamage:
-    baseValue: 25
+  hpRegen:
+    currentValue: 0
+    baseValue: 0
     minValue: 0
-  rammingKnockback:
-    baseValue: 3
+  invincibility:
+    currentValue: 0
+    baseValue: 0
+  damage:
+    currentValue: 0
+    baseValue: 10
+    minValue: 0
+  knockbackPower:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0
+  backstabMultiplier:
+    currentValue: 0
+    baseValue: 1
     minValue: 0
 --- !u!212 &573201795644266485
 SpriteRenderer:
@@ -5391,13 +5474,15 @@ MonoBehaviour:
   moduleDefinition: {fileID: 0}
   targetPosition: {x: 0, y: 0}
   maxSpeed:
+    currentValue: 0
     baseValue: 15
     minValue: 0
   body: {fileID: 0}
   steeringThrust:
+    currentValue: 0
     baseValue: 0.1
     minValue: 0
   burstCooldown:
+    currentValue: 0
     baseValue: 3
     minValue: 0
-  burstDistance: 3

@@ -645,7 +645,31 @@ MonoBehaviour:
   - {fileID: 362748142000764873, guid: 9343f78637b59a24fbf333c5fed56051, type: 3}
   - {fileID: 362748142000764873, guid: 7d41aeaf1146e9842acf84602235018f, type: 3}
   - {fileID: 362748142000764873, guid: cd849f38d0eafe94193eed3de24e10b3, type: 3}
-  enemyScalerUpgradeDefinition: {fileID: 11400000, guid: 163bb0a716d99c244bb9ba23eaa8ef9e, type: 2}
+  enemyScalerEffects:
+  - stat: 6
+    statModifier:
+      Flat: 0
+      Percent: 100
+    targetTags:
+    - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
+  - stat: 1
+    statModifier:
+      Flat: 0
+      Percent: 100
+    targetTags:
+    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
+  - stat: 2
+    statModifier:
+      Flat: 0
+      Percent: 100
+    targetTags:
+    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
+  - stat: 3
+    statModifier:
+      Flat: 0
+      Percent: 100
+    targetTags:
+    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
 --- !u!61 &1304093821
 BoxCollider2D:
   m_ObjectHideFlags: 0

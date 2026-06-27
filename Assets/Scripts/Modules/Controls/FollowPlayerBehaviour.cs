@@ -3,7 +3,10 @@ public class FollowPlayerBehaviour : ControlBehaviour
 {
     public void FixedUpdate()
     {
-        var playerPosition = (ship as Enemy).Player.gameObject.transform.position;
+        Player player = (ship as Enemy).Player;
+        if (player == null || player.gameObject.layer != LayerMask.NameToLayer("Player")) return;
+        
+        var playerPosition = player.gameObject.transform.position;
         var clampedPosition = ClampPositionToCameraBounds(playerPosition);
         ship.SetTargetPosition(clampedPosition);
     }

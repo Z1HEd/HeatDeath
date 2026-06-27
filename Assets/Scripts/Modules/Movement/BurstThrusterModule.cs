@@ -7,7 +7,7 @@ public class BurstThrusterModule : MovementModule
     [SerializeField] private ScalarStat steeringThrust = new ScalarStat(StatType.Thrust, 0.05f, 0f);
 
     [Header("Burst Settings")]
-    [SerializeField] private ScalarStat burstCooldown = new ScalarStat(StatType.BurstCooldown, 3f, 0f);
+    [SerializeField] private ScalarStat burstCooldown = new ScalarStat(StatType.Cooldown, 3f, 0f);
 
     private const float ThrustScale        = 100.0f;
     private const float StopDistance       = 0.2f;
@@ -73,16 +73,18 @@ public class BurstThrusterModule : MovementModule
         body.AddForce(requiredAccel * body.mass, ForceMode2D.Force);
     }
 
-    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
+    protected override void ApplyModifiers()
     {
-        base.ApplyModifiers(modifiers);
-        steeringThrust.Recalculate(modifiers);
-        burstCooldown.Recalculate(modifiers);
+        base.ApplyModifiers();
+
+        steeringThrust.Recalculate(currentModifiers);
+        burstCooldown.Recalculate(currentModifiers);
     }
 
     protected override void ResetModifiers()
     {
         base.ResetModifiers();
+        
         steeringThrust.ResetToBase();
         burstCooldown.ResetToBase();
     }

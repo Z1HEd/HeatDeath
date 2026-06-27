@@ -5111,12 +5111,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EffectManager
   activeEffects:
-  - stat: 6
-    statModifier:
-      Flat: 0
-      Percent: 33
-    targetTags:
-    - {fileID: 11400000, guid: 2c382f2690590cb48a53051168322d54, type: 2}
+  - rid: 7560140318346838968
+  ship: {fileID: 0}
+  shouldRecalculate: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 7560140318346838968
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        stat: 6
+        statModifier:
+          Flat: 0
+          Percent: 33
+        targetTags:
+        - {fileID: 11400000, guid: 2c382f2690590cb48a53051168322d54, type: 2}
 --- !u!1 &6853425191156878356
 GameObject:
   m_ObjectHideFlags: 0
@@ -5241,11 +5250,22 @@ MonoBehaviour:
     currentValue: 0
     baseValue: 3
     minValue: 0
-  rammingDamage:
+  hpRegen:
     currentValue: 0
-    baseValue: 15
+    baseValue: 0
     minValue: 0
-  rammingKnockback:
+  invincibility:
+    currentValue: 0
+    baseValue: 0
+  damage:
+    currentValue: 0
+    baseValue: 10
+    minValue: 0
+  knockbackPower:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0
+  backstabMultiplier:
     currentValue: 0
     baseValue: 1
     minValue: 0

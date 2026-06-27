@@ -9746,6 +9746,7 @@ GameObject:
   - component: {fileID: 1683226674827135924}
   - component: {fileID: 4831795120304215577}
   - component: {fileID: 2714910884704897700}
+  - component: {fileID: 2735005139785217404}
   m_Layer: 6
   m_Name: Yamato
   m_TagString: Player
@@ -9919,6 +9920,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   moduleManager: {fileID: 0}
+  upgradeManager: {fileID: 0}
+  effectManager: {fileID: 0}
   knockbackFreezeDuration: 0.15
   deathParticles: []
 --- !u!114 &1683226674827135924
@@ -9954,10 +9957,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 3575443304599885754}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 691d52fa997aab14b87ba8e80e453f7a, type: 3}
+  m_Script: {fileID: 11500000, guid: b161e2e212b9aab4a8f8a0c2000e9013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DuplicateWeaponModule
   moduleDefinition: {fileID: 0}
+--- !u!114 &2735005139785217404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3575443304599885754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0218620d8b9dcdd4eb062618f82253fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EffectManager
+  activeEffects: []
 --- !u!1 &6853425191156878356
 GameObject:
   m_ObjectHideFlags: 0
@@ -10114,11 +10130,15 @@ MonoBehaviour:
     currentValue: 0
     baseValue: 2
     minValue: 0
-  rammingDamage:
+  damage:
     currentValue: 0
-    baseValue: 15
+    baseValue: 10
     minValue: 0
-  rammingKnockback:
+  knockbackPower:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0
+  backstabMultiplier:
     currentValue: 0
     baseValue: 1
     minValue: 0

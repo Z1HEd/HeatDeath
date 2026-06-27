@@ -52,7 +52,7 @@ public class Ship : MonoBehaviour, IHittable
         spriteRenderer.material = _material;
     }
 
-    public virtual void Update()
+    protected virtual void Update()
     {
         if (knockbackTimeRemaining > 0f)
         {

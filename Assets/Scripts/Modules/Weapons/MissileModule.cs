@@ -18,22 +18,24 @@ public class MissileModule : ProjectileModule
     protected override void Update()
     {
         base.Update();
-        if (Time.time - lastFireTime > FireDelay / 2)
+        if (fireCooldown < fireCooldown.MaxValue/2)
             spriteRenderer.sprite = textureWithRocket;
         else
             spriteRenderer.sprite = textureWithoutRocket;
     }
 
-    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
+    protected override void ApplyModifiers()
     {
-        base.ApplyModifiers(modifiers);
-        ExplosionRange.Recalculate(modifiers);
-        SeekingRange.Recalculate(modifiers);
+        base.ApplyModifiers();
+
+        ExplosionRange.Recalculate(currentModifiers);
+        SeekingRange.Recalculate(currentModifiers);
     }
 
     protected override void ResetModifiers()
     {
         base.ResetModifiers();
+
         ExplosionRange.ResetToBase();
         SeekingRange.ResetToBase();
     }

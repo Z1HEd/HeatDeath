@@ -14,7 +14,6 @@ public class GameUIController : MonoBehaviour
 
     [SerializeField] private UIDocument uiDocument;
 
-    private ShipCoreModule playerCoreModule;
     private Player player;
     private UpgradeManager upgradeManager;
     private UpgradeDraftService upgradeDraftService;
@@ -36,10 +35,8 @@ public class GameUIController : MonoBehaviour
     private VisualElement upgradePanel;
     private Label upgradeHeader;
     private Button[] optionButtons;
-    public Button[] weaponButtons;
-    public UICooldownOverlay[] weaponCooldownOverlays;
-    public Button abilityButton;
-    public UICooldownOverlay abilityCooldownOverlay;
+    public UICooldownDurationOverlay[] weaponButtonOverlays;
+    public UICooldownDurationOverlay abilityButtonOverlay;
     private Action[] optionHandlers;
 
     private int pendingShipDrafts;
@@ -101,59 +98,33 @@ public class GameUIController : MonoBehaviour
             root.Q<Button>("UpgradeOption2"),
             root.Q<Button>("UpgradeOption3")
         };
-        weaponButtons = new[]
+        weaponButtonOverlays = new[]
         {
-            root.Q<Button>("Weapon1"),
-            root.Q<Button>("Weapon2"),
-            root.Q<Button>("Weapon3"),
-            root.Q<Button>("Weapon4")
+            new UICooldownDurationOverlay(root.Q<Button>("Weapon1")),
+            new UICooldownDurationOverlay(root.Q<Button>("Weapon2")),
+            new UICooldownDurationOverlay(root.Q<Button>("Weapon3")),
+            new UICooldownDurationOverlay(root.Q<Button>("Weapon4"))
         };
-        weaponCooldownOverlays = new[]
-        {
-            new UICooldownOverlay(root.Q<VisualElement>("Cooldown1")),
-            new UICooldownOverlay(root.Q<VisualElement>("Cooldown2")),
-            new UICooldownOverlay(root.Q<VisualElement>("Cooldown3")),
-            new UICooldownOverlay(root.Q<VisualElement>("Cooldown4"))
-        };
-        abilityButton = root.Q<Button>("Cooldown5");
-        abilityCooldownOverlay = new UICooldownOverlay(root.Q<VisualElement>("Cooldown5"));
-    }
-
-    private void OnDestroy()
-    {
-        if (playerCoreModule != null)
-            playerCoreModule.OnHPShieldsChanged -= UpdateBars;
-
-        if (optionButtons != null && optionHandlers != null)
-        {
-            for (int i = 0; i < optionButtons.Length; i++)
-            {
-                if (optionButtons[i] != null && optionHandlers[i] != null)
-                    optionButtons[i].clicked -= optionHandlers[i];
-            }
-        }
-
-        if (GameController.Instance != null)
-        {
-            GameController.Instance.OnXPChanged -= UpdateXPBar;
-            GameController.Instance.OnLevelChanged -= UpdateLevelText;
-            GameController.Instance.OnLevelChanged -= StartDraftSequence;
-        }
+        abilityButtonOverlay = new UICooldownDurationOverlay(root.Q<Button>("Ability1"));
     }
     public void BindWeaponButton(GameObject weapon, int index){
         weapon.GetComponent<WeaponModule>().updateCooldownOverlay+=
-                weaponCooldownOverlays[index].SetUpdateFill;
-        weaponButtons[index].style.backgroundImage = 
-                new StyleBackground(weapon.GetComponent<SpriteRenderer>().sprite);
+                weaponButtonOverlays[index].SetCooldownFill;
+        weaponButtonOverlays[index].button.style.backgroundImage = 
+                new StyleBackground(weapon.GetComponent<SpriteRenderer>().sprite.texture);
     }
 
     private void BindPlayer(GameObject playerObject)
     {
         player = playerObject.GetComponent<Player>();
-        playerCoreModule = player != null ? player.CoreModule : null;
-
-        if (playerCoreModule != null)
-            playerCoreModule.OnHPShieldsChanged += UpdateBars;
+        player.CoreModule.OnHPShieldsChanged += UpdateBars;
+        
+        abilityButtonOverlay.button.clicked += player.ability.Activate;
+        player.ability.updateCooldown += abilityButtonOverlay.SetCooldownFill;
+        player.ability.updateDuration += abilityButtonOverlay.SetDurationFill;
+        player.ability.updateIcon += abilityButtonOverlay.SetIcon;
+        player.ability.updateActivatable += abilityButtonOverlay.SetClickable;
+        abilityButtonOverlay.SetClickable(player.ability.IsActivatable);
     }
     private void PauseUnpause()
     {
@@ -365,11 +336,9 @@ public class GameUIController : MonoBehaviour
 
     private void UpdateHealthBar()
     {
-        if (playerCoreModule == null)
-            return;
 
-        float currentHealth = playerCoreModule.CurrentHealth;
-        float maxHealth = playerCoreModule.CurrentMaxHealth;
+        float currentHealth = player.CoreModule.CurrentHealth;
+        float maxHealth = player.CoreModule.CurrentMaxHealth;
 
         float fillPercent = maxHealth > 0 ? currentHealth / maxHealth : 0;
         healthFill.style.width = Length.Percent(Mathf.Clamp01(fillPercent) * 100f);
@@ -378,11 +347,8 @@ public class GameUIController : MonoBehaviour
 
     private void UpdateShieldBar()
     {
-        if (playerCoreModule == null)
-            return;
-
-        float currentShields = playerCoreModule.CurrentShields;
-        float maxShields = playerCoreModule.CurrentMaxShields;
+        float currentShields = player.CoreModule.CurrentShields;
+        float maxShields = player.CoreModule.CurrentMaxShields;
 
         float fillPercent = maxShields > 0 ? currentShields / maxShields : 0;
         shieldFill.style.width = Length.Percent(Mathf.Clamp01(fillPercent) * 100f);

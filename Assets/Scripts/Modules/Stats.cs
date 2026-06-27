@@ -2,6 +2,54 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum StatType
+{
+	None = 0,
+	Health = 1,
+	Shields = 2,
+	ShieldRegen = 3,
+	Thrust = 4,
+	MaxSpeed = 5,
+	Damage = 6,
+	Knockback = 7,
+	Cooldown = 8,
+	ProjectileSpeed = 9,
+	BackstabMultiplier = 10,
+	ProjectileKnockback = 11,
+	ProjectileCount = 12,
+	Range = 13,
+	ProjectileSpread = 14,
+	CanAim = 15,
+	ProjectilePiercing = 16,
+	Lifetime = 17,
+	ShieldDamageMultiplier = 18,
+	HPDamageMultiplier = 19,
+	ExplosionRange = 20,
+	ProjectileRange = 21,
+	TimeScale = 22,
+	HPRegen = 23,
+    AbilityDuration = 24,
+    EffectMuliplier = 25,
+    Invincibility = 26,
+}
+
+[Serializable]
+public struct StatModifier
+{
+    public float Flat;
+    public float Percent;
+    public StatModifier(float flat, float percent)
+    {
+        Flat = flat;
+        Percent = percent;
+    }
+
+    public static StatModifier operator*(StatModifier left, float right) 
+    {
+        return new StatModifier(left.Flat * right, left.Percent * right);
+    }
+}
+
 [Serializable]
 public abstract class StatBase<T>
 {
@@ -37,15 +85,15 @@ public abstract class StatBase<T>
             CurrentValueChanged?.Invoke(currentValue);
     }
 
-    protected static float CalculateModifiedValue(
+    protected float CalculateModifiedValue(
         float baseStatValue,
-        IReadOnlyDictionary<StatType, StatModifier> modifiers,
-        StatType stat)
+        IReadOnlyDictionary<StatType, StatModifier> modifiers)
     {
-        if (modifiers == null || stat == StatType.None)
+        if (modifiers == null || Type == StatType.None)
             return baseStatValue;
+        
+        modifiers.TryGetValue(Type, out StatModifier modifier);
 
-        modifiers.TryGetValue(stat, out StatModifier modifier);
         return (baseStatValue + modifier.Flat) * (1f + (modifier.Percent * 0.01f));
     }
 }
@@ -74,7 +122,8 @@ public sealed class ResourceStat : StatBase<float>
 
     public float BaseValue => baseValue;
     public float CurrentValue => CurrentOr(Mathf.Max(minValue, baseValue));
-    public float MaxValue => IsInitialized ? maxValue : Mathf.Max(minValue, baseValue);
+    public float MaxValue => maxValue;
+    public float MinValue => minValue;
 
     public static implicit operator float(ResourceStat stat)
     {
@@ -83,18 +132,17 @@ public sealed class ResourceStat : StatBase<float>
 
     public void Recalculate(IReadOnlyDictionary<StatType, StatModifier> modifiers, bool preserveCurrentRatio)
     {
-        float previousMax = IsInitialized ? Mathf.Max(minValue, maxValue) : 0f;
-        float ratio = previousMax > 0f ? CurrentValue / previousMax : 1f;
+        float ratio = MaxValue > 0f ? (CurrentValue / MaxValue) : 0f;
 
-        maxValue = Mathf.Max(minValue, CalculateModifiedValue(baseValue, modifiers, Type));
-
+        maxValue = Mathf.Max(minValue, CalculateModifiedValue(baseValue, modifiers));
+    
         if (!IsInitialized || !preserveCurrentRatio)
         {
             SetCurrentValue(maxValue);
         }
         else
         {
-            SetCurrentValue(Mathf.Clamp(maxValue * ratio, 0f, maxValue));
+            SetCurrentValue(Mathf.Clamp(maxValue * ratio, minValue, maxValue));
         }
     }
 
@@ -104,6 +152,10 @@ public sealed class ResourceStat : StatBase<float>
             maxValue = Mathf.Max(minValue, baseValue);
 
         SetCurrentValue(maxValue);
+    }
+    public void ResetToMin()
+    {
+        SetCurrentValue(minValue);
     }
 
     public void AddCurrent(float value)
@@ -119,7 +171,7 @@ public sealed class ResourceStat : StatBase<float>
         if (!IsInitialized)
             ResetToMax();
 
-        if (multiplier<0) return value;
+        if (multiplier<=0) return value;
 
         float leftover = 0f;
 
@@ -164,7 +216,7 @@ public sealed class ScalarStat : StatBase<float>
 
     public void Recalculate(IReadOnlyDictionary<StatType, StatModifier> modifiers)
     {
-        SetCurrentValue(Mathf.Max(minValue, CalculateModifiedValue(baseValue, modifiers, Type)));
+        SetCurrentValue(Mathf.Max(minValue, CalculateModifiedValue(baseValue, modifiers)));
     }
 
     public void ResetToBase()
@@ -198,7 +250,7 @@ public sealed class BoolStat : StatBase<bool>
         return stat != null && stat.CurrentValue;
     }
 
-    public void Recalculate(IReadOnlyDictionary<StatType, StatModifier> modifiers)
+    public void Recalculate(IReadOnlyDictionary<StatType,StatModifier> modifiers)
     {
         if (modifiers == null || Type == StatType.None)
         {

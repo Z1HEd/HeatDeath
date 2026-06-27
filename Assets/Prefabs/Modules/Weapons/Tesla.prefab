@@ -107,10 +107,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TeslaModule
   moduleDefinition: {fileID: 11400000, guid: c3f5e2a31b65fc54a940668ad06e4813, type: 2}
   firePoint: {fileID: 2137022525525021128}
-  fireRate:
+  fireCooldown:
     currentValue: 0
-    baseValue: 0.5
-    minValue: 0.0001
+    baseValue: 2
+    minValue: 0
+  timeScale:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0
   range:
     currentValue: 0
     baseValue: 6

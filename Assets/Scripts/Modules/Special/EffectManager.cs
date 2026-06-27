@@ -5,22 +5,27 @@ using UnityEngine;
 [RequireComponent(typeof(Ship))]
 public class EffectManager : MonoBehaviour
 {
-    [SerializeField]
-    private List<Effect> activeEffects = new List<Effect>();
+    [SerializeReference] [SubclassSelector] private List<Effect> activeEffects = new List<Effect>();
+    public Ship ship;
 
     public event Action OnChanged;
-    private bool shouldRecalculate = false;
+    public bool shouldRecalculate = false;
+
+    protected void Awake()
+    {
+        ship = GetComponent<Ship>();
+    }
 
     public void Update()
     {
         if (shouldRecalculate){
-            RecalculateAllModules();
+            ReapplyEffects();
             OnChanged?.Invoke();
             shouldRecalculate = false;
         }
     }
 
-    public void RecalculateAllModules()
+    private void ReapplyEffects()
     {
         ModuleManager moduleManager = GetComponent<ModuleManager>();
 
@@ -30,11 +35,13 @@ public class EffectManager : MonoBehaviour
     public void AddEffect(Effect effect)
     {
         activeEffects.Add(effect);
+        effect.ApplyToShip(ship);
         shouldRecalculate = true;
     }
     public void RemoveEffect(Effect effect)
     {
         activeEffects.Remove(effect);
+        effect.RemoveFromShip(ship);
         shouldRecalculate = true;
     }
 }

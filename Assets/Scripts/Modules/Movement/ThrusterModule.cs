@@ -59,15 +59,17 @@ public class ThrusterModule : MovementModule
         targetPosition = newTarget;
     }
 
-    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
+    protected override void ApplyModifiers()
     {
-        base.ApplyModifiers(modifiers);
-        thrust.Recalculate(modifiers);
+        base.ApplyModifiers();
+
+        thrust.Recalculate(currentModifiers);
     }
 
     protected override void ResetModifiers()
     {
         base.ResetModifiers();
+
         thrust.ResetToBase();
     }
 }

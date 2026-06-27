@@ -47,10 +47,7 @@ public class ProjectileModule : WeaponModule
         }
 
         if (CanFire)
-        {
-            lastFireTime = Time.time;
             Fire();
-        }
     }
 
     private void OnShipExitedRange(Ship exitedShip)
@@ -102,19 +99,19 @@ public class ProjectileModule : WeaponModule
         return Random.Range(-halfSpread, halfSpread);
     }
 
-    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
+    protected override void ApplyModifiers()
     {
-        base.ApplyModifiers(modifiers);
+        base.ApplyModifiers();
         
-        projectileSpeed.Recalculate(modifiers);
-        projectileDamage.Recalculate(modifiers);
-        HPDamageMultiplier.Recalculate(modifiers);
-        ShieldDamageMultiplier.Recalculate(modifiers);
-        BackstabMultiplier.Recalculate(modifiers);
-        projectileKnockback.Recalculate(modifiers);
-        projectilePiercing.Recalculate(modifiers);
-        projectileCount.Recalculate(modifiers);
-        projectileSpread.Recalculate(modifiers);
+        projectileSpeed.Recalculate(currentModifiers);
+        projectileDamage.Recalculate(currentModifiers);
+        HPDamageMultiplier.Recalculate(currentModifiers);
+        ShieldDamageMultiplier.Recalculate(currentModifiers);
+        BackstabMultiplier.Recalculate(currentModifiers);
+        projectileKnockback.Recalculate(currentModifiers);
+        projectilePiercing.Recalculate(currentModifiers);
+        projectileCount.Recalculate(currentModifiers);
+        projectileSpread.Recalculate(currentModifiers);
     }
 
     protected override void ResetModifiers()

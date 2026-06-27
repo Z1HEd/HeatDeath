@@ -20,7 +20,8 @@ public class UpgradeDefinition : ScriptableObject
     [SerializeField] private ModuleDefinition boundModule;
     [SerializeField] private UpgradeRarity rarity;
     [SerializeField] private int maxStacks = 1;
-    [SerializeField] private List<Effect> effects = new List<Effect>();
+    
+    [SerializeReference] [SubclassSelector] private List<Effect> effects = new List<Effect>();
 
     public string DisplayName => displayName;
     public string Key => key;

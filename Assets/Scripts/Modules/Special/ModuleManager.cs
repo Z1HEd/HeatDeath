@@ -81,10 +81,8 @@ public class ModuleManager : MonoBehaviour
         return false;
     }
 
-    public void AddWeapon(WeaponDefinition definition)
+    public WeaponModule AddWeapon(WeaponDefinition definition)
     {
-        if (definition == null || definition.WeaponPrefab == null)
-            return;
         foreach (Transform mount in turretMounts){
             if (mount.childCount>0) continue;
             var weapon = Instantiate(definition.WeaponPrefab, mount);
@@ -92,16 +90,11 @@ public class ModuleManager : MonoBehaviour
                 GameUIController.Instance.BindWeaponButton(weapon,weaponDefinitions.Count);
                 weaponDefinitions.Add(definition);
             }
-            StartCoroutine(RecalculateAfterFrame());
+            ship.effectManager.shouldRecalculate = true;
             OnWeaponAdded?.Invoke(definition);
-            return;
+            return weapon.GetComponent<WeaponModule>();
         }
         Debug.LogError("Failed to add weapon: missing turret mount");
-    }
-
-    private IEnumerator RecalculateAfterFrame()
-    {
-        yield return null;
-        GetComponent<EffectManager>().RecalculateAllModules();
+        return null;
     }
 }

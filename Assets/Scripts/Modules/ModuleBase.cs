@@ -9,10 +9,12 @@ public abstract class ModuleBase: MonoBehaviour
     protected Ship ship;
     protected UpgradeManager upgradeManager;
     public ModuleDefinition ModuleDefinition => moduleDefinition;
+    public Dictionary<StatType, StatModifier> currentModifiers = new Dictionary<StatType, StatModifier>();
 
     protected virtual void Awake()
     {
         ship = GetComponentInParent<Ship>();
+        if (!ship) ship = GetComponent<Ship>();
         if (!ship) 
         {
             Debug.LogError("Module not in ship!");
@@ -30,28 +32,18 @@ public abstract class ModuleBase: MonoBehaviour
         ship.moduleManager.RemoveModule(this);
     }
 
-    protected IReadOnlyDictionary<StatType, StatModifier> GetApplicableModifiers(IReadOnlyList<Effect> effects)
-    {
-        var result = new Dictionary<StatType, StatModifier>();
-        if (moduleDefinition == null) return result;
-        foreach (var effect in effects)
-        {
-            if (!effect.IsApplicableTo(moduleDefinition))
-                continue;
-
-            effect.ApplyToMap(result);
-        }
-
-        return result;
-    }
 
     public void UpdateEffects(IReadOnlyList<Effect> effects)
     {
         ResetModifiers();
-        ApplyModifiers(GetApplicableModifiers(effects));
+
+        foreach (var effect in effects)
+            effect.ApplyToModule(this);
+        
+        ApplyModifiers();
     }
 
-    protected abstract void ResetModifiers();
+    protected virtual void ResetModifiers() {currentModifiers.Clear();}
 
-    protected abstract void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers);
+    protected virtual void ApplyModifiers() {}
 }

@@ -6,13 +6,13 @@ using System.Collections.Generic;
 public abstract class WeaponModule : ModuleBase
 {
     [SerializeField] public Transform firePoint;
-    [SerializeField] protected ScalarStat fireRate = new ScalarStat(StatType.FireRate, 1f, 0.0001f);
+    [SerializeField] protected ResourceStat fireCooldown = new ResourceStat(StatType.Cooldown, 1f, 0f);
+    [SerializeField] protected ScalarStat timeScale = new ScalarStat(StatType.TimeScale, 1f, 0f);
     [SerializeField] protected ScalarStat range = new ScalarStat(StatType.Range, 15f, 0f);
     
     [SerializeField] public BoolStat canAim = new BoolStat(StatType.CanAim, true);
     
     protected RangeDetector rangeDetector;
-    protected float lastFireTime;
     public event Action<float> updateCooldownOverlay;
 
     protected int DetectLayer { get; private set; }
@@ -32,16 +32,16 @@ public abstract class WeaponModule : ModuleBase
         firePoint = transform.GetChild(0);
     }
 
-    protected virtual float FireDelay => 1f / fireRate;
-    protected virtual bool CanFire => Time.time >= lastFireTime + FireDelay;
-    protected virtual float CooldownProgress => Mathf.Clamp((Time.time-lastFireTime)/FireDelay,0f,1f);
+    public virtual bool CanFire => fireCooldown == fireCooldown.MinValue;
+    public virtual float CooldownFraction => Mathf.Clamp(1f-(fireCooldown)/fireCooldown.MaxValue,0f,1f);
 
     protected virtual void Update()
     {
-        updateCooldownOverlay?.Invoke(CooldownProgress);
+        fireCooldown.Consume(Time.deltaTime, timeScale);
+        updateCooldownOverlay?.Invoke(CooldownFraction);
     }
 
-    protected virtual void Fire() { lastFireTime = Time.time; }
+    protected virtual void Fire() { fireCooldown.ResetToMax(); }
 
     protected void OnValidate()
     {
@@ -81,17 +81,22 @@ public abstract class WeaponModule : ModuleBase
         if (!rangeDetector) return;
         rangeDetector.SetRadius(range);
     }
-    protected override void ApplyModifiers(IReadOnlyDictionary<StatType, StatModifier> modifiers)
+    protected override void ApplyModifiers()
     {
-        fireRate.Recalculate(modifiers);
-        range.Recalculate(modifiers);
-        canAim.Recalculate(modifiers);
+        base.ApplyModifiers();
+
+        fireCooldown.Recalculate(currentModifiers,true);
+        timeScale.Recalculate(currentModifiers);
+        range.Recalculate(currentModifiers);
+        canAim.Recalculate(currentModifiers);
         UpdateRange(range);
     }
 
     protected override void ResetModifiers()
     {
-        fireRate.ResetToBase();
+        base.ResetModifiers();
+
+        timeScale.ResetToBase();
         range.ResetToBase();
         canAim.ResetToBase();
     }
