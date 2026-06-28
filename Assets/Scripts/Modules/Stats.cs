@@ -28,7 +28,7 @@ public enum StatType
 	ProjectileRange = 21,
 	TimeScale = 22,
 	HPRegen = 23,
-    AbilityDuration = 24,
+    Duration = 24,
     EffectMuliplier = 25,
     Invincibility = 26,
 }

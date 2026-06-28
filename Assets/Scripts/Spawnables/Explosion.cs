@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using System.Collections.Generic;
 public class Explosion : MonoBehaviour, IHitter
 {
     public float Damage { get; private set; }
@@ -7,6 +7,8 @@ public class Explosion : MonoBehaviour, IHitter
     public float HPDamageMultiplier { get; private set; }
     public float ShieldDamageMultiplier { get; private set; }
     public float BackstabMultiplier { get; private set; }
+    public List<Effect> appliesEffects { get; private set; }
+    public List<Effect> GetEffects() {return appliesEffects;}
     public float timer = -1;
     public const float FADE_DURATION = 0.3f;
     private SpriteRenderer spriteRenderer;
@@ -18,6 +20,7 @@ public class Explosion : MonoBehaviour, IHitter
         HPDamageMultiplier = hitter.HPDamageMultiplier;
         ShieldDamageMultiplier=hitter.ShieldDamageMultiplier;
         BackstabMultiplier=hitter.ShieldDamageMultiplier;
+        appliesEffects = hitter.GetEffects();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
         transform.localScale = new Vector3(radius,radius,radius);

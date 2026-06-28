@@ -11,15 +11,17 @@ public class StatModifierEffect : Effect
 
     public bool HasTargetTags => targetTags != null && targetTags.Count > 0;
     public StatModifierEffect(){}
-    public StatModifierEffect(StatType Stat, StatModifier Modifier, List<TagDefinition> TargetTags)
+    public StatModifierEffect(StatType Stat, StatModifier Modifier, List<TagDefinition> TargetTags, ResourceStat Duration)
     {
         stat = Stat;
         statModifier = Modifier;
         targetTags = TargetTags;
+        duration = Duration;
     }
 
     public override bool IsApplicableTo(ModuleDefinition moduleDefinition)
     {
+        if (moduleDefinition == null) return false;
         return moduleDefinition.MatchesAnyTag(targetTags);
     }
 
@@ -41,6 +43,6 @@ public class StatModifierEffect : Effect
     }
     public override Effect Stacked(float times)
     {
-        return new StatModifierEffect(stat,statModifier*times,targetTags);
+        return new StatModifierEffect(stat,statModifier*times,targetTags, duration);
     }
 }

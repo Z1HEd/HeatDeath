@@ -17,6 +17,7 @@ public class ShipCoreModule : ModuleBase, IHitter
     [SerializeField] private ScalarStat damage = new ScalarStat(StatType.Damage, 10f, 0f);
     [SerializeField] private ScalarStat knockbackPower = new ScalarStat(StatType.Knockback, 1f, 0f);
     [SerializeField] private ScalarStat backstabMultiplier = new ScalarStat(StatType.BackstabMultiplier, 1f, 0f);
+    [SerializeField] private List<Effect> appliesEffects = new();
 
     protected SpriteRenderer shieldRenderer;
 
@@ -33,6 +34,7 @@ public class ShipCoreModule : ModuleBase, IHitter
     public float ShieldDamageMultiplier => 1f;
     public float HPDamageMultiplier => 1f;
     public float BackstabMultiplier => backstabMultiplier;
+    public List<Effect> GetEffects() {return appliesEffects;}
 
     protected override void Awake()
     {

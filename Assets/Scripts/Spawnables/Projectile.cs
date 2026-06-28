@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -11,6 +12,8 @@ public class Projectile : MonoBehaviour, IHitter
     public float HPDamageMultiplier { get; protected set; } = 1f;
     public float BackstabMultiplier { get; protected set; } = 1f;
     public float KnockbackPower { get; protected set; } = 0f;
+    public List<Effect> appliesEffects = new();
+    public List<Effect> GetEffects() {return appliesEffects;}
     protected Rigidbody2D rb;
     protected SpriteRenderer spriteRenderer;
     public bool isDead {get;protected set;}
@@ -33,6 +36,7 @@ public class Projectile : MonoBehaviour, IHitter
         ShieldDamageMultiplier = sourceModule.ShieldDamageMultiplier;
         HPDamageMultiplier = sourceModule.HPDamageMultiplier;
         BackstabMultiplier = sourceModule.BackstabMultiplier;
+        appliesEffects = sourceModule.AppliesEffects;
         ConfigurePiercing(sourceModule.projectilePiercing);
     }
 

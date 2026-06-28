@@ -7,7 +7,7 @@ public class TimedEffectAbility : AbilityModule
     [SerializeField]
     protected ResourceStat cooldown = new ResourceStat(StatType.Cooldown,1f,0f);
     [SerializeField]
-    protected ResourceStat duration = new ResourceStat(StatType.AbilityDuration,1f,0f);
+    protected ResourceStat duration = new ResourceStat(StatType.Duration,1f,0f);
     [SerializeField]
     protected ScalarStat effectMultiplier = new ScalarStat(StatType.EffectMuliplier,1f,0.01f);
     [SerializeReference]

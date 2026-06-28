@@ -18,6 +18,16 @@ public class EffectManager : MonoBehaviour
 
     public void Update()
     {
+        for (int i =0;i<activeEffects.Count;)
+        {
+            if (!activeEffects[i].Update(Time.deltaTime))
+            { 
+                RemoveEffect(activeEffects[i]);
+                shouldRecalculate = true;
+            }
+            else i++;
+
+        }
         if (shouldRecalculate){
             ReapplyEffects();
             OnChanged?.Invoke();

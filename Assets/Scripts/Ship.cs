@@ -80,6 +80,7 @@ public class Ship : MonoBehaviour, IHittable
         {
             StartCoroutine(DamageFlash());
         }
+        ApplyEffects(hitter.GetEffects());
     }
 
     public void ApplyKnockback(IHitter hitter, Vector3 direction)
@@ -105,6 +106,11 @@ public class Ship : MonoBehaviour, IHittable
         Vector3 direction = contact.normal;
 
         ApplyKnockback(hitter,direction);
+    }
+    public void ApplyEffects(List<Effect> effects)
+    {
+        foreach (var effect in effects)
+            effectManager.AddEffect(effect);
     }
 
     public virtual void Die()

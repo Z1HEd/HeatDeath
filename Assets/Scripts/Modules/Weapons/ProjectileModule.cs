@@ -14,6 +14,7 @@ public class ProjectileModule : WeaponModule
     [SerializeField] public ScalarStat projectilePiercing = new ScalarStat(StatType.ProjectilePiercing, 0f, -1f);
     [SerializeField] public ScalarStat projectileCount = new ScalarStat(StatType.ProjectileCount, 1f, 1f);
     [SerializeField] public ScalarStat projectileSpread = new ScalarStat(StatType.ProjectileSpread, 0f, 0f);
+    [SerializeField] public List<Effect> AppliesEffects = new();
 
     private Ship currentTarget;
 

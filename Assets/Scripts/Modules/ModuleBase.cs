@@ -33,12 +33,15 @@ public abstract class ModuleBase: MonoBehaviour
     }
 
 
-    public void UpdateEffects(IReadOnlyList<Effect> effects)
+    public void UpdateEffects(IReadOnlyCollection<Effect> effects)
     {
         ResetModifiers();
-
+        int applied = 0;
         foreach (var effect in effects)
-            effect.ApplyToModule(this);
+            if (effect.IsApplicableTo(moduleDefinition)){
+                effect.ApplyToModule(this);
+                applied++;
+            }
         
         ApplyModifiers();
     }

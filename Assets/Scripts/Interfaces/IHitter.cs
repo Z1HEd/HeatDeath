@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 public interface IHitter
 {
     Transform transform {get;}
@@ -7,5 +8,6 @@ public interface IHitter
     float HPDamageMultiplier {get;}
     float BackstabMultiplier {get;}
     float KnockbackPower { get; }
+    List<Effect> GetEffects();
 }
 

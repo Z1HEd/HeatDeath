@@ -4897,6 +4897,7 @@ GameObject:
   - component: {fileID: 1683226674827135924}
   - component: {fileID: 4831795120304215577}
   - component: {fileID: 2735005139785217404}
+  - component: {fileID: 603749140259078204}
   m_Layer: 6
   m_Name: Thunder
   m_TagString: Player
@@ -5111,21 +5112,113 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EffectManager
   activeEffects:
-  - rid: 7560140318346838968
+  - rid: 7560140350874189892
   ship: {fileID: 0}
   shouldRecalculate: 0
   references:
     version: 2
     RefIds:
-    - rid: 7560140318346838968
+    - rid: 7560140350874189892
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
         stat: 6
         statModifier:
           Flat: 0
           Percent: 33
         targetTags:
         - {fileID: 11400000, guid: 2c382f2690590cb48a53051168322d54, type: 2}
+--- !u!114 &603749140259078204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3575443304599885754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fa84c8ae7f320443be96e9335452d7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ExplosionAbility
+  moduleDefinition: {fileID: 0}
+  damage:
+    currentValue: 0
+    baseValue: 0
+    minValue: 0
+  shieldDamageMultiplier:
+    currentValue: 0
+    baseValue: 1
+    minValue: -1
+  hpDamageMultiplier:
+    currentValue: 0
+    baseValue: 1
+    minValue: -1
+  backstabMultiplier:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0
+  knockback:
+    currentValue: 0
+    baseValue: 0
+    minValue: 0
+  cooldown:
+    currentValue: 0
+    baseValue: 12
+    minValue: 0
+  effectMultiplier:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0.01
+  range:
+    currentValue: 0
+    baseValue: 4
+    minValue: 0.01
+  explosionPrefab: {fileID: 5675550285233396970, guid: 3a228cbda7b267348aea17b2327d9602, type: 3}
+  baseEffects:
+  - rid: 7560140350874189893
+  - rid: 7560140350874189896
+  - rid: 7560140350874189897
+  explosionLayer: 9
+  references:
+    version: 2
+    RefIds:
+    - rid: 7560140350874189893
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: 0
+          baseValue: 3
+          minValue: 0
+        stat: 22
+        statModifier:
+          Flat: 0
+          Percent: -100
+        targetTags:
+        - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
+    - rid: 7560140350874189896
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: 0
+          baseValue: 3
+          minValue: 0
+        stat: 4
+        statModifier:
+          Flat: 0
+          Percent: -100
+        targetTags:
+        - {fileID: 11400000, guid: df54a4c9aee35f5478056d725b32b0c6, type: 2}
+    - rid: 7560140350874189897
+      type: {class: MultiplyRigidbodyVelocityEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
+        multiplier: 0.25
 --- !u!1 &6853425191156878356
 GameObject:
   m_ObjectHideFlags: 0
