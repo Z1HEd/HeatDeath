@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(ModuleManager))]
+[RequireComponent(typeof(EffectManager))]
 [RequireComponent(typeof(UpgradeManager))]
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SpriteRenderer))]
@@ -16,6 +17,9 @@ public class Ship : MonoBehaviour, IHittable
         Shader.PropertyToID("_FlashAmount");
     public Action OnDeath;
     public ModuleManager moduleManager;
+
+    public UpgradeManager upgradeManager; 
+    public EffectManager effectManager;
     [SerializeField]
     private float knockbackFreezeDuration = 0.15f;
     [SerializeField]
@@ -35,6 +39,8 @@ public class Ship : MonoBehaviour, IHittable
     protected virtual void Awake()
     {
         moduleManager = GetComponent<ModuleManager>();
+        effectManager = GetComponent<EffectManager>();
+        upgradeManager = GetComponent<UpgradeManager>();
         shipRigidbody = GetComponent<Rigidbody2D>();
         coreModule = GetComponentInChildren<ShipCoreModule>();
     }
@@ -42,12 +48,11 @@ public class Ship : MonoBehaviour, IHittable
     public virtual void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        coreModule?.Initialize();
         _material = Instantiate(spriteRenderer.sharedMaterial);
         spriteRenderer.material = _material;
     }
 
-    public virtual void Update()
+    protected virtual void Update()
     {
         if (knockbackTimeRemaining > 0f)
         {

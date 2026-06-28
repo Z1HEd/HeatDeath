@@ -4,7 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public class EnemyController : MonoBehaviour
 {
-    public const float ENEMY_SCALING_COEFFICIENT = 1.06f;
+    public const float ENEMY_SCALING_COEFFICIENT = 1.1f;
     [SerializeField]
     private List<Enemy> enemyPrefabs;
 
@@ -14,7 +14,7 @@ public class EnemyController : MonoBehaviour
     private const int maxEnemies = 3;
     private BoxCollider2D spawnCollider;
     [SerializeField]
-    UpgradeDefinition enemyScalerUpgradeDefinition;
+    List<StatModifierEffect> enemyScalerEffects = new List<StatModifierEffect>();
 
     private void Awake()
     {
@@ -39,8 +39,10 @@ public class EnemyController : MonoBehaviour
     {
         Vector2 spawnPosition = GetRandomSpawnPosition();
         Enemy enemy = Instantiate(prefab, spawnPosition, Quaternion.identity);
-        float scalingPercent = Mathf.Pow(ENEMY_SCALING_COEFFICIENT,GameController.Instance.CurrentLevel-1)*100.0f-100;
-        enemy.GetComponent<UpgradeManager>().AddUpgrade(enemyScalerUpgradeDefinition,(int)scalingPercent);
+        float scalingfraction = Mathf.Pow(ENEMY_SCALING_COEFFICIENT,GameController.Instance.CurrentLevel-1)-1;
+
+        foreach (var effect in enemyScalerEffects)
+            enemy.GetComponent<EffectManager>().AddEffect(effect.Stacked(scalingfraction));
         enemy.OnDeath += () => RemoveEnemy(enemy);
         enemies.Add(enemy);
     }

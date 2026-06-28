@@ -25,10 +25,10 @@ __# Heat Death To-Do List __
 - ✅Add enemy HP/Shield bars
 - Better enemy AI (random movements, stay in top of the screen)
 
-- Add 4 base ships to choose from
-- Make weapon modules display properly on the ship module
+- Add 5 base ships to choose from
+- ✅Make weapon modules display properly on the ship module
 
-- Basic pause menu
+- ✅Basic pause menu
 - Basic main menu
 - Saving and continuing runs
 - Improve UI

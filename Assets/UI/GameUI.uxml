@@ -15,6 +15,28 @@
         <ui:Button name="UpgradeOption3" text="Option 3" picking-mode="Position" class="upgrade-option"/>
     </ui:VisualElement>
     <ui:VisualElement name="HudPanel" class="hud-container" style="left: 0; right: 0; width: auto; bottom: 0; justify-content: center; align-content: auto; flex-grow: 0;">
+        <ui:VisualElement name="WeaponsAbilities" style="flex-grow: 1; flex-direction: row; margin-bottom: 5px;">
+            <ui:VisualElement name="Weapons" style="flex-grow: 0; margin-bottom: 0; align-items: flex-start; align-content: flex-start; flex-direction: row; min-width: 0; min-height: 0; width: initial; flex-shrink: 1; max-width: none; right: auto; position: relative; left: auto;">
+                <ui:Button text="" icon-image="" tooltip="Weapon 1" name="Weapon1" selectable="false" focusable="false" enabled="true" picking-mode="Ignore" style="flex-shrink: 0; max-width: 40px; padding-left: 0; padding-bottom: 0; padding-right: 0; padding-top: 0; margin-bottom: 0; margin-top: 0; margin-left: 0; max-height: 40px; margin-right: 10px; flex-grow: 1; align-self: stretch; background-image: none; display: flex; position: relative; top: auto; left: auto; bottom: auto; right: auto; min-width: 40px; min-height: 40px;">
+                    <ui:VisualElement picking-mode="Ignore" name="Cooldown" enabled="true" style="flex-grow: 1; left: 0; top: 0; right: 0; bottom: 0; position: absolute; background-color: rgba(0, 0, 0, 0.7); overflow: hidden;"/>
+                </ui:Button>
+                <ui:Button text="" icon-image="" tooltip="Weapon 1" name="Weapon2" enabled="true" picking-mode="Ignore" style="flex-shrink: 0; max-width: 40px; padding-left: 0; padding-bottom: 0; padding-right: 0; padding-top: 0; margin-bottom: 0; margin-top: 0; margin-left: 0; max-height: 40px; margin-right: 10px; flex-grow: 1; align-self: stretch; background-image: none; display: flex; min-width: 40px; min-height: 40px;">
+                    <ui:VisualElement picking-mode="Ignore" name="Cooldown" style="flex-grow: 1; left: 0; top: 0; right: 0; bottom: 0; position: absolute; background-color: rgba(0, 0, 0, 0.7); overflow: hidden;"/>
+                </ui:Button>
+                <ui:Button text="" icon-image="" tooltip="Weapon 1" name="Weapon3" enabled="true" picking-mode="Ignore" style="flex-shrink: 0; max-width: 40px; padding-left: 0; padding-bottom: 0; padding-right: 0; padding-top: 0; margin-bottom: 0; margin-top: 0; margin-left: 0; max-height: 40px; margin-right: 10px; flex-grow: 1; align-self: stretch; background-image: none; display: flex; min-width: 40px; min-height: 40px;">
+                    <ui:VisualElement picking-mode="Ignore" name="Cooldown" enabled="true" style="flex-grow: 1; left: 0; top: 0; right: 0; bottom: 0; position: absolute; background-color: rgba(0, 0, 0, 0.7); overflow: hidden;"/>
+                </ui:Button>
+                <ui:Button text="" icon-image="" tooltip="Weapon 1" name="Weapon4" enabled="true" picking-mode="Ignore" style="flex-shrink: 0; max-width: 40px; padding-left: 0; padding-bottom: 0; padding-right: 0; padding-top: 0; margin-bottom: 0; margin-top: 0; margin-left: 0; max-height: 40px; margin-right: 10px; flex-grow: 1; align-self: stretch; background-image: none; display: flex; min-width: 40px; min-height: 40px;">
+                    <ui:VisualElement picking-mode="Ignore" name="Cooldown" style="flex-grow: 1; left: 0; top: 0; right: 0; bottom: 0; position: absolute; background-color: rgba(0, 0, 0, 0.7); overflow: hidden; display: flex;"/>
+                </ui:Button>
+            </ui:VisualElement>
+            <ui:VisualElement name="Abilities" style="flex-grow: 1; flex-direction: row-reverse;">
+                <ui:Button text="" icon-image="" tooltip="Weapon 1" name="Ability1" style="flex-shrink: 0; max-width: 40px; padding-left: 0; padding-bottom: 0; padding-right: 0; padding-top: 0; margin-bottom: 0; margin-top: 0; margin-left: 10px; max-height: 40px; margin-right: 0; flex-grow: 1; align-self: stretch; background-image: none; display: flex; min-width: 40px; min-height: 40px;">
+                    <ui:VisualElement picking-mode="Ignore" name="Cooldown" style="flex-grow: 1; left: 0; top: 0; right: 0; bottom: 0; position: absolute; background-color: rgba(0, 0, 0, 0.7); visibility: visible; overflow: hidden; display: flex;"/>
+                    <ui:VisualElement picking-mode="Ignore" name="Duration" style="flex-grow: 1; left: 0; top: 0; right: 0; bottom: 0; position: absolute; background-color: rgba(0, 112, 255, 0.7); visibility: visible; overflow: hidden; display: flex;"/>
+                </ui:Button>
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:VisualElement name="XPBar" class="bar-background" style="height: 12px; margin-bottom: 4px;">
             <ui:VisualElement name="XPFill" class="bar-fill xp-bar"/>
             <ui:Label name="XPText" text="0/200" class="xp-text" style="padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; height: auto; font-size: 10px;"/>

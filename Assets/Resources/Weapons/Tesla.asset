@@ -16,6 +16,7 @@ MonoBehaviour:
   componentTypeName: TeslaModule
   tags:
   - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
+  - {fileID: 11400000, guid: 2c382f2690590cb48a53051168322d54, type: 2}
   - {fileID: 11400000, guid: b03028a4aa56fc64a8afacd5404ea678, type: 2}
   key: weapon.tesla
   description: Hits enemies with electricity. Chains 2 times.

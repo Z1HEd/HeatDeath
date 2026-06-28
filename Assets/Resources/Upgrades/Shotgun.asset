@@ -15,11 +15,20 @@ MonoBehaviour:
   displayName: Shotgun Upgrade
   key: upgrade.shotgun.bulletcount
   description: +2 bullets per shot
-  boundModule: {fileID: 11400000, guid: 10b237f597433b6429d00f65eefac757, type: 2}
+  boundModule: {fileID: 0}
   rarity: 0
   maxStacks: 3
-  modifiers:
-  - stat: 12
-    operation: 0
-    value: 2
-    targetTags: []
+  effects:
+  - rid: 7560140318346838743
+  references:
+    version: 2
+    RefIds:
+    - rid: 7560140318346838743
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        stat: 12
+        statModifier:
+          Flat: 2
+          Percent: 0
+        targetTags:
+        - {fileID: 11400000, guid: ab8bc2c2ea4af464784ba49640668476, type: 2}
