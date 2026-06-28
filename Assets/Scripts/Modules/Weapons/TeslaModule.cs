@@ -100,7 +100,7 @@ public class TeslaModule : WeaponModule, IHitter
     private IEnumerator ShowLightning(List<Ship> chain)
     {
         var renderers = new List<LineRenderer>();
-        Vector3 previous = transform.position;
+        Vector3 previous = firePoint!=null? firePoint.transform.position : transform.position;
 
         for (int i = 0; i < chain.Count; i++)
         {
