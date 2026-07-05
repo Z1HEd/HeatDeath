@@ -18,7 +18,7 @@ public class SpeedParticlesScaler : MonoBehaviour
     {
         var mainModule = particles.main;
         var emission = particles.emission;
-        var multiplier = Mathf.Clamp(movementModule.body.linearVelocity.magnitude / movementModule.maxSpeed,0.3f,1f);
+        var multiplier = Mathf.Clamp(movementModule.body.linearVelocity.magnitude / movementModule.maxSpeed,0.5f,1f);
         mainModule.startSpeed = startSpeed *multiplier;
         emission.rateOverTime = emissionRate *multiplier;
     }

@@ -5121,6 +5121,10 @@ MonoBehaviour:
     - rid: 7560140318346838967
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
         stat: 10
         statModifier:
           Flat: 0
@@ -5159,15 +5163,24 @@ MonoBehaviour:
   - rid: 7560140318346838964
   - rid: 7560140318346838965
   - rid: 7560140318346838966
+  - rid: 7682644111872491743
   references:
     version: 2
     RefIds:
     - rid: 7560140318346838961
       type: {class: GhostEffect, ns: , asm: Assembly-CSharp}
-      data: 
+      data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
     - rid: 7560140318346838963
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
         stat: 5
         statModifier:
           Flat: 0
@@ -5177,6 +5190,10 @@ MonoBehaviour:
     - rid: 7560140318346838964
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
         stat: 22
         statModifier:
           Flat: 0
@@ -5186,6 +5203,10 @@ MonoBehaviour:
     - rid: 7560140318346838965
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
         stat: 3
         statModifier:
           Flat: 0
@@ -5195,12 +5216,24 @@ MonoBehaviour:
     - rid: 7560140318346838966
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
         stat: 23
         statModifier:
           Flat: 10
           Percent: 0
         targetTags:
         - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
+    - rid: 7682644111872491743
+      type: {class: ChangeSpriteColorEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
+        color: {r: 1, g: 1, b: 1, a: 0.11372549}
 --- !u!1 &4005121729113178305
 GameObject:
   m_ObjectHideFlags: 0

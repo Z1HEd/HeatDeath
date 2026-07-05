@@ -5111,8 +5111,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0218620d8b9dcdd4eb062618f82253fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EffectManager
+  activeEffects: []
   ship: {fileID: 0}
   shouldRecalculate: 0
+  references:
+    version: 2
+    RefIds: []
 --- !u!114 &628116781386659854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5141,12 +5145,17 @@ MonoBehaviour:
   baseEffects:
   - rid: 7560140318346838959
   - rid: 7560140318346838960
+  - rid: 7682644111872491742
   references:
     version: 2
     RefIds:
     - rid: 7560140318346838959
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
         stat: 26
         statModifier:
           Flat: 1
@@ -5156,12 +5165,24 @@ MonoBehaviour:
     - rid: 7560140318346838960
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
         stat: 6
         statModifier:
           Flat: 0
           Percent: 100
         targetTags:
         - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
+    - rid: 7682644111872491742
+      type: {class: ChangeSpriteColorEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
+        color: {r: 1, g: 0.2509804, b: 0.2509804, a: 1}
 --- !u!1 &6853425191156878356
 GameObject:
   m_ObjectHideFlags: 0

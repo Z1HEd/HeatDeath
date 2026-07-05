@@ -5176,7 +5176,7 @@ MonoBehaviour:
     currentValue: 0
     baseValue: 4
     minValue: 0.01
-  explosionPrefab: {fileID: 5675550285233396970, guid: 3a228cbda7b267348aea17b2327d9602, type: 3}
+  explosionPrefab: {fileID: 5675550285233396970, guid: bb1ad54bce2548d488f95a2e660fbb4e, type: 3}
   baseEffects:
   - rid: 7560140350874189893
   - rid: 7560140350874189896

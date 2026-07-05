@@ -117,7 +117,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1
+      scalar: 0.6
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -4997,7 +4997,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1
+      scalar: 0.6
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -9960,8 +9960,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0218620d8b9dcdd4eb062618f82253fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EffectManager
+  activeEffects: []
   ship: {fileID: 0}
   shouldRecalculate: 0
+  references:
+    version: 2
+    RefIds: []
 --- !u!114 &4140172227944536636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9991,12 +9995,17 @@ MonoBehaviour:
   - rid: 7560140318346838736
   - rid: 7560140318346838737
   - rid: 7560140318346838738
+  - rid: 7682644111872491731
   references:
     version: 2
     RefIds:
     - rid: 7560140318346838736
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
         stat: 4
         statModifier:
           Flat: 0
@@ -10006,6 +10015,10 @@ MonoBehaviour:
     - rid: 7560140318346838737
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
         stat: 5
         statModifier:
           Flat: 0
@@ -10015,12 +10028,87 @@ MonoBehaviour:
     - rid: 7560140318346838738
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
         stat: 8
         statModifier:
           Flat: 0
           Percent: -50
         targetTags:
         - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
+    - rid: 7682644111872491731
+      type: {class: ChangeThrusterColorEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
+        color:
+          m_Mode: 1
+          m_GradientMin:
+            serializedVersion: 2
+            key0: {r: 1, g: 1, b: 1, a: 1}
+            key1: {r: 1, g: 1, b: 1, a: 1}
+            key2: {r: 0, g: 0, b: 0, a: 0}
+            key3: {r: 0, g: 0, b: 0, a: 0}
+            key4: {r: 0, g: 0, b: 0, a: 0}
+            key5: {r: 0, g: 0, b: 0, a: 0}
+            key6: {r: 0, g: 0, b: 0, a: 0}
+            key7: {r: 0, g: 0, b: 0, a: 0}
+            ctime0: 0
+            ctime1: 65535
+            ctime2: 0
+            ctime3: 0
+            ctime4: 0
+            ctime5: 0
+            ctime6: 0
+            ctime7: 0
+            atime0: 0
+            atime1: 65535
+            atime2: 0
+            atime3: 0
+            atime4: 0
+            atime5: 0
+            atime6: 0
+            atime7: 0
+            m_Mode: 0
+            m_ColorSpace: -1
+            m_NumColorKeys: 2
+            m_NumAlphaKeys: 2
+          m_GradientMax:
+            serializedVersion: 2
+            key0: {r: 1, g: 1, b: 1, a: 1}
+            key1: {r: 0.29213488, g: 0, b: 1, a: 1}
+            key2: {r: 0.31132078, g: 0.21794182, b: 0.20999467, a: 0}
+            key3: {r: 0.31132078, g: 0.21794182, b: 0.20999467, a: 0}
+            key4: {r: 0.31132078, g: 0.21794182, b: 0.20999467, a: 0}
+            key5: {r: 0, g: 0, b: 0, a: 0}
+            key6: {r: 0, g: 0, b: 0, a: 0}
+            key7: {r: 0, g: 0, b: 0, a: 0}
+            ctime0: 0
+            ctime1: 7517
+            ctime2: 31611
+            ctime3: 65535
+            ctime4: 65535
+            ctime5: 0
+            ctime6: 0
+            ctime7: 0
+            atime0: 0
+            atime1: 65535
+            atime2: 0
+            atime3: 0
+            atime4: 0
+            atime5: 0
+            atime6: 0
+            atime7: 0
+            m_Mode: 0
+            m_ColorSpace: 0
+            m_NumColorKeys: 4
+            m_NumAlphaKeys: 2
+          m_ColorMin: {r: 0, g: 0, b: 0, a: 0}
+          m_ColorMax: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &4005121729113178305
 GameObject:
   m_ObjectHideFlags: 0
@@ -10206,6 +10294,10 @@ MonoBehaviour:
   shieldRegen:
     currentValue: 0
     baseValue: 3
+    minValue: 0
+  hpRegen:
+    currentValue: 0
+    baseValue: 0
     minValue: 0
   invincibility:
     currentValue: 0
