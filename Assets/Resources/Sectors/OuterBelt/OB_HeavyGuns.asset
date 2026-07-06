@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e9ef6053a7977b4ead1d08050cd97c9, type: 3}
+  m_Name: OB_HeavyGuns
+  m_EditorClassIdentifier: Assembly-CSharp::WaveDefinition
+  waveName: Heavy Guns
+  enemyEntries:
+  - enemyPrefab: {fileID: 362748142000764873, guid: 7d41aeaf1146e9842acf84602235018f, type: 3}
+    count: 7
+    isBoss: 0
+  - enemyPrefab: {fileID: 362748142000764873, guid: 9343f78637b59a24fbf333c5fed56051, type: 3}
+    count: 7
+    isBoss: 0
+  - enemyPrefab: {fileID: 362748142000764873, guid: f126ee99fc3e081428df0a3a0e563fe5, type: 3}
+    count: 4
+    isBoss: 0
+  - enemyPrefab: {fileID: 362748142000764873, guid: 0e630dcf34176da4a9c2d473abe6c325, type: 3}
+    count: 3
+    isBoss: 0
+  - enemyPrefab: {fileID: 362748142000764873, guid: 4c06e968526149a4da7038b52b0c8d59, type: 3}
+    count: 2
+    isBoss: 0
+  maxConcurrentEnemies: 3
+  spawnCooldown: 2
+  isBossWave: 0
+  cachedTotalXP: 300
+  cachedTotalEnemyCount: 23

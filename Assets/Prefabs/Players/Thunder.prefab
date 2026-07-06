@@ -5174,7 +5174,7 @@ MonoBehaviour:
     minValue: 0.01
   range:
     currentValue: 0
-    baseValue: 4
+    baseValue: 6
     minValue: 0.01
   explosionPrefab: {fileID: 5675550285233396970, guid: bb1ad54bce2548d488f95a2e660fbb4e, type: 3}
   baseEffects:

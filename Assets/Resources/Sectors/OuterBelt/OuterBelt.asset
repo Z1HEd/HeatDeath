@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acfe8d7f07050f943b55291df7f89584, type: 3}
+  m_Name: OuterBelt
+  m_EditorClassIdentifier: Assembly-CSharp::SectorDefinition
+  sectorName: Outer Belt
+  waves:
+  - {fileID: 11400000, guid: b5629ce4501d9ff47805e4382ee00454, type: 2}
+  - {fileID: 11400000, guid: a8e7698a38fe79a4e97634dfa06768bd, type: 2}
+  - {fileID: 11400000, guid: c23a210757fc7f64090a707803af9fd0, type: 2}
+  - {fileID: 11400000, guid: 9b04afdbbe9465e458ead75172d29096, type: 2}
+  - {fileID: 11400000, guid: b113db65a0e7eb040a0d9fc591fdc8fa, type: 2}

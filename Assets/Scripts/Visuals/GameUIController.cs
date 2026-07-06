@@ -31,6 +31,7 @@ public class GameUIController : MonoBehaviour
     private VisualElement xpFill;
     private Label xpText;
     private Label levelText;
+    private Label waveText;
     private Label pausedText;
     private VisualElement upgradePanel;
     private Label upgradeHeader;
@@ -64,6 +65,7 @@ public class GameUIController : MonoBehaviour
         GameController.Instance.OnXPChanged += UpdateXPBar;
         GameController.Instance.OnLevelChanged += UpdateLevelText;
         GameController.Instance.OnLevelChanged += StartDraftSequence;
+        EnemySpawnController.Instance.OnWaveChanged += UpdateWaveText;
 
         UpdateXPBar();
         UpdateLevelText(0);
@@ -88,6 +90,7 @@ public class GameUIController : MonoBehaviour
         xpFill = root.Q<VisualElement>("XPFill");
         xpText = root.Q<Label>("XPText");
         levelText = root.Q<Label>("LevelText");
+        waveText = root.Q<Label>("WaveText");
         pausedText = root.Q<Label>("PausedText");
         upgradePanel = root.Q<VisualElement>("UpgradePanel");
         upgradeHeader = root.Q<Label>("UpgradeHeader");
@@ -368,6 +371,10 @@ public class GameUIController : MonoBehaviour
     private void UpdateLevelText(int levelsIncrease)
     {
         levelText.text = $"Level {GameController.Instance.CurrentLevel}";
+    }
+    private void UpdateWaveText(WaveDefinition wave,int waveNumber)
+    {
+        waveText.text = $"Wave {waveNumber}: {EnemySpawnController.Instance.CurrentSectorName} - {wave.WaveName}";
     }
 
     // -------------------------------------------------------------------------

@@ -2,8 +2,8 @@
     <Style src="project://database/Assets/UI/Style.uss?fileID=7433441132597879392&amp;guid=455ad7f7bf01ad84b8487fb033edc018&amp;type=3#Style"/>
     <ui:VisualElement name="TopArea" style="flex-grow: 0; height: 0; min-height: 0; bottom: auto; align-self: stretch; flex-direction: row;">
         <ui:VisualElement name="Info" style="flex-grow: 1;">
-            <ui:Label name="LevelText" text="Level 1" picking-mode="Ignore" class="level-text" style="height: 36px; font-size: 36px; padding-bottom: 0; padding-top: 0; padding-right: 0; padding-left: 0; margin-bottom: 6px;"/>
-            <ui:Label name="LocationText" text="Outer Belt&#10;" picking-mode="Ignore" class="level-text" style="height: 8px; font-size: 24px; padding-bottom: 0; padding-right: 0; padding-top: 0; padding-left: 0;"/>
+            <ui:Label name="WaveText" text="Wave 1 : Outer Belt - Assault " picking-mode="Ignore" class="level-text" style="height: 36px; font-size: 36px; padding-bottom: 0; padding-right: 0; padding-top: 0; padding-left: 0;"/>
+            <ui:Label name="LevelText" text="Level 1" picking-mode="Ignore" class="level-text" style="height: 24px; font-size: 24px; padding-bottom: 0; padding-top: 0; padding-right: 0; padding-left: 0; margin-bottom: 6px;"/>
         </ui:VisualElement>
         <ui:Button text="" name="PauseButton" style="background-image: url(&quot;project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=5866165431930342980&amp;guid=ef8f01ad8bba4844c8c04f60c57b3674&amp;type=3#Remove@2x&quot;); min-width: 80px; min-height: 80px; padding-bottom: 0; padding-right: 0; padding-top: 0; padding-left: 0; margin-bottom: 0; margin-left: 0; margin-top: 0; margin-right: 0;"/>
     </ui:VisualElement>

@@ -22,8 +22,10 @@ public class GameController : MonoBehaviour
     public int CurrentLevel => currentLevel;
     public float CurrentXP => currentXP;
 
-    public float XPRequiredForNextLevel => CalculateXPRequiredForLevel(currentLevel + 1);
+    public float XPRequiredForNextLevel => 100f;
     public float CurrentLevelProgress => currentXP / XPRequiredForNextLevel;
+
+    public static GameController Instance => instance;
 
     public bool IsWeaponDraftLevel()
     {
@@ -53,8 +55,6 @@ public class GameController : MonoBehaviour
             Instantiate(gameUIPrefab);
     }
 
-    public static GameController Instance => instance;
-
     public GameObject SpawnPlayer(ShipDefinition shipDefinition)
     {
         if (shipDefinition == null || shipDefinition.ShipPrefab == null)
@@ -75,11 +75,6 @@ public class GameController : MonoBehaviour
         
         ProcessLevelUpsFromCurrentXP();
         OnXPChanged?.Invoke();
-    }
-
-    private float CalculateXPRequiredForLevel(int level)
-    {
-        return 5f * (level - 1);
     }
 
     private void ProcessLevelUpsFromCurrentXP()

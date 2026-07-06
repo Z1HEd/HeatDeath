@@ -619,7 +619,7 @@ GameObject:
   - component: {fileID: 1304093821}
   - component: {fileID: 1304093820}
   m_Layer: 1
-  m_Name: EnemyController
+  m_Name: EnemySpawnController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -634,42 +634,55 @@ MonoBehaviour:
   m_GameObject: {fileID: 1304093819}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73ba021ead15d18449d8db82fc40669b, type: 3}
+  m_Script: {fileID: 11500000, guid: a92966f9d27545c4ba8133d07267cd92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
-  enemyPrefabs:
-  - {fileID: 362748142000764873, guid: 4c06e968526149a4da7038b52b0c8d59, type: 3}
-  - {fileID: 362748142000764873, guid: 0e630dcf34176da4a9c2d473abe6c325, type: 3}
-  - {fileID: 362748142000764873, guid: f126ee99fc3e081428df0a3a0e563fe5, type: 3}
-  - {fileID: 362748142000764873, guid: dae3405c2a5009d4eb2a61a0fed516a3, type: 3}
-  - {fileID: 362748142000764873, guid: 9343f78637b59a24fbf333c5fed56051, type: 3}
-  - {fileID: 362748142000764873, guid: 7d41aeaf1146e9842acf84602235018f, type: 3}
-  - {fileID: 362748142000764873, guid: cd849f38d0eafe94193eed3de24e10b3, type: 3}
+  sectors:
+  - {fileID: 11400000, guid: cae10b8d41c13734ebfe4adaf80de7b6, type: 2}
+  randomizeSectorOrder: 1
+  randomizeEndlessOrder: 1
+  randomizeWaveOrder: 1
   enemyScalerEffects:
-  - stat: 6
+  - duration:
+      currentValue: 0
+      baseValue: 0
+      minValue: 0
+    stat: 1
+    statModifier:
+      Flat: 0
+      Percent: 100
+    targetTags:
+    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
+  - duration:
+      currentValue: 0
+      baseValue: 0
+      minValue: 0
+    stat: 2
+    statModifier:
+      Flat: 0
+      Percent: 100
+    targetTags:
+    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
+  - duration:
+      currentValue: 0
+      baseValue: 0
+      minValue: 0
+    stat: 3
+    statModifier:
+      Flat: 0
+      Percent: 100
+    targetTags:
+    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
+  - duration:
+      currentValue: 0
+      baseValue: 0
+      minValue: 0
+    stat: 6
     statModifier:
       Flat: 0
       Percent: 100
     targetTags:
     - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
-  - stat: 1
-    statModifier:
-      Flat: 0
-      Percent: 100
-    targetTags:
-    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
-  - stat: 2
-    statModifier:
-      Flat: 0
-      Percent: 100
-    targetTags:
-    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
-  - stat: 3
-    statModifier:
-      Flat: 0
-      Percent: 100
-    targetTags:
-    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
 --- !u!61 &1304093821
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -10363,7 +10363,7 @@ MonoBehaviour:
   - {fileID: 7581100874683839773, guid: 8680070470f266d429545b15a390b54d, type: 3}
   - {fileID: 7283073850961016515, guid: 13fe4bd2d9c42d94895d2d4264fa2c1c, type: 3}
   _player: {fileID: 0}
-  xpReward: 2
+  xpReward: 6
 --- !u!114 &928230739474773828
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10390,8 +10390,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0218620d8b9dcdd4eb062618f82253fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EffectManager
+  activeEffects: []
   ship: {fileID: 0}
   shouldRecalculate: 0
+  references:
+    version: 2
+    RefIds: []
 --- !u!114 &7033119405330998455
 MonoBehaviour:
   m_ObjectHideFlags: 0
