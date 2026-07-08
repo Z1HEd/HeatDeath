@@ -107,9 +107,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TeslaModule
   moduleDefinition: {fileID: 11400000, guid: c3f5e2a31b65fc54a940668ad06e4813, type: 2}
-  firePoint: {fileID: 2137022525525021128}
+  firePoint: {fileID: 4762442769049882903}
   fireCooldown:
-    currentValue: 1.2419279
+    currentValue: 0
     baseValue: 2
     minValue: 0
   timeScale:
@@ -118,7 +118,7 @@ MonoBehaviour:
     minValue: 0
   range:
     currentValue: 0
-    baseValue: 6
+    baseValue: 5
     minValue: 0
   canAim:
     currentValue: 0
@@ -210,7 +210,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 6
+  m_Radius: 5
 --- !u!114 &1472815519448370622
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -223,7 +223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e764ef61a77dbc94eaf78330889bb2b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RangeDetector
-  range: 6
+  range: 5
   trackedShips: []
 --- !u!1 &6659556580702485918
 GameObject:

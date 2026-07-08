@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c743f8faaee6ec40b59bee7f55a932e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileModule
-  moduleDefinition: {fileID: 11400000, guid: 250a7571d34a251468762ef99fd40cad, type: 2}
+  moduleDefinition: {fileID: 11400000, guid: 90240251ac9882a4e8ff2cb834625980, type: 2}
   firePoint: {fileID: 3116449676911722161}
   fireCooldown:
     currentValue: 0

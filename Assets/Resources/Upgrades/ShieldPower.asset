@@ -18,6 +18,7 @@ MonoBehaviour:
   boundModule: {fileID: 11400000, guid: f4b1836a0ae68c6498413a6f2ec0caef, type: 2}
   rarity: 1
   maxStacks: 5
+  mutuallyExclusiveWith: []
   effects:
   - rid: 7560140318346838739
   - rid: 7560140318346838740
@@ -27,6 +28,10 @@ MonoBehaviour:
     - rid: 7560140318346838739
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        duration:
+          currentValue: Infinity
+          baseValue: Infinity
+          minValue: 0
         stat: 2
         statModifier:
           Flat: 0
@@ -36,6 +41,10 @@ MonoBehaviour:
     - rid: 7560140318346838740
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        duration:
+          currentValue: Infinity
+          baseValue: Infinity
+          minValue: 0
         stat: 3
         statModifier:
           Flat: 0

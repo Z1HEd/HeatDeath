@@ -22,7 +22,7 @@ public class TeslaModule : WeaponModule, IHitter
     [SerializeField] private Material lightningMaterial;
 
 
-    private const float CHAIN_RANGE_FALLOFF = 0.75f;
+    private const float CHAIN_RANGE_FALLOFF = 0.6f;
 
     protected override void Awake()
     {
