@@ -18,6 +18,21 @@ public class UpgradeManager : MonoBehaviour
         int current = GetStackCount(upgrade);
         return !upgrade.IsMaxStacks(current);
     }
+
+    public bool HasMutuallyExclusiveUpgradeEquipped(UpgradeDefinition upgrade)
+    {
+        if (upgrade == null)
+            return false;
+
+        foreach (var owned in stackCounts.Keys)
+        {
+            if (owned.IsMutuallyExclusiveWith(upgrade) || upgrade.IsMutuallyExclusiveWith(owned))
+                return true;
+        }
+
+        return false;
+    }
+
     public void AddUpgrade(UpgradeDefinition upgrade, int stackCount = 1)
     {
         if (!CanAddUpgrade(upgrade))

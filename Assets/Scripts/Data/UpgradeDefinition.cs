@@ -20,6 +20,7 @@ public class UpgradeDefinition : ScriptableObject
     [SerializeField] private ModuleDefinition boundModule;
     [SerializeField] private UpgradeRarity rarity;
     [SerializeField] private int maxStacks = 1;
+    [SerializeField] private List<UpgradeDefinition> mutuallyExclusiveWith = new List<UpgradeDefinition>();
     
     [SerializeReference] [SubclassSelector] private List<Effect> effects = new List<Effect>();
 
@@ -31,6 +32,16 @@ public class UpgradeDefinition : ScriptableObject
     public UpgradeRarity Rarity => rarity;
     public int MaxStacks => maxStacks;
     public IReadOnlyList<Effect> Effects => effects;
+
+    public IReadOnlyList<UpgradeDefinition> MutuallyExclusiveWith => mutuallyExclusiveWith;
+
+    public bool IsMutuallyExclusiveWith(UpgradeDefinition other)
+    {
+        if (other == null || other == this)
+            return false;
+
+        return mutuallyExclusiveWith.Contains(other);
+    }
 
     public bool IsBoundTo(ModuleDefinition module)
     {

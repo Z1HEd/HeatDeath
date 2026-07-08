@@ -33,7 +33,7 @@ __# Heat Death To-Do List __
 - Saving and continuing runs
 - Improve UI
 
-- Update enemy spawning system
+- ✅Update enemy spawning system
 - ✅Add enemy stat multipliers (based on current level)
 - Add enemy locations:
 - - ✅Outer Belt

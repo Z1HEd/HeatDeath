@@ -89,6 +89,9 @@ public class UpgradeDraftService
         if (!upgradeManager.CanAddUpgrade(upgrade))
             return false;
 
+        if (upgradeManager.HasMutuallyExclusiveUpgradeEquipped(upgrade))
+        return false;
+
         return upgrade.BoundModule != null
             ? moduleManager.HasModule(upgrade.BoundModule)
             : IsApplicableToAnyInstalledModule(upgrade, moduleManager);
