@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,12 @@ public class EnemySpawnController : MonoBehaviour
     private static EnemySpawnController instance;
     public const float ENEMY_SCALING_COEFFICIENT = 1.25f;
     public const float XP_PER_LEVEL = 100f;
+
+    [Header("Pacing")]
+    [Tooltip("Pause before each wave (after the first wave of a sector).")]
+    [SerializeField] private float waveEntryDelay = 2f;
+    [Tooltip("Pause before the first wave of a newly entered sector.")]
+    [SerializeField] private float sectorEntryDelay = 3f;
 
     [Header("Progression")]
     [Tooltip("Sectors play in this order (or shuffled, see below) without repeating. " +
@@ -126,7 +133,8 @@ public class EnemySpawnController : MonoBehaviour
         sectorQueueIndex++;
         currentWaveOrder = BuildWaveOrder(currentSector, randomizeWaveOrder);
         currentWaveIndex = 0;
-        StartWave(currentWaveOrder[currentWaveIndex]);
+        currentWave = null;
+        StartCoroutine(StartWaveAfterDelay(currentWaveOrder[currentWaveIndex], sectorEntryDelay));
     }
 
     private List<WaveDefinition> BuildWaveOrder(SectorDefinition sector, bool shuffle)
@@ -178,13 +186,24 @@ public class EnemySpawnController : MonoBehaviour
         currentWaveIndex++;
         if (currentWaveIndex < currentWaveOrder.Count)
         {
-            StartWave(currentWaveOrder[currentWaveIndex]);
+            currentWave = null;
+            StartCoroutine(StartWaveAfterDelay(currentWaveOrder[currentWaveIndex], waveEntryDelay));
         }
         else
         {
             currentWave = null;
             AdvanceToNextSector();
         }
+    }
+
+    // currentWave stays null for the duration of the pause, so Update() simply
+    // idles (no spawning, no clear-checks) until the delay elapses.
+    private IEnumerator StartWaveAfterDelay(WaveDefinition wave, float delay)
+    {
+        if (delay > 0f)
+            yield return new WaitForSeconds(delay);
+
+        StartWave(wave);
     }
 
     // ---------------------------------------------------------------
