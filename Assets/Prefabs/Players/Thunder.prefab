@@ -5190,7 +5190,7 @@ MonoBehaviour:
       data:
         duration:
           currentValue: 0
-          baseValue: 3
+          baseValue: 5
           minValue: 0
         stat: 22
         statModifier:
@@ -5203,7 +5203,7 @@ MonoBehaviour:
       data:
         duration:
           currentValue: 0
-          baseValue: 3
+          baseValue: 5
           minValue: 0
         stat: 4
         statModifier:
@@ -5218,7 +5218,7 @@ MonoBehaviour:
           currentValue: 0
           baseValue: Infinity
           minValue: 0
-        multiplier: 0.25
+        multiplier: 0.1
 --- !u!1 &6853425191156878356
 GameObject:
   m_ObjectHideFlags: 0

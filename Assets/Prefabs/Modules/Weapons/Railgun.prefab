@@ -71,7 +71,7 @@ MonoBehaviour:
     minValue: 0
   projectileDamage:
     currentValue: 0
-    baseValue: 25
+    baseValue: 30
     minValue: 0
   ShieldDamageMultiplier:
     currentValue: 0

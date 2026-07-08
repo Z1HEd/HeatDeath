@@ -10158,7 +10158,7 @@ MonoBehaviour:
   targetPosition: {x: 0, y: 0}
   maxSpeed:
     currentValue: 0
-    baseValue: 3.5
+    baseValue: 4.5
     minValue: 0
   body: {fileID: 0}
   thrust:
@@ -10377,7 +10377,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KeepDistanceModule
   distanceMin: 1
-  distanceMax: 4
+  distanceMax: 3
 --- !u!114 &7315353507716852863
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -18,25 +18,13 @@ MonoBehaviour:
     count: 1
     isBoss: 1
   - enemyPrefab: {fileID: 362748142000764873, guid: 9343f78637b59a24fbf333c5fed56051, type: 3}
-    count: 2
+    count: 4
     isBoss: 0
   - enemyPrefab: {fileID: 362748142000764873, guid: 7d41aeaf1146e9842acf84602235018f, type: 3}
     count: 2
-    isBoss: 0
-  - enemyPrefab: {fileID: 362748142000764873, guid: 4c06e968526149a4da7038b52b0c8d59, type: 3}
-    count: 3
-    isBoss: 0
-  - enemyPrefab: {fileID: 362748142000764873, guid: 0e630dcf34176da4a9c2d473abe6c325, type: 3}
-    count: 5
-    isBoss: 0
-  - enemyPrefab: {fileID: 362748142000764873, guid: f126ee99fc3e081428df0a3a0e563fe5, type: 3}
-    count: 2
-    isBoss: 0
-  - enemyPrefab: {fileID: 362748142000764873, guid: dae3405c2a5009d4eb2a61a0fed516a3, type: 3}
-    count: 3
     isBoss: 0
   maxConcurrentEnemies: 4
   spawnCooldown: 2
   waveOrder: 3
   cachedTotalXP: 300
-  cachedTotalEnemyCount: 18
+  cachedTotalEnemyCount: 7

@@ -20,13 +20,10 @@ public class BurstThrusterModule : MovementModule
     {
         cooldownTimer -= Time.deltaTime;
 
-        if (cooldownTimer > 0f)
+        if (cooldownTimer > 0f || Time.timeScale <= 0f)
             return;
 
-        if (Time.timeScale <= 0f || GameUIController.Instance.IsCursorOverUI())
-            return;
-
-        if (!UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame)
+        if ((!UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame || GameUIController.Instance.IsCursorOverUI()) && ship is Player)
             return;
 
         Vector2 toTarget = targetPosition - body.position;

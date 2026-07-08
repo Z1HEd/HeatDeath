@@ -121,8 +121,8 @@ MonoBehaviour:
     baseValue: 100
     minValue: 0
   canAim:
-    currentValue: 0
-    baseValue: 0
+    currentValue: 1
+    baseValue: 1
   projectilePrefab: {fileID: 4529807675471374433, guid: 6362a540d7efa7e488c23f6277dad9e6, type: 3}
   projectileSpeed:
     currentValue: 0
@@ -130,7 +130,7 @@ MonoBehaviour:
     minValue: 0
   projectileDamage:
     currentValue: 0
-    baseValue: 25
+    baseValue: 35
     minValue: 0
   ShieldDamageMultiplier:
     currentValue: 0

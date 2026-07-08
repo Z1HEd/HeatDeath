@@ -51,7 +51,7 @@ MonoBehaviour:
   firePoint: {fileID: 4029245818587827056}
   fireCooldown:
     currentValue: 0
-    baseValue: 1
+    baseValue: 0.75
     minValue: 0
   timeScale:
     currentValue: 1
@@ -5226,7 +5226,7 @@ MonoBehaviour:
   firePoint: {fileID: 1415212342813086038}
   fireCooldown:
     currentValue: 0
-    baseValue: 1
+    baseValue: 0.75
     minValue: 0
   timeScale:
     currentValue: 1
@@ -5469,7 +5469,7 @@ MonoBehaviour:
   firePoint: {fileID: 8774167210518566561}
   fireCooldown:
     currentValue: 0
-    baseValue: 0.75
+    baseValue: 0.5
     minValue: 0
   timeScale:
     currentValue: 1
@@ -5707,7 +5707,7 @@ MonoBehaviour:
     baseValue: 8
     minValue: 0
   projectileDamage:
-    currentValue: 30
+    currentValue: 50
     baseValue: 50
     minValue: 0
   ShieldDamageMultiplier:
@@ -5827,7 +5827,7 @@ MonoBehaviour:
   moduleDefinition: {fileID: 11400000, guid: f4b1836a0ae68c6498413a6f2ec0caef, type: 2}
   health:
     currentValue: 0
-    baseValue: 750
+    baseValue: 500
     minValue: 1
   shields:
     currentValue: 0

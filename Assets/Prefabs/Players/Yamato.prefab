@@ -5475,10 +5475,10 @@ MonoBehaviour:
   targetPosition: {x: 0, y: 0}
   maxSpeed:
     currentValue: 0
-    baseValue: 5
+    baseValue: 6
     minValue: 0
   body: {fileID: 0}
   thrust:
     currentValue: 0
-    baseValue: 0.15
+    baseValue: 0.2
     minValue: 0

@@ -141,7 +141,7 @@ MonoBehaviour:
   firePoint: {fileID: 3742177717849637036}
   fireCooldown:
     currentValue: 0
-    baseValue: 1.5
+    baseValue: 1.75
     minValue: 0
   timeScale:
     currentValue: 1
@@ -160,8 +160,8 @@ MonoBehaviour:
     baseValue: 5
     minValue: 0
   projectileDamage:
-    currentValue: 15
-    baseValue: 15
+    currentValue: 25
+    baseValue: 25
     minValue: 0
   ShieldDamageMultiplier:
     currentValue: 0.75

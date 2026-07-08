@@ -50,7 +50,7 @@ MonoBehaviour:
   moduleDefinition: {fileID: 11400000, guid: 12025bb4045e8b446bf8bb38f7229639, type: 2}
   firePoint: {fileID: 4029245818587827056}
   fireCooldown:
-    currentValue: 0
+    currentValue: 0.98
     baseValue: 1
     minValue: 0
   timeScale:
@@ -5351,7 +5351,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 878508704014828498}
-  - component: {fileID: 1420081732694351909}
+  - component: {fileID: 4145095573299018954}
   m_Layer: 7
   m_Name: Thruster
   m_TagString: Untagged
@@ -5375,7 +5375,7 @@ Transform:
   - {fileID: 1087788062086157673}
   m_Father: {fileID: 3035712108534689694}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1420081732694351909
+--- !u!114 &4145095573299018954
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5384,19 +5384,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 6591395354022937013}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: baad76691ffcccc4296979df7c28d8fe, type: 3}
+  m_Script: {fileID: 11500000, guid: 416eb35727709d24eb35898f8aacfd3b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ThrusterModule
-  moduleDefinition: {fileID: 11400000, guid: a3f144a87eb1d22449ea79a4d0b8c12b, type: 2}
+  m_EditorClassIdentifier: Assembly-CSharp::BurstThrusterModule
+  moduleDefinition: {fileID: 0}
   targetPosition: {x: 0, y: 0}
   maxSpeed:
     currentValue: 0
-    baseValue: 4
+    baseValue: 10
     minValue: 0
   body: {fileID: 0}
-  thrust:
+  steeringThrust:
     currentValue: 0
-    baseValue: 0.06
+    baseValue: 0.05
+    minValue: 0
+  burstCooldown:
+    currentValue: 0
+    baseValue: 2
     minValue: 0
 --- !u!1 &7622125486683924137
 GameObject:
@@ -5692,7 +5696,7 @@ MonoBehaviour:
   moduleDefinition: {fileID: 11400000, guid: 12025bb4045e8b446bf8bb38f7229639, type: 2}
   firePoint: {fileID: 8098290535768811927}
   fireCooldown:
-    currentValue: 0
+    currentValue: 0.78000003
     baseValue: 0.8
     minValue: 0
   timeScale:
