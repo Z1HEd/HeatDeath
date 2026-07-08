@@ -31,6 +31,6 @@ MonoBehaviour:
     isBoss: 0
   maxConcurrentEnemies: 3
   spawnCooldown: 2
-  isBossWave: 0
+  waveOrder: 2
   cachedTotalXP: 300
   cachedTotalEnemyCount: 23

@@ -5331,15 +5331,15 @@ MonoBehaviour:
   moduleDefinition: {fileID: 11400000, guid: f4b1836a0ae68c6498413a6f2ec0caef, type: 2}
   health:
     currentValue: 0
-    baseValue: 50
+    baseValue: 100
     minValue: 1
   shields:
     currentValue: 0
-    baseValue: 40
+    baseValue: 75
     minValue: 0
   shieldRegen:
     currentValue: 0
-    baseValue: 0
+    baseValue: 3
     minValue: 0
   hpRegen:
     currentValue: 0

@@ -75,7 +75,7 @@ public class Projectile : MonoBehaviour, IHitter
             return false;
 
         var hittable = collision.GetComponent<IHittable>();
-        if (hittable == null)
+        if (hittable == null || hittable.IsDead)
             return false;
         
         hittable.Hit(this);

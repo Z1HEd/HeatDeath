@@ -6,7 +6,7 @@ using UnityEngine;
 public class EnemySpawnController : MonoBehaviour
 {
     private static EnemySpawnController instance;
-    public const float ENEMY_SCALING_COEFFICIENT = 1.5f;
+    public const float ENEMY_SCALING_COEFFICIENT = 1.25f;
     public const float XP_PER_LEVEL = 100f;
 
     [Header("Progression")]
@@ -23,9 +23,10 @@ public class EnemySpawnController : MonoBehaviour
 
     [Header("Scaling")]
     [SerializeField] private List<StatModifierEffect> enemyScalerEffects = new List<StatModifierEffect>();
-
+    
     private BoxCollider2D spawnCollider;
 
+    // Sector/wave progression state
     private List<SectorDefinition> sectorQueue = new List<SectorDefinition>();
     private int sectorQueueIndex;
     private bool endlessMode;
@@ -35,20 +36,19 @@ public class EnemySpawnController : MonoBehaviour
     private int currentWaveIndex;
     private WaveDefinition currentWave;
 
+    // Wave spawning state
     private List<int> remainingCounts = new List<int>();
     private int spawnedThisWave;
     private float spawnTimer;
     private readonly List<Enemy> aliveEnemies = new List<Enemy>();
 
     private float xpCounter;
-
     private int waveCounter;
     public int WaveCounter => waveCounter;
-    public static EnemySpawnController Instance => instance;
 
     public event Action<WaveDefinition, int> OnWaveChanged;
-
     public String CurrentSectorName => currentSector.SectorName;
+    public static EnemySpawnController Instance => instance;
 
     private void Awake()
     {
@@ -70,13 +70,21 @@ public class EnemySpawnController : MonoBehaviour
     private void Update()
     {
         if (currentWave == null) return;
-
+ 
         bool doneSpawning = spawnedThisWave >= currentWave.TotalEnemyCount;
-
+ 
         if (!doneSpawning)
         {
             spawnTimer += Time.deltaTime;
-            if (spawnTimer >= currentWave.SpawnCooldown && aliveEnemies.Count < currentWave.MaxConcurrentEnemies)
+ 
+            // SpawnCooldown is the cooldown at (maxConcurrentEnemies - 1) alive;
+            // it scales down linearly to 0 (instant) at 0 alive.
+            int denom = currentWave.MaxConcurrentEnemies - 1;
+            float dynamicCooldown = denom > 0
+                ? currentWave.SpawnCooldown * aliveEnemies.Count / denom
+                : 0f;
+ 
+            if (spawnTimer >= dynamicCooldown && aliveEnemies.Count < currentWave.MaxConcurrentEnemies)
             {
                 TrySpawnFromWave();
                 spawnTimer = 0f;
@@ -121,22 +129,28 @@ public class EnemySpawnController : MonoBehaviour
         StartWave(currentWaveOrder[currentWaveIndex]);
     }
 
-    // Builds the play order for a sector's waves. The boss wave (assumed to be
-    // the last entry in SectorDefinition, per its own validation) is always kept last;
-    // everything before it is optionally shuffled so waves don't play in the
-    // same order every time the sector is visited.
     private List<WaveDefinition> BuildWaveOrder(SectorDefinition sector, bool shuffle)
     {
-        var waves = new List<WaveDefinition>(sector.Waves);
-        if (waves.Count == 0) return waves;
+        var groups = new SortedDictionary<int, List<WaveDefinition>>();
+        foreach (var wave in sector.Waves)
+        {
+            if (wave == null) continue;
+            if (!groups.TryGetValue(wave.WaveOrder, out var group))
+            {
+                group = new List<WaveDefinition>();
+                groups[wave.WaveOrder] = group;
+            }
+            group.Add(wave);
+        }
 
-        WaveDefinition boss = waves[waves.Count - 1];
-        waves.RemoveAt(waves.Count - 1);
-
-        if (shuffle) Shuffle(waves);
-
-        waves.Add(boss);
-        return waves;
+        var result = new List<WaveDefinition>();
+        foreach (var kvp in groups)
+        {
+            var group = kvp.Value;
+            if (shuffle) Shuffle(group);
+            result.AddRange(group);
+        }
+        return result;
     }
 
     private void StartWave(WaveDefinition wave)
@@ -153,7 +167,6 @@ public class EnemySpawnController : MonoBehaviour
         waveCounter++;
         OnWaveChanged?.Invoke(currentWave, waveCounter);
 
-        // Edge case: a wave with no enemies configured clears itself instantly.
         if (wave.TotalEnemyCount == 0)
             OnWaveCleared();
     }
@@ -191,13 +204,31 @@ public class EnemySpawnController : MonoBehaviour
         SpawnEnemy(prefab);
     }
 
-    // Picks a random entry among those that still have enemies left to spawn.
-    private int PickWeightedRemainingEntry()
+   private int PickWeightedRemainingEntry()
     {
+        var entries = currentWave.EnemyEntries;
+ 
+        int bossTotal = 0;
+        for (int i = 0; i < remainingCounts.Count; i++)
+        {
+            if (entries[i].isBoss) bossTotal += remainingCounts[i];
+        }
+ 
+        if (bossTotal > 0)
+        {
+            int bossRoll = UnityEngine.Random.Range(0, bossTotal);
+            for (int i = 0; i < remainingCounts.Count; i++)
+            {
+                if (!entries[i].isBoss) continue;
+                if (bossRoll < remainingCounts[i]) return i;
+                bossRoll -= remainingCounts[i];
+            }
+        }
+ 
         int totalRemaining = 0;
         foreach (var r in remainingCounts) totalRemaining += r;
         if (totalRemaining <= 0) return -1;
-
+ 
         int roll = UnityEngine.Random.Range(0, totalRemaining);
         for (int i = 0; i < remainingCounts.Count; i++)
         {
@@ -212,7 +243,8 @@ public class EnemySpawnController : MonoBehaviour
         Vector2 spawnPosition = GetRandomSpawnPosition();
         Enemy enemy = Instantiate(prefab, spawnPosition, Quaternion.identity);
 
-        float scalingFraction = Mathf.Pow(ENEMY_SCALING_COEFFICIENT, waveCounter) - 1f;
+        float levelEquivalent = xpCounter / XP_PER_LEVEL;
+        float scalingFraction = Mathf.Pow(ENEMY_SCALING_COEFFICIENT, levelEquivalent) - 1f;
 
         foreach (var effect in enemyScalerEffects)
             enemy.GetComponent<EffectManager>().AddEffect(effect.Stacked(scalingFraction));

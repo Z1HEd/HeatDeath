@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5e9ef6053a7977b4ead1d08050cd97c9, type: 3}
-  m_Name: OB_Boss
+  m_Name: OB_Harbringer
   m_EditorClassIdentifier: Assembly-CSharp::WaveDefinition
   waveName: Harbringer
   enemyEntries:
@@ -36,7 +36,7 @@ MonoBehaviour:
     count: 3
     isBoss: 0
   maxConcurrentEnemies: 4
-  spawnCooldown: 3
-  isBossWave: 1
+  spawnCooldown: 2
+  waveOrder: 3
   cachedTotalXP: 300
   cachedTotalEnemyCount: 18

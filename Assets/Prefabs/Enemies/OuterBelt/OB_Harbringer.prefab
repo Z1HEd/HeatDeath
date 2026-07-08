@@ -51,7 +51,7 @@ MonoBehaviour:
   firePoint: {fileID: 4029245818587827056}
   fireCooldown:
     currentValue: 0
-    baseValue: 1.4
+    baseValue: 1
     minValue: 0
   timeScale:
     currentValue: 1
@@ -5226,7 +5226,7 @@ MonoBehaviour:
   firePoint: {fileID: 1415212342813086038}
   fireCooldown:
     currentValue: 0
-    baseValue: 1.4
+    baseValue: 1
     minValue: 0
   timeScale:
     currentValue: 1
@@ -5469,7 +5469,7 @@ MonoBehaviour:
   firePoint: {fileID: 8774167210518566561}
   fireCooldown:
     currentValue: 0
-    baseValue: 1.2
+    baseValue: 0.75
     minValue: 0
   timeScale:
     currentValue: 1
@@ -5688,7 +5688,7 @@ MonoBehaviour:
   firePoint: {fileID: 1378227089662196627}
   fireCooldown:
     currentValue: 0
-    baseValue: 2.5
+    baseValue: 1.5
     minValue: 0
   timeScale:
     currentValue: 1
@@ -5708,7 +5708,7 @@ MonoBehaviour:
     minValue: 0
   projectileDamage:
     currentValue: 30
-    baseValue: 30
+    baseValue: 50
     minValue: 0
   ShieldDamageMultiplier:
     currentValue: 0.75
@@ -5827,15 +5827,15 @@ MonoBehaviour:
   moduleDefinition: {fileID: 11400000, guid: f4b1836a0ae68c6498413a6f2ec0caef, type: 2}
   health:
     currentValue: 0
-    baseValue: 250
+    baseValue: 750
     minValue: 1
   shields:
     currentValue: 0
-    baseValue: 250
+    baseValue: 500
     minValue: 0
   shieldRegen:
     currentValue: 0
-    baseValue: 3
+    baseValue: 20
     minValue: 0
   hpRegen:
     currentValue: 0
@@ -6234,7 +6234,7 @@ MonoBehaviour:
   - {fileID: 7581100874683839773, guid: 8680070470f266d429545b15a390b54d, type: 3}
   - {fileID: 7283073850961016515, guid: 13fe4bd2d9c42d94895d2d4264fa2c1c, type: 3}
   _player: {fileID: 0}
-  xpReward: 150
+  xpReward: 200
 --- !u!114 &928230739474773828
 MonoBehaviour:
   m_ObjectHideFlags: 0

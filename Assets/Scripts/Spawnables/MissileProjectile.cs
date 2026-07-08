@@ -76,7 +76,7 @@ public class MissileProjectile : Projectile
             return false;
 
         var hittable = collision.GetComponent<IHittable>();
-        if (hittable == null)
+        if (hittable == null || hittable.IsDead)
             return false;
 
         Explosion explosion = Instantiate(explosionPrefab,transform.position,transform.rotation);

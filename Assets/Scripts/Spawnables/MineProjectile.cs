@@ -29,7 +29,7 @@ public class MineProjectile : Projectile
 
     protected override void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.GetComponent<Ship>() == null) return;
+        if (collision.GetComponent<Ship>() == null  || collision.GetComponent<Ship>().IsDead) return;
         Explode();
     }
 
