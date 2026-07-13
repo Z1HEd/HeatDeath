@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f862af129677ce44c899cfb7918b2251, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Explosion
+  shakeScreenDuration: 0
 --- !u!212 &4813600566757404590
 SpriteRenderer:
   serializedVersion: 2

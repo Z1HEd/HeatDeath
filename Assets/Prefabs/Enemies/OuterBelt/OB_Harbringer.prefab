@@ -87,7 +87,7 @@ MonoBehaviour:
     minValue: 0
   projectileKnockback:
     currentValue: 0
-    baseValue: 0
+    baseValue: 2
     minValue: 0
   projectilePiercing:
     currentValue: 0
@@ -5262,7 +5262,7 @@ MonoBehaviour:
     minValue: 0
   projectileKnockback:
     currentValue: 0
-    baseValue: 0
+    baseValue: 2
     minValue: 0
   projectilePiercing:
     currentValue: 0
@@ -5505,7 +5505,7 @@ MonoBehaviour:
     minValue: 0
   projectileKnockback:
     currentValue: 0
-    baseValue: 0
+    baseValue: 2
     minValue: 0
   projectilePiercing:
     currentValue: 0
@@ -5724,7 +5724,7 @@ MonoBehaviour:
     minValue: 0
   projectileKnockback:
     currentValue: 1
-    baseValue: 1
+    baseValue: 4
     minValue: 0
   projectilePiercing:
     currentValue: 0

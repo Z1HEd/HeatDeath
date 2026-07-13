@@ -133,7 +133,7 @@ MonoBehaviour:
   moduleDefinition: {fileID: 11400000, guid: 250a7571d34a251468762ef99fd40cad, type: 2}
   firePoint: {fileID: 416210592748895249}
   fireCooldown:
-    currentValue: 1.73
+    currentValue: 0
     baseValue: 1.75
     minValue: 0
   timeScale:
@@ -170,7 +170,7 @@ MonoBehaviour:
     minValue: 0
   projectileKnockback:
     currentValue: 0
-    baseValue: 0
+    baseValue: 0.75
     minValue: 0
   projectilePiercing:
     currentValue: 0

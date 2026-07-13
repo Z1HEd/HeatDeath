@@ -177,7 +177,7 @@ MonoBehaviour:
     minValue: 0
   projectileKnockback:
     currentValue: 1
-    baseValue: 1
+    baseValue: 4
     minValue: 0
   projectilePiercing:
     currentValue: 0

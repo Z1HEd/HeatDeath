@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 public class Explosion : MonoBehaviour, IHitter
 {
+    [SerializeField]
+    public float shakeScreenDuration = 0.25f;
     public float Damage { get; private set; }
     public float KnockbackPower { get; private set; }
     public float HPDamageMultiplier { get; private set; }
@@ -49,6 +51,7 @@ public class Explosion : MonoBehaviour, IHitter
         expanding = true;
 
         circleCollider.enabled = true;
+        ScreenShaker.Instance.Shake(shakeScreenDuration,.1f);
     }
 
     private void Update()

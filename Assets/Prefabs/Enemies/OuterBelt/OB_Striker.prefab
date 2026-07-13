@@ -50,8 +50,8 @@ MonoBehaviour:
   moduleDefinition: {fileID: 11400000, guid: 12025bb4045e8b446bf8bb38f7229639, type: 2}
   firePoint: {fileID: 4029245818587827056}
   fireCooldown:
-    currentValue: 0.98
-    baseValue: 1
+    currentValue: 0
+    baseValue: 0.75
     minValue: 0
   timeScale:
     currentValue: 1
@@ -87,7 +87,7 @@ MonoBehaviour:
     minValue: 0
   projectileKnockback:
     currentValue: 0
-    baseValue: 0
+    baseValue: 2
     minValue: 0
   projectilePiercing:
     currentValue: 0
@@ -5696,7 +5696,7 @@ MonoBehaviour:
   moduleDefinition: {fileID: 11400000, guid: 12025bb4045e8b446bf8bb38f7229639, type: 2}
   firePoint: {fileID: 8098290535768811927}
   fireCooldown:
-    currentValue: 0.78000003
+    currentValue: 0
     baseValue: 0.8
     minValue: 0
   timeScale:
@@ -5733,7 +5733,7 @@ MonoBehaviour:
     minValue: 0
   projectileKnockback:
     currentValue: 0
-    baseValue: 0
+    baseValue: 2
     minValue: 0
   projectilePiercing:
     currentValue: 0

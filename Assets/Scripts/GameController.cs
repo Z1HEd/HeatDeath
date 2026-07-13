@@ -7,10 +7,10 @@ public class GameController : MonoBehaviour
     private static GameController instance;
     
     [SerializeField]
-    private int currentLevel = 1;
+    private int currentLevel = 0;
     [SerializeField]
     private float currentXP = 0f;
-    private List<int> weaponDraftLevels = new List<int> { 1, 5, 10, 20 };
+    private List<int> weaponDraftLevels = new List<int> { 0, 10, 20, 40 };
     [SerializeField]
     private GameObject gameUIPrefab;
     [SerializeField]
