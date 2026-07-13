@@ -11,8 +11,9 @@ public class ChangeSpriteColorEffect : Effect
 
     public ChangeSpriteColorEffect() { }
 
-    public ChangeSpriteColorEffect(Color color)
+    public ChangeSpriteColorEffect(ResourceStat duration, Color color)
     {
+        this.duration = duration;
         this.color = color;
     }
 
@@ -44,6 +45,7 @@ public class ChangeSpriteColorEffect : Effect
 
     public override Effect Stacked(float times)
     {
-        return new ChangeSpriteColorEffect(color);
+        var durationCopy = new ResourceStat(duration.Type, duration.BaseValue, duration.MinValue);
+        return new ChangeSpriteColorEffect(durationCopy, color);
     }
 }

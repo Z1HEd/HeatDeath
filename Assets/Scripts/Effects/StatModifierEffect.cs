@@ -43,6 +43,7 @@ public class StatModifierEffect : Effect
     }
     public override Effect Stacked(float times)
     {
-        return new StatModifierEffect(stat,statModifier*times,targetTags, duration);
+        var durationCopy = new ResourceStat(duration.Type, duration.BaseValue, duration.MinValue);
+        return new StatModifierEffect(stat,statModifier*times,targetTags, durationCopy);
     }
 }

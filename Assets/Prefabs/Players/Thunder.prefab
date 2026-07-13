@@ -5190,7 +5190,7 @@ MonoBehaviour:
       data:
         duration:
           currentValue: 0
-          baseValue: 5
+          baseValue: 4
           minValue: 0
         stat: 22
         statModifier:
@@ -5203,7 +5203,7 @@ MonoBehaviour:
       data:
         duration:
           currentValue: 0
-          baseValue: 5
+          baseValue: 4
           minValue: 0
         stat: 4
         statModifier:

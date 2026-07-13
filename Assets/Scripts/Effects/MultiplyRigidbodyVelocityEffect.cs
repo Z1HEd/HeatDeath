@@ -7,8 +7,9 @@ public class MultiplyRigidbodyVelocityEffect : Effect
     [SerializeField]
     private float multiplier;
     public MultiplyRigidbodyVelocityEffect(){}
-    public MultiplyRigidbodyVelocityEffect(float Multiplier)
+    public MultiplyRigidbodyVelocityEffect(ResourceStat duration, float Multiplier)
     {
+        this.duration = duration;
         multiplier = Multiplier;
     }
     public override bool IsApplicableTo(ModuleDefinition definition){return false;}
@@ -18,5 +19,9 @@ public class MultiplyRigidbodyVelocityEffect : Effect
         ship.GetComponent<Rigidbody2D>().linearVelocity *=multiplier;
     }
     public override void RemoveFromShip(Ship ship) {}
-    public override Effect Stacked(float times){return new MultiplyRigidbodyVelocityEffect(multiplier*times);}
+    public override Effect Stacked(float times)
+    {
+        var durationCopy = new ResourceStat(duration.Type, duration.BaseValue, duration.MinValue);
+        return new MultiplyRigidbodyVelocityEffect(durationCopy,multiplier*times);
+    }
 }

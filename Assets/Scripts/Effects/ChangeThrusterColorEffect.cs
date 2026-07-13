@@ -13,8 +13,9 @@ public class ChangeThrusterColorEffect : Effect
 
     public ChangeThrusterColorEffect() { }
 
-    public ChangeThrusterColorEffect(ParticleSystem.MinMaxGradient color)
+    public ChangeThrusterColorEffect(ResourceStat duration, ParticleSystem.MinMaxGradient color)
     {
+        this.duration = duration;
         this.color = color;
     }
 
@@ -80,6 +81,7 @@ public class ChangeThrusterColorEffect : Effect
 
     public override Effect Stacked(float times)
     {
-        return new ChangeThrusterColorEffect(color);
+        var durationCopy = new ResourceStat(duration.Type, duration.BaseValue, duration.MinValue);
+        return new ChangeThrusterColorEffect(durationCopy, color);
     }
 }
