@@ -38,8 +38,26 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 1343910827
+    locked: 0
+  - name: Ships
+    uniqueID: 614429577
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Turrets
+    uniqueID: 1468492301
+    locked: 0
+  - name: Shields
+    uniqueID: 2666144635
+    locked: 0
+  - name: Projectiles
+    uniqueID: 1804148673
+    locked: 0
+  - name: Effects
+    uniqueID: 1087405025
     locked: 0
   m_RenderingLayers:
   - Default
