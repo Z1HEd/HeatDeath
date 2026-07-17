@@ -6,6 +6,13 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class Projectile : MonoBehaviour, IHitter
 {
+    [SerializeField]
+    public GameObject sparksPrefab;
+
+    [SerializeField, Range(0f, 1f)]
+    [Tooltip("How much the spark direction leans toward the surface normal vs. continuing along the bullet's travel direction. 0 = pure travel direction, 1 = pure normal.")]
+    private float sparkNormalBias = 0.3f;
+
     [field: SerializeField]
     public float Damage { get; protected set; } = 10f;
     public float ShieldDamageMultiplier { get; protected set; } = 1f;
@@ -13,10 +20,10 @@ public class Projectile : MonoBehaviour, IHitter
     public float BackstabMultiplier { get; protected set; } = 1f;
     public float KnockbackPower { get; protected set; } = 0f;
     public List<Effect> appliesEffects = new();
-    public List<Effect> GetEffects() {return appliesEffects;}
+    public List<Effect> GetEffects() { return appliesEffects; }
     protected Rigidbody2D rb;
     protected SpriteRenderer spriteRenderer;
-    public bool isDead {get;protected set;}
+    public bool isDead { get; protected set; }
     private int remainingPierceHits;
     private bool hasInfinitePierce;
 
@@ -77,11 +84,11 @@ public class Projectile : MonoBehaviour, IHitter
         var hittable = collision.GetComponent<IHittable>();
         if (hittable == null || hittable.IsDead)
             return false;
-        
         hittable.Hit(this);
         
+        SpawnSparks(collision);
         if (collision.GetComponent<Rigidbody2D>() != null)
-            hittable.ApplyKnockback(this, transform.position-collision.transform.position);
+            hittable.ApplyKnockback(this, transform.position - collision.transform.position);
 
         TryConsumeCharge();
         return true;
@@ -103,10 +110,35 @@ public class Projectile : MonoBehaviour, IHitter
         return true;
     }
 
+    protected virtual void SpawnSparks(Collider2D hitCollider)
+    {
+        if (sparksPrefab == null || hitCollider == null)
+            return;
+
+        Vector2 incomingDir = rb.linearVelocity.sqrMagnitude > 0.0001f
+            ? rb.linearVelocity.normalized
+            : (Vector2)transform.right;
+
+        Vector2 normal = transform.position - hitCollider.transform.position;
+
+        if (normal.sqrMagnitude < 0.0001f)
+            normal = -incomingDir; // degenerate fallback, still outward-ish for head-on hits
+        normal.Normalize();
+
+        Vector2 sparkDir = Vector2.Lerp(incomingDir, normal, sparkNormalBias).normalized;
+        if (sparkDir.sqrMagnitude < 0.0001f)
+            sparkDir = incomingDir;
+
+        float angle = Mathf.Atan2(sparkDir.y, sparkDir.x) * Mathf.Rad2Deg;
+
+        GameObject sparks = Instantiate(sparksPrefab, transform.position, Quaternion.Euler(0f, 0f, angle));
+        sparks.transform.right = sparkDir; // align prefab's local "forward" (right) axis with spark direction
+    }
+
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
         if (isDead) return;
+
         TryApplyHit(collision);
     }
 }
-

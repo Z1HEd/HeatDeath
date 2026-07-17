@@ -202,6 +202,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97991d6ea1863f74494d89a04a60f749, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
+  sparksPrefab: {fileID: 8471937396547440258, guid: 4da0c084adfe87fc4b2c76a018886e35, type: 3}
+  <Damage>k__BackingField: 10
 --- !u!96 &8440399078109587810
 TrailRenderer:
   serializedVersion: 4
