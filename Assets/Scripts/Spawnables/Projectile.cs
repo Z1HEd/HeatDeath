@@ -88,7 +88,7 @@ public class Projectile : MonoBehaviour, IHitter
         
         SpawnSparks(collision);
         if (collision.GetComponent<Rigidbody2D>() != null)
-            hittable.ApplyKnockback(this, transform.position - collision.transform.position);
+            hittable.ApplyKnockback(this, -rb.linearVelocity.normalized);
 
         TryConsumeCharge();
         return true;
