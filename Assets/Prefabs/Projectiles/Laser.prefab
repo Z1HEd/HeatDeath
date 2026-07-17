@@ -120,6 +120,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d435b6bdda296974380af52c8d1dfffc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LaserProjectile
+  sparksPrefab: {fileID: 0}
+  sparkNormalBias: 0.3
+  <Damage>k__BackingField: 10
   lifeTime: 0.25
   baseColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &8609777888533767894
@@ -199,8 +202,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1804148673
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}

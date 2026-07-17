@@ -143,8 +143,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1804148673
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 56aa5ee3308ed0f45b496b709d91e2d6, type: 3}
@@ -169,6 +169,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9295733488116c44af238d62b6e7488, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MineProjectile
+  sparksPrefab: {fileID: 0}
+  sparkNormalBias: 0.3
+  <Damage>k__BackingField: 10
   explosionPrefab: {fileID: 5675550285233396970, guid: 3a228cbda7b267348aea17b2327d9602, type: 3}
-  explosionRadius: 2
+  explosionRange: 3
   drag: 3

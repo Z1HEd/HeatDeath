@@ -188,8 +188,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1804148673
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 3d6309115ba786d4683848ecd278a450, type: 3}
@@ -314,9 +314,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0e089d123b44e345a8fc17f9398fa2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MissileProjectile
+  sparksPrefab: {fileID: 0}
+  sparkNormalBias: 0.3
+  <Damage>k__BackingField: 10
   lockDelay: 0.5
   turnSpeedDegrees: 120
   targetLockRange:
+    currentValue: 0
     baseValue: 5
     minValue: 0
   explosionRange: 2.5
