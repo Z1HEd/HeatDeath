@@ -8,7 +8,6 @@ public class EnemySpawnController : MonoBehaviour
 {
     private static EnemySpawnController instance;
     public const float ENEMY_SCALING_COEFFICIENT = 1.25f;
-    public const float XP_PER_LEVEL = 100f;
 
     [Header("Pacing")]
     [Tooltip("Pause before each wave (after the first wave of a sector).")]
@@ -262,7 +261,7 @@ public class EnemySpawnController : MonoBehaviour
         Vector2 spawnPosition = GetRandomSpawnPosition();
         Enemy enemy = Instantiate(prefab, spawnPosition, Quaternion.identity);
 
-        float levelEquivalent = xpCounter / XP_PER_LEVEL;
+        float levelEquivalent = xpCounter / GameController.XP_PER_LEVEL;
         float scalingFraction = Mathf.Pow(ENEMY_SCALING_COEFFICIENT, levelEquivalent) - 1f;
 
         foreach (var effect in enemyScalerEffects)

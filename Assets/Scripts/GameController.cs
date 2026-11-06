@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class GameController : MonoBehaviour
 {
     private static GameController instance;
+    public const float XP_PER_LEVEL = 100f;
     
     [SerializeField]
     private int currentLevel = 0;
@@ -22,7 +23,7 @@ public class GameController : MonoBehaviour
     public int CurrentLevel => currentLevel;
     public float CurrentXP => currentXP;
 
-    public float XPRequiredForNextLevel => 100f;
+    public float XPRequiredForNextLevel => XP_PER_LEVEL;
     public float CurrentLevelProgress => currentXP / XPRequiredForNextLevel;
 
     public static GameController Instance => instance;
