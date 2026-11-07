@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,7 +17,9 @@ public class TeslaModule : WeaponModule, IHitter
     public float BackstabMultiplier => backstabMultiplier;
     public List<Effect> GetEffects(){ return EmitEffects(appliesEffects);}
     [SerializeField] private int maxChainTargets = 3;
-    [SerializeField] private float lightningDuration = 0.1f;
+    [SerializeField] private float lightningDuration = 0.2f;
+    [Tooltip("Seconds between re-rolls of the bolt shape.")]
+    [SerializeField] private float jitterInterval = 0.03f;
     [SerializeField] private Material lightningMaterial;
 
 
@@ -59,7 +60,7 @@ public class TeslaModule : WeaponModule, IHitter
             return;
 
         ApplyChainDamage(chain);
-        StartCoroutine(ShowLightning(chain));
+        ShowLightning(chain);
     }
 
     private List<Ship> BuildChain()
@@ -97,37 +98,26 @@ public class TeslaModule : WeaponModule, IHitter
         }
     }
 
-    private IEnumerator ShowLightning(List<Ship> chain)
+    // One bolt per hop: fire point -> chain[0] -> chain[1] -> ...
+    private void ShowLightning(List<Ship> chain)
     {
-        var renderers = new List<LineRenderer>();
-        Vector3 previous = firePoint!=null? firePoint.transform.position : transform.position;
+        if (lightningMaterial == null)
+            return;
 
-        for (int i = 0; i < chain.Count; i++)
+        // Draw above ships, on the weapon's own sorting layer.
+        var sprite = GetComponent<SpriteRenderer>();
+        int sortingLayerID = sprite != null ? sprite.sortingLayerID : 0;
+        int sortingOrder = (sprite != null ? sprite.sortingOrder : 0) + 10;
+
+        Transform from = firePoint != null ? firePoint : transform;
+        foreach (Ship target in chain)
         {
-            if (chain[i] == null)
+            if (target == null)
                 continue;
 
-            GameObject go = new GameObject("Lightning");
-            LineRenderer lr = go.AddComponent<LineRenderer>();
-            lr.positionCount = 2;
-            lr.SetPosition(0, previous);
-            lr.SetPosition(1, chain[i].transform.position);
-            lr.startWidth = 0.1f;
-            lr.endWidth = 0.05f;
-            lr.useWorldSpace = true;
-            if (lightningMaterial != null)
-                lr.material = lightningMaterial;
-
-            renderers.Add(lr);
-            previous = chain[i].transform.position;
-        }
-
-        yield return new WaitForSeconds(lightningDuration);
-
-        for (int i = 0; i < renderers.Count; i++)
-        {
-            if (renderers[i] != null)
-                Destroy(renderers[i].gameObject);
+            LightningBolt.Spawn(from, from.position, target.transform, lightningDuration, jitterInterval,
+                lightningMaterial, sortingLayerID, sortingOrder);
+            from = target.transform;
         }
     }
 
