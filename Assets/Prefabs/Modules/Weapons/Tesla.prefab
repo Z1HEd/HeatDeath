@@ -140,8 +140,9 @@ MonoBehaviour:
     baseValue: 1
     minValue: 0
   maxChainTargets: 3
-  lightningDuration: 0.1
-  lightningMaterial: {fileID: 0}
+  lightningDuration: 0.2
+  jitterInterval: 0.03
+  lightningMaterial: {fileID: 2100000, guid: cc2ae67600de477bbaa6aa989854bc50, type: 2}
 --- !u!1 &3014855846730604681
 GameObject:
   m_ObjectHideFlags: 0
