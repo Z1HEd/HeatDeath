@@ -59,17 +59,10 @@ public class ThrusterModule : MovementModule
         targetPosition = newTarget;
     }
 
-    protected override void ApplyModifiers()
+    protected override void CollectStats(List<IStat> stats)
     {
-        base.ApplyModifiers();
+        base.CollectStats(stats);
 
-        thrust.Recalculate(currentModifiers);
-    }
-
-    protected override void ResetModifiers()
-    {
-        base.ResetModifiers();
-
-        thrust.ResetToBase();
+        stats.Add(thrust);
     }
 }

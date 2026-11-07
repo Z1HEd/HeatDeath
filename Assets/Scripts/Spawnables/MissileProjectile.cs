@@ -35,7 +35,6 @@ public class MissileProjectile : Projectile
             Debug.LogError("Missile expects MissileModule, got: "+ sourceModule);
         
         rangeDetector.Initialize(targetLockRange);
-        targetLockRange.CurrentValueChanged += UpdateRange;
     }
 
     private void FixedUpdate()

@@ -17,7 +17,7 @@ public class ShipCoreModule : ModuleBase, IHitter
     [SerializeField] private ScalarStat damage = new ScalarStat(StatType.Damage, 10f, 0f);
     [SerializeField] private ScalarStat knockbackPower = new ScalarStat(StatType.Knockback, 1f, 0f);
     [SerializeField] private ScalarStat backstabMultiplier = new ScalarStat(StatType.BackstabMultiplier, 1f, 0f);
-    [SerializeField] private List<Effect> appliesEffects = new();
+    [SerializeReference, SubclassSelector] private List<Effect> appliesEffects = new();
 
     protected SpriteRenderer shieldRenderer;
 
@@ -27,14 +27,17 @@ public class ShipCoreModule : ModuleBase, IHitter
     public float CurrentShields => shields.CurrentValue;
     public int CurrentMaxHealth => Mathf.RoundToInt(health.MaxValue);
     public int CurrentMaxShields => Mathf.RoundToInt(shields.MaxValue);
+    public float HealthFraction => health.Fraction;
+    public float ShieldFraction => shields.Fraction;
     public float CurrentShieldRegen => shieldRegen.CurrentValue;
     public float CurrentHPRegen => hpRegen.CurrentValue;
+    public bool IsFull => health.CurrentValue >= health.MaxValue && shields.CurrentValue >= shields.MaxValue;
     public float Damage => damage;
     public float KnockbackPower => knockbackPower;
     public float ShieldDamageMultiplier => 1f;
     public float HPDamageMultiplier => 1f;
     public float BackstabMultiplier => backstabMultiplier;
-    public List<Effect> GetEffects() {return appliesEffects;}
+    public List<Effect> GetEffects() {return EmitEffects(appliesEffects);}
 
     protected override void Awake()
     {
@@ -44,12 +47,12 @@ public class ShipCoreModule : ModuleBase, IHitter
 
     private void Update()
     {
-        if (shields.CurrentValue <= shields.MaxValue){
+        if (shields.CurrentValue < shields.MaxValue){
             shields.AddCurrent(CurrentShieldRegen * Time.deltaTime);
             OnHPShieldsChanged?.Invoke();
         }
 
-        if (health.CurrentValue <= health.MaxValue){
+        if (health.CurrentValue < health.MaxValue){
             health.AddCurrent(CurrentHPRegen * Time.deltaTime);
             OnHPShieldsChanged?.Invoke();
         }
@@ -87,29 +90,22 @@ public class ShipCoreModule : ModuleBase, IHitter
         
     }
 
-    protected override void ApplyModifiers()
+    protected override void CollectStats(List<IStat> stats)
     {
-        base.ApplyModifiers();
+        base.CollectStats(stats);
 
-        health.Recalculate(currentModifiers, true);
-        shields.Recalculate(currentModifiers, true);
-        shieldRegen.Recalculate(currentModifiers);
-        hpRegen.Recalculate(currentModifiers);
-        invincibility.Recalculate(currentModifiers);
-        damage.Recalculate(currentModifiers);
-        knockbackPower.Recalculate(currentModifiers);
-
-        OnHPShieldsChanged?.Invoke();
+        stats.Add(health);
+        stats.Add(shields);
+        stats.Add(shieldRegen);
+        stats.Add(hpRegen);
+        stats.Add(invincibility);
+        stats.Add(damage);
+        stats.Add(knockbackPower);
+        stats.Add(backstabMultiplier);
     }
 
-    protected override void ResetModifiers()
+    protected override void OnStatsChanged()
     {
-        base.ResetModifiers();
-
-        shieldRegen.ResetToBase();
-        hpRegen.ResetToBase();
-        damage.ResetToBase();
-        knockbackPower.ResetToBase();
-        invincibility.ResetToBase();
+        OnHPShieldsChanged?.Invoke();
     }
 }

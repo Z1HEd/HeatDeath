@@ -40,17 +40,10 @@ public class MineModule : ProjectileModule
         projectile.Initialize(shotDirection * projectileSpeed, this);
         OnProjectileSpawned(projectile);
     }
-    protected override void ApplyModifiers()
+    protected override void CollectStats(List<IStat> stats)
     {
-        base.ApplyModifiers();
+        base.CollectStats(stats);
 
-        ExplosionRange.Recalculate(currentModifiers);
-    }
-
-    protected override void ResetModifiers()
-    {
-        base.ResetModifiers();
-        
-        ExplosionRange.ResetToBase();
+        stats.Add(ExplosionRange);
     }
 }

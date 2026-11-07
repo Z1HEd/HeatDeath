@@ -9,7 +9,7 @@ public class TimedEffectAbility : AbilityModule
     [SerializeField]
     protected ResourceStat duration = new ResourceStat(StatType.Duration,1f,0f);
     [SerializeField]
-    protected ScalarStat effectMultiplier = new ScalarStat(StatType.EffectMuliplier,1f,0.01f);
+    protected ScalarStat effectMultiplier = new ScalarStat(StatType.EffectMultiplier,1f,0.01f);
     [SerializeReference]
     [SubclassSelector]
     protected List<Effect> baseEffects = new();
@@ -17,8 +17,8 @@ public class TimedEffectAbility : AbilityModule
     private bool isActive = false;
     public override bool IsActivatable => !isActive && cooldown.CurrentValue == 0f;
     public override bool IsActive => isActive;
-    public override float CooldownFraction => cooldown/cooldown.MaxValue;
-    public override float DurationFraction => duration/duration.MaxValue;
+    public override float CooldownFraction => cooldown.Fraction;
+    public override float DurationFraction => duration.Fraction;
     public void Update()
     {
         if (isActive)
@@ -28,7 +28,7 @@ public class TimedEffectAbility : AbilityModule
             InvokeUpdateDuration();
         }
         else{
-            if (cooldown.Consume(Time.deltaTime)>0f) InvokeUpdateActivatable();
+            if (cooldown.Tick(Time.deltaTime)) InvokeUpdateActivatable();
             InvokeUpdateCooldown();
         }
     }
@@ -38,9 +38,8 @@ public class TimedEffectAbility : AbilityModule
         if (!IsActivatable) return;
         isActive = true;
         duration.ResetToMax();
-        foreach (var effect in baseEffects)
+        foreach (var appliedEffect in EmitEffects(baseEffects, effectMultiplier))
         {
-            Effect appliedEffect = effect.Stacked(effectMultiplier);
             appliedEffects.Add(appliedEffect);
             ship.effectManager.AddEffect(appliedEffect);
         }
@@ -51,25 +50,19 @@ public class TimedEffectAbility : AbilityModule
     {
         if (!isActive) return;
         isActive = false;
-        InvokeUpdateActivatable();
         cooldown.ResetToMax();
+        InvokeUpdateActivatable();
         foreach (var effect in appliedEffects)
             ship.effectManager.RemoveEffect(effect);
+        appliedEffects.Clear();
     }
 
-    protected override void ApplyModifiers()
+    protected override void CollectStats(List<IStat> stats)
     {
-        base.ApplyModifiers();
+        base.CollectStats(stats);
 
-        cooldown.Recalculate(currentModifiers,true);
-        duration.Recalculate(currentModifiers,true);
-        effectMultiplier.Recalculate(currentModifiers);
-    }
-
-    protected override void ResetModifiers()
-    {
-        base.ResetModifiers();
-
-        effectMultiplier.ResetToBase();
+        stats.Add(cooldown);
+        stats.Add(duration);
+        stats.Add(effectMultiplier);
     }
 }

@@ -22,7 +22,4 @@ public class DuplicateWeaponAbility : AbilityModule
         if (spawnedWeapon)
             InvokeUpdateCooldown();
     }
-
-    protected override void ApplyModifiers(){}
-
 }

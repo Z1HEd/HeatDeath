@@ -31,16 +31,45 @@ public class StatModifierEffect : Effect
     public override void ApplyToModule(ModuleBase module)
     {
         var map = module.currentModifiers;
-        if (!map.TryGetValue(stat, out StatModifier currentModifier)){
-            currentModifier = default;
-            currentModifier.Percent = 0f;
-        }
-        currentModifier.Percent += statModifier.Percent * currentModifier.Percent * 0.001f;
-        currentModifier.Percent += statModifier.Percent;
-        currentModifier.Flat += statModifier.Flat;
-
-        map[stat] = currentModifier;
+        map.TryGetValue(stat, out StatModifier currentModifier);
+        map[stat] = StatModifier.Combine(currentModifier, statModifier);
     }
+    // Same stat, same targets, same direction: a slow and a speed-up never share a slot.
+    public override bool SharesSlotWith(Effect other)
+    {
+        return other is StatModifierEffect o
+            && o.stat == stat
+            && Mathf.Sign(Direction) == Mathf.Sign(o.Direction)
+            && HasSameTags(o.targetTags);
+    }
+
+    // Percent decides first, flat breaks ties.
+    public override bool IsAtLeastAsStrongAs(Effect other)
+    {
+        if (other is not StatModifierEffect o)
+            return true;
+
+        float percent = Mathf.Abs(statModifier.Percent), otherPercent = Mathf.Abs(o.statModifier.Percent);
+        if (percent != otherPercent)
+            return percent > otherPercent;
+
+        return Mathf.Abs(statModifier.Flat) >= Mathf.Abs(o.statModifier.Flat);
+    }
+
+    private float Direction => statModifier.Percent != 0f ? statModifier.Percent : statModifier.Flat;
+
+    private bool HasSameTags(List<TagDefinition> otherTags)
+    {
+        if (targetTags.Count != otherTags.Count)
+            return false;
+
+        foreach (var tag in targetTags)
+            if (!otherTags.Contains(tag))
+                return false;
+
+        return true;
+    }
+
     public override Effect Stacked(float times)
     {
         var durationCopy = new ResourceStat(duration.Type, duration.BaseValue, duration.MinValue);

@@ -90,7 +90,6 @@ public class ModuleManager : MonoBehaviour
                 GameUIController.Instance.BindWeaponButton(weapon,weaponDefinitions.Count);
                 weaponDefinitions.Add(definition);
             }
-            ship.effectManager.shouldRecalculate = true;
             OnWeaponAdded?.Invoke(definition);
             return weapon.GetComponent<WeaponModule>();
         }

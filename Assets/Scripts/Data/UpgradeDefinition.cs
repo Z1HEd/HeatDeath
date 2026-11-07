@@ -31,6 +31,7 @@ public class UpgradeDefinition : ScriptableObject
     public bool IsGeneral => boundModule == null;
     public UpgradeRarity Rarity => rarity;
     public int MaxStacks => maxStacks;
+    public bool IsInfinite => maxStacks < 1;
     public IReadOnlyList<Effect> Effects => effects;
 
     public IReadOnlyList<UpgradeDefinition> MutuallyExclusiveWith => mutuallyExclusiveWith;
@@ -50,7 +51,7 @@ public class UpgradeDefinition : ScriptableObject
 
     public bool IsMaxStacks(int currentCount)
     {
-        if (maxStacks < 1)
+        if (IsInfinite)
             return false;
 
         return currentCount >= maxStacks;

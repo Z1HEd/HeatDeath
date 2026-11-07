@@ -28,12 +28,11 @@ public abstract class WeaponModule : ModuleBase
         rangeDetector.gameObject.layer = DetectLayer;
 
         rangeDetector.Initialize(range);
-        range.CurrentValueChanged += UpdateRange;
         firePoint = transform.GetChild(0);
     }
 
-    public virtual bool CanFire => fireCooldown == fireCooldown.MinValue;
-    public virtual float CooldownFraction => Mathf.Clamp(1f-(fireCooldown)/fireCooldown.MaxValue,0f,1f);
+    public virtual bool CanFire => timeScale > 0f && fireCooldown == fireCooldown.MinValue;
+    public virtual float CooldownFraction => Mathf.Clamp01(1f - fireCooldown.Fraction);
 
     protected virtual void Update()
     {
@@ -45,7 +44,7 @@ public abstract class WeaponModule : ModuleBase
 
     protected void OnValidate()
     {
-        UpdateRange(range);
+        UpdateRange();
     }
 
     private void DetermineWeaponLayer()
@@ -76,29 +75,24 @@ public abstract class WeaponModule : ModuleBase
         }
     }
 
-    private void UpdateRange(float newRange)
+    private void UpdateRange()
     {
         if (!rangeDetector) return;
         rangeDetector.SetRadius(range);
     }
-    protected override void ApplyModifiers()
+    protected override void CollectStats(List<IStat> stats)
     {
-        base.ApplyModifiers();
+        base.CollectStats(stats);
 
-        fireCooldown.Recalculate(currentModifiers,true);
-        timeScale.Recalculate(currentModifiers);
-        range.Recalculate(currentModifiers);
-        canAim.Recalculate(currentModifiers);
-        UpdateRange(range);
+        stats.Add(fireCooldown);
+        stats.Add(timeScale);
+        stats.Add(range);
+        stats.Add(canAim);
     }
 
-    protected override void ResetModifiers()
+    protected override void OnStatsChanged()
     {
-        base.ResetModifiers();
-
-        timeScale.ResetToBase();
-        range.ResetToBase();
-        canAim.ResetToBase();
+        UpdateRange();
     }
 }
 

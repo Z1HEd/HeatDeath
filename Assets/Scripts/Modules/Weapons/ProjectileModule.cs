@@ -14,7 +14,9 @@ public class ProjectileModule : WeaponModule
     [SerializeField] public ScalarStat projectilePiercing = new ScalarStat(StatType.ProjectilePiercing, 0f, -1f);
     [SerializeField] public ScalarStat projectileCount = new ScalarStat(StatType.ProjectileCount, 1f, 1f);
     [SerializeField] public ScalarStat projectileSpread = new ScalarStat(StatType.ProjectileSpread, 0f, 0f);
-    [SerializeField] public List<Effect> AppliesEffects = new();
+    [SerializeReference, SubclassSelector] public List<Effect> AppliesEffects = new();
+
+    public List<Effect> EmitAppliedEffects() => EmitEffects(AppliesEffects);
 
     private Ship currentTarget;
 
@@ -100,34 +102,19 @@ public class ProjectileModule : WeaponModule
         return Random.Range(-halfSpread, halfSpread);
     }
 
-    protected override void ApplyModifiers()
+    protected override void CollectStats(List<IStat> stats)
     {
-        base.ApplyModifiers();
-        
-        projectileSpeed.Recalculate(currentModifiers);
-        projectileDamage.Recalculate(currentModifiers);
-        HPDamageMultiplier.Recalculate(currentModifiers);
-        ShieldDamageMultiplier.Recalculate(currentModifiers);
-        BackstabMultiplier.Recalculate(currentModifiers);
-        projectileKnockback.Recalculate(currentModifiers);
-        projectilePiercing.Recalculate(currentModifiers);
-        projectileCount.Recalculate(currentModifiers);
-        projectileSpread.Recalculate(currentModifiers);
+        base.CollectStats(stats);
+
+        stats.Add(projectileSpeed);
+        stats.Add(projectileDamage);
+        stats.Add(HPDamageMultiplier);
+        stats.Add(ShieldDamageMultiplier);
+        stats.Add(BackstabMultiplier);
+        stats.Add(projectileKnockback);
+        stats.Add(projectilePiercing);
+        stats.Add(projectileCount);
+        stats.Add(projectileSpread);
     }
 
-    protected override void ResetModifiers()
-    {
-        base.ResetModifiers();
-
-        projectileSpeed.ResetToBase();
-        projectileDamage.ResetToBase();
-        HPDamageMultiplier.ResetToBase();
-        ShieldDamageMultiplier.ResetToBase();
-        BackstabMultiplier.ResetToBase();
-        projectileKnockback.ResetToBase();
-        projectilePiercing.ResetToBase();
-        projectileCount.ResetToBase();
-        projectileSpread.ResetToBase();
-    }
-    
 }

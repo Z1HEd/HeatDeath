@@ -14,7 +14,11 @@ Terminology: "scrap" is the in-game name for XP, not a separate currency. The pl
 
 ## Rules
 
-Do not edit Unity assets (prefabs, scenes, ScriptableObject `.asset` files, materials, `.meta` files, and similar) without explicit permission given at that moment. Permission from an earlier request does not carry over. If a code change needs an asset change, describe what is needed and ask.
+Do not edit Unity assets (prefabs, scenes, ScriptableObject `.asset` files, materials, `.meta` files, and similar) without explicit permission given at that moment. Permission from an earlier request does not carry over. If a code change needs an asset change, describe what is needed and ask. Once told to make asset changes, make all of them in one go without asking again for each file.
+
+The user reviews every code change in batches. Split big refactors into separate logical batches, ideally no more than 100 changed lines each. Work through a whole batch without stopping, then stop editing until the user approves it.
+
+Never commit unless the user explicitly asks for it.
 
 ## Commands
 
@@ -47,14 +51,16 @@ This pipeline spans most of the code:
 
 1. An `UpgradeDefinition` holds a list of `Effect`s. `UpgradeManager` clones them with `Effect.Stacked(stacks)` and replaces the previous clones whenever the stack count changes.
 2. `EffectManager` owns the active effects, ticks their durations, and sets `shouldRecalculate` when the list changes. The recalculation runs once in its `Update`, not immediately.
-3. Each module clears its modifiers, applies every effect where `IsApplicableTo(moduleDefinition)` is true (matched by `TagDefinition`), then calls `ApplyModifiers`, which recalculates each stat field.
+3. Each module clears its modifiers, applies every effect where `IsApplicableTo(moduleDefinition)` is true (matched by `TagDefinition`), recalculates every stat listed in its `CollectStats`, then calls `OnStatsChanged`.
 
-Stats (`ResourceStat`, `ScalarStat`, `BoolStat` in `Assets/Scripts/Modules/Stats.cs`) resolve to `(base + Flat) * (1 + Percent/100)`. `BoolStat` is true if `Flat > 0`, false if `Flat < 0`, otherwise its base value.
+Stats (`ResourceStat`, `ScalarStat`, `BoolStat` in `Assets/Scripts/Modules/Stats.cs`) resolve to `(base + Flat) * (1 + Percent/100)`. Stacks of one upgrade add up (+25% × 4 = +100%), and percents from different sources multiply (×2 and ×2 give ×4), so -100% always wins. `BoolStat` is true if `Flat > 0`, false if `Flat < 0`, otherwise its base value.
 
 To add a stat:
 - Append to `StatType`. Its values are serialized as integers, so never renumber them.
 - Pass the type to the stat's constructor.
-- Add the stat to the module's `ResetModifiers` and `ApplyModifiers` overrides. A stat missing from these silently ignores effects.
+- Add the stat to the module's `CollectStats` override. A stat missing from it silently ignores effects.
+
+On-hit effects arrive through `Ship.ApplyEffects`, which gives each target its own copy and uses `EffectManager.AddStatusEffect`: effects in the same slot (`SharesSlotWith`) don't stack, and the stronger or equal one replaces the old one and restarts it. Modules hand out effects through `ModuleBase.EmitEffects`, which scales their durations by the module's `Duration` modifier.
 
 To add an `Effect`, implement `Stacked` so it returns a new instance. Definition assets are shared, so effects must not be mutated at runtime.
 

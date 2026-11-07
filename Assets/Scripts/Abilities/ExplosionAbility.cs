@@ -12,7 +12,7 @@ public class ExplosionAbility : AbilityModule, IHitter
     [SerializeField]
     protected ResourceStat cooldown = new ResourceStat(StatType.Cooldown,1f,0f);
     [SerializeField]
-    protected ScalarStat effectMultiplier = new ScalarStat(StatType.EffectMuliplier,1f,0.01f);
+    protected ScalarStat effectMultiplier = new ScalarStat(StatType.EffectMultiplier,1f,0.01f);
     [SerializeField]
     protected ScalarStat range = new ScalarStat(StatType.Range,1f,0.01f);
     [SerializeField]
@@ -25,7 +25,7 @@ public class ExplosionAbility : AbilityModule, IHitter
     private List<Effect> appliedEffects = new();
     public override bool IsActivatable => cooldown.CurrentValue == 0f;
     public override bool IsActive => false;
-    public override float CooldownFraction => cooldown/cooldown.MaxValue;
+    public override float CooldownFraction => cooldown.Fraction;
     public override float DurationFraction => 0f;
     public float Damage => damage;
     public float ShieldDamageMultiplier => shieldDamageMultiplier;
@@ -33,10 +33,10 @@ public class ExplosionAbility : AbilityModule, IHitter
     public float BackstabMultiplier => backstabMultiplier;
     public float KnockbackPower => knockback;
 
-    public List<Effect> GetEffects(){ return Effect.StackedList(baseEffects,effectMultiplier);}
+    public List<Effect> GetEffects(){ return EmitEffects(baseEffects,effectMultiplier);}
     public void Update()
     {
-        if (cooldown.Consume(Time.deltaTime)>0f) InvokeUpdateActivatable();
+        if (cooldown.Tick(Time.deltaTime)) InvokeUpdateActivatable();
         InvokeUpdateCooldown();
     }
 
@@ -52,20 +52,17 @@ public class ExplosionAbility : AbilityModule, IHitter
 
     public override void Deactivate(){}
 
-    protected override void ApplyModifiers()
+    protected override void CollectStats(List<IStat> stats)
     {
-        base.ApplyModifiers();
+        base.CollectStats(stats);
 
-        cooldown.Recalculate(currentModifiers,true);
-        effectMultiplier.Recalculate(currentModifiers);
-        range.Recalculate(currentModifiers);
-    }
-
-    protected override void ResetModifiers()
-    {
-        base.ResetModifiers();
-
-        effectMultiplier.ResetToBase();
-        range.ResetToBase();
+        stats.Add(damage);
+        stats.Add(shieldDamageMultiplier);
+        stats.Add(hpDamageMultiplier);
+        stats.Add(backstabMultiplier);
+        stats.Add(knockback);
+        stats.Add(cooldown);
+        stats.Add(effectMultiplier);
+        stats.Add(range);
     }
 }

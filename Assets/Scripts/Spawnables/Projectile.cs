@@ -43,7 +43,7 @@ public class Projectile : MonoBehaviour, IHitter
         ShieldDamageMultiplier = sourceModule.ShieldDamageMultiplier;
         HPDamageMultiplier = sourceModule.HPDamageMultiplier;
         BackstabMultiplier = sourceModule.BackstabMultiplier;
-        appliesEffects = sourceModule.AppliesEffects;
+        appliesEffects = sourceModule.EmitAppliedEffects();
         ConfigurePiercing(sourceModule.projectilePiercing);
     }
 

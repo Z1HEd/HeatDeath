@@ -22,6 +22,6 @@ public class MultiplyRigidbodyVelocityEffect : Effect
     public override Effect Stacked(float times)
     {
         var durationCopy = new ResourceStat(duration.Type, duration.BaseValue, duration.MinValue);
-        return new MultiplyRigidbodyVelocityEffect(durationCopy,multiplier*times);
+        return new MultiplyRigidbodyVelocityEffect(durationCopy,Mathf.Pow(multiplier,times));
     }
 }

@@ -29,7 +29,7 @@ public enum StatType
 	TimeScale = 22,
 	HPRegen = 23,
     Duration = 24,
-    EffectMuliplier = 25,
+    EffectMultiplier = 25,
     Invincibility = 26,
 }
 
@@ -48,20 +48,30 @@ public struct StatModifier
     {
         return new StatModifier(left.Flat * right, left.Percent * right);
     }
+
+    // Flats add up. Percents multiply as factors, so a -100% stays exactly -100% whatever else applies.
+    public static StatModifier Combine(StatModifier a, StatModifier b)
+    {
+        float factor = (1f + a.Percent / 100f) * (1f + b.Percent / 100f);
+        return new StatModifier(a.Flat + b.Flat, (factor - 1f) * 100f);
+    }
+}
+
+public interface IStat
+{
+    void Initialize();
+    void Recalculate(IReadOnlyDictionary<StatType, StatModifier> modifiers);
 }
 
 [Serializable]
-public abstract class StatBase<T>
+public abstract class StatBase<T> : IStat
 {
     private StatType type;
 
-    [NonSerialized] private bool initialized;
-    [SerializeField] private T currentValue;
-
-    public event Action<T> CurrentValueChanged;
+    [SerializeField, ReadOnly] protected T currentValue;
 
     public StatType Type => type;
-    protected bool IsInitialized => initialized;
+    public T CurrentValue => currentValue;
 
     protected StatBase() { }
 
@@ -70,158 +80,130 @@ public abstract class StatBase<T>
         this.type = type;
     }
 
-    protected T CurrentOr(T fallback)
+    public abstract void Initialize();
+    public abstract void Recalculate(IReadOnlyDictionary<StatType, StatModifier> modifiers);
+
+    protected StatModifier GetModifier(IReadOnlyDictionary<StatType, StatModifier> modifiers)
     {
-        return initialized ? currentValue : fallback;
-    }
+        if (type == StatType.None)
+            return default;
 
-    protected void SetCurrentValue(T value)
-    {
-        bool changed = !initialized || !EqualityComparer<T>.Default.Equals(currentValue, value);
-        currentValue = value;
-        initialized = true;
-
-        if (changed)
-            CurrentValueChanged?.Invoke(currentValue);
-    }
-
-    protected float CalculateModifiedValue(
-        float baseStatValue,
-        IReadOnlyDictionary<StatType, StatModifier> modifiers)
-    {
-        if (modifiers == null || Type == StatType.None)
-            return baseStatValue;
-        
-        modifiers.TryGetValue(Type, out StatModifier modifier);
-
-        return (baseStatValue + modifier.Flat) * (1f + (modifier.Percent * 0.01f));
+        modifiers.TryGetValue(type, out StatModifier modifier);
+        return modifier;
     }
 }
 
 [Serializable]
-public sealed class ResourceStat : StatBase<float>
+public abstract class FloatStat : StatBase<float>
 {
-    [SerializeField] private float baseValue = 1f;
-    [SerializeField] private float minValue = 0f;
+    [SerializeField] protected float baseValue;
+    [SerializeField] protected float minValue;
 
-    [NonSerialized] private float maxValue;
+    protected FloatStat() { }
 
-    public ResourceStat() { }
-
-    public ResourceStat(float baseValue, float minValue)
-    {
-        this.baseValue = baseValue;
-        this.minValue = minValue;
-    }
-
-    public ResourceStat(StatType type, float baseValue, float minValue) : base(type)
+    protected FloatStat(StatType type, float baseValue, float minValue) : base(type)
     {
         this.baseValue = baseValue;
         this.minValue = minValue;
     }
 
     public float BaseValue => baseValue;
-    public float CurrentValue => CurrentOr(Mathf.Max(minValue, baseValue));
-    public float MaxValue => maxValue;
     public float MinValue => minValue;
 
-    public static implicit operator float(ResourceStat stat)
+    public static implicit operator float(FloatStat stat)
     {
         return stat != null ? stat.CurrentValue : 0f;
     }
 
-    public void Recalculate(IReadOnlyDictionary<StatType, StatModifier> modifiers, bool preserveCurrentRatio)
+    protected float CalculateModifiedValue(IReadOnlyDictionary<StatType, StatModifier> modifiers)
     {
-        float ratio = MaxValue > 0f ? (CurrentValue / MaxValue) : 0f;
+        StatModifier modifier = GetModifier(modifiers);
 
-        maxValue = Mathf.Max(minValue, CalculateModifiedValue(baseValue, modifiers));
-    
-        if (!IsInitialized || !preserveCurrentRatio)
-        {
-            SetCurrentValue(maxValue);
-        }
-        else
-        {
-            SetCurrentValue(Mathf.Clamp(maxValue * ratio, minValue, maxValue));
-        }
+        // Divide rather than multiply by 0.01f, which is inexact: -100% has to give exactly 0.
+        return Mathf.Max(minValue, (baseValue + modifier.Flat) * (1f + modifier.Percent / 100f));
+    }
+}
+
+// minValue is the floor for MaxValue only. CurrentValue always stays within 0..MaxValue.
+[Serializable]
+public sealed class ResourceStat : FloatStat
+{
+    [NonSerialized] private float maxValue;
+
+    public ResourceStat() { baseValue = 1f; }
+
+    public ResourceStat(StatType type, float baseValue, float minValue) : base(type, baseValue, minValue) { }
+
+    public float MaxValue => maxValue;
+    // Current/max, or 0 when the max is 0 (e.g. cut by -100%), so callers never divide by 0.
+    public float Fraction => maxValue > 0f ? currentValue / maxValue : 0f;
+
+    public override void Initialize()
+    {
+        maxValue = Mathf.Max(minValue, baseValue);
+        currentValue = maxValue;
+    }
+
+    // Keeps the current/max ratio, so a ship at half health stays at half when its max changes.
+    public override void Recalculate(IReadOnlyDictionary<StatType, StatModifier> modifiers)
+    {
+        float ratio = maxValue > 0f ? currentValue / maxValue : 0f;
+
+        maxValue = CalculateModifiedValue(modifiers);
+        currentValue = Mathf.Clamp(maxValue * ratio, 0f, maxValue);
     }
 
     public void ResetToMax()
     {
-        if (!IsInitialized)
-            maxValue = Mathf.Max(minValue, baseValue);
-
-        SetCurrentValue(maxValue);
-    }
-    public void ResetToMin()
-    {
-        SetCurrentValue(minValue);
+        currentValue = maxValue;
     }
 
     public void AddCurrent(float value)
     {
-        if (!IsInitialized)
-            ResetToMax();
+        currentValue = Mathf.Clamp(currentValue + value, 0f, maxValue);
+    }
 
-        SetCurrentValue(Mathf.Clamp(CurrentValue + value, 0f, MaxValue));
+    // Returns true only on the call that reaches 0.
+    public bool Tick(float delta)
+    {
+        if (currentValue <= 0f)
+            return false;
+
+        Consume(delta);
+        return currentValue <= 0f;
     }
 
     public float Consume(float value, float multiplier = 1f)
     {
-        if (!IsInitialized)
-            ResetToMax();
-
         if (multiplier<=0) return value;
 
-        float leftover = 0f;
-
-        if (CurrentValue >= value * multiplier)
+        if (currentValue >= value * multiplier)
         {
-            SetCurrentValue(CurrentValue - value*multiplier);
-            return leftover;
+            currentValue -= value * multiplier;
+            return 0f;
         }
-        leftover = value - CurrentValue/multiplier;
-        SetCurrentValue(0f);
+
+        float leftover = value - currentValue / multiplier;
+        currentValue = 0f;
         return leftover;
     }
 }
 
 [Serializable]
-public sealed class ScalarStat : StatBase<float>
+public sealed class ScalarStat : FloatStat
 {
-    [SerializeField] private float baseValue;
-    [SerializeField] private float minValue = 0f;
-
     public ScalarStat() { }
 
-    public ScalarStat(float baseValue, float minValue)
+    public ScalarStat(StatType type, float baseValue, float minValue) : base(type, baseValue, minValue) { }
+
+    public override void Initialize()
     {
-        this.baseValue = baseValue;
-        this.minValue = minValue;
+        currentValue = Mathf.Max(minValue, baseValue);
     }
 
-    public ScalarStat(StatType type, float baseValue, float minValue) : base(type)
+    public override void Recalculate(IReadOnlyDictionary<StatType, StatModifier> modifiers)
     {
-        this.baseValue = baseValue;
-        this.minValue = minValue;
-    }
-
-    public float BaseValue => baseValue;
-    public float CurrentValue => CurrentOr(Mathf.Max(minValue, baseValue));
-
-    public static implicit operator float(ScalarStat stat)
-    {
-        return stat != null ? stat.CurrentValue : 0f;
-    }
-
-    public void Recalculate(IReadOnlyDictionary<StatType, StatModifier> modifiers)
-    {
-        SetCurrentValue(Mathf.Max(minValue, CalculateModifiedValue(baseValue, modifiers)));
-    }
-
-    public void ResetToBase()
-    {
-        SetCurrentValue(Mathf.Max(minValue, baseValue));
+        currentValue = CalculateModifiedValue(modifiers);
     }
 }
 
@@ -232,38 +214,26 @@ public sealed class BoolStat : StatBase<bool>
 
     public BoolStat() { }
 
-    public BoolStat(bool baseValue)
-    {
-        this.baseValue = baseValue;
-    }
-
     public BoolStat(StatType type, bool baseValue) : base(type)
     {
         this.baseValue = baseValue;
     }
 
     public bool BaseValue => baseValue;
-    public bool CurrentValue => CurrentOr(baseValue);
 
     public static implicit operator bool(BoolStat stat)
     {
         return stat != null && stat.CurrentValue;
     }
 
-    public void Recalculate(IReadOnlyDictionary<StatType,StatModifier> modifiers)
+    public override void Initialize()
     {
-        if (modifiers == null || Type == StatType.None)
-        {
-            SetCurrentValue(baseValue);
-            return;
-        }
-
-        modifiers.TryGetValue(Type, out StatModifier modifier);
-        SetCurrentValue(modifier.Flat > 0f ? true : (modifier.Flat < 0f ? false : baseValue));
+        currentValue = baseValue;
     }
 
-    public void ResetToBase()
+    public override void Recalculate(IReadOnlyDictionary<StatType,StatModifier> modifiers)
     {
-        SetCurrentValue(baseValue);
+        StatModifier modifier = GetModifier(modifiers);
+        currentValue = modifier.Flat > 0f ? true : (modifier.Flat < 0f ? false : baseValue);
     }
 }

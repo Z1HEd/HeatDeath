@@ -5144,7 +5144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6dfdf2f835ec9247b2ae47ef8bedfac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TimedEffectAbility
-  moduleDefinition: {fileID: 0}
+  moduleDefinition: {fileID: 11400000, guid: 12cc9ee001c34b658b6cc925f1cec563, type: 2}
   cooldown:
     currentValue: 0
     baseValue: 20

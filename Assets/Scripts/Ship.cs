@@ -107,10 +107,15 @@ public class Ship : MonoBehaviour, IHittable
 
         ApplyKnockback(hitter,direction);
     }
+    // Each ship gets its own copies: one explosion can hit several ships with the same list.
     public void ApplyEffects(List<Effect> effects)
     {
+        if (effects == null)
+            return;
+
         foreach (var effect in effects)
-            effectManager.AddEffect(effect);
+            if (effect != null)
+                effectManager.AddStatusEffect(effect.Stacked(1f));
     }
 
     public virtual void Die()

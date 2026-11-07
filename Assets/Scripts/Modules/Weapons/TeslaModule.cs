@@ -9,14 +9,14 @@ public class TeslaModule : WeaponModule, IHitter
     [SerializeField] protected ScalarStat shieldDamageMultiplier = new ScalarStat(StatType.ShieldDamageMultiplier, 1f, -1f);
     [SerializeField] protected ScalarStat hpDamageMultiplier = new ScalarStat(StatType.HPDamageMultiplier, 1f, -1f);
     [SerializeField] protected ScalarStat backstabMultiplier = new ScalarStat(StatType.BackstabMultiplier, 1f, 0f);
-    [SerializeField] private List<Effect> appliesEffects = new();
+    [SerializeReference, SubclassSelector] private List<Effect> appliesEffects = new();
 
     public float KnockbackPower => 0f;
     public float Damage =>damage;
     public float ShieldDamageMultiplier => shieldDamageMultiplier;
-    public float HPDamageMultiplier => shieldDamageMultiplier;
+    public float HPDamageMultiplier => hpDamageMultiplier;
     public float BackstabMultiplier => backstabMultiplier;
-    public List<Effect> GetEffects(){ return appliesEffects;}
+    public List<Effect> GetEffects(){ return EmitEffects(appliesEffects);}
     [SerializeField] private int maxChainTargets = 3;
     [SerializeField] private float lightningDuration = 0.1f;
     [SerializeField] private Material lightningMaterial;
@@ -148,20 +148,13 @@ public class TeslaModule : WeaponModule, IHitter
         }
         return closest;
     }
-    protected override void ApplyModifiers()
+    protected override void CollectStats(List<IStat> stats)
     {
-        base.ApplyModifiers();
-        damage.Recalculate(currentModifiers);
-        range.Recalculate(currentModifiers);
+        base.CollectStats(stats);
 
-        if (rangeDetector != null)
-            rangeDetector.SetRadius(range);
-    }
-
-    protected override void ResetModifiers()
-    {
-        base.ResetModifiers();
-        damage.ResetToBase();
-        range.ResetToBase();
+        stats.Add(damage);
+        stats.Add(shieldDamageMultiplier);
+        stats.Add(hpDamageMultiplier);
+        stats.Add(backstabMultiplier);
     }
 }

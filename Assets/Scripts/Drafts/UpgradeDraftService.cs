@@ -26,6 +26,8 @@ public class UpgradeDraftService
     private readonly List<UpgradeDefinition> definitions;
     private readonly System.Random random;
 
+    public IReadOnlyList<UpgradeDefinition> AllUpgrades => definitions;
+
     public UpgradeDraftService(int? seed = null)
     {
         definitions = new List<UpgradeDefinition>(Resources.LoadAll<UpgradeDefinition>("Upgrades"));

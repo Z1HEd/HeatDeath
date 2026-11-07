@@ -19,15 +19,13 @@ public class HealthShieldbar : MonoBehaviour
 
     public void UpdateBars()
     {
-        gameObject.SetActive(!hideWhenFull ||
-                shipCore.CurrentHealth != shipCore.CurrentMaxHealth || 
-                shipCore.CurrentShields != shipCore.CurrentMaxShields);
+        gameObject.SetActive(!hideWhenFull || !shipCore.IsFull);
 
         if (!gameObject.activeSelf) return;
         
-        healthBar.localScale = new Vector3(Mathf.Clamp(shipCore.CurrentHealth/shipCore.CurrentMaxHealth,0f,1f),
+        healthBar.localScale = new Vector3(Mathf.Clamp01(shipCore.HealthFraction),
                 healthBar.localScale.y,healthBar.localScale.z);
-        shieldBar.localScale = new Vector3(Mathf.Clamp(shipCore.CurrentShields/shipCore.CurrentMaxShields,0f,1f),
+        shieldBar.localScale = new Vector3(Mathf.Clamp01(shipCore.ShieldFraction),
                 healthBar.localScale.y,healthBar.localScale.z);
     }
 }

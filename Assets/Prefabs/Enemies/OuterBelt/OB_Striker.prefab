@@ -5387,7 +5387,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 416eb35727709d24eb35898f8aacfd3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BurstThrusterModule
-  moduleDefinition: {fileID: 0}
+  moduleDefinition: {fileID: 11400000, guid: 48407ca851f1438e98754451bee771e6, type: 2}
   targetPosition: {x: 0, y: 0}
   maxSpeed:
     currentValue: 0

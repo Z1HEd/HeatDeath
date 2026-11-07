@@ -41,8 +41,8 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
-        int current = GetStackCount(upgrade);
-        stackCounts[upgrade] = current + stackCount;
+        int newCount = GetStackCount(upgrade) + stackCount;
+        stackCounts[upgrade] = upgrade.MaxStacks >= 1 ? Mathf.Min(newCount, upgrade.MaxStacks) : newCount;
         UpdateRelatedEffects(upgrade);
     }
     public void ClearAll()
@@ -58,6 +58,7 @@ public class UpgradeManager : MonoBehaviour
         foreach (var upgrade in relatedEffects.Keys)
             foreach (var effect in relatedEffects[upgrade])
                 ship.effectManager.RemoveEffect(effect);
+        relatedEffects.Clear();
     }
 
     private void UpdateRelatedEffects(UpgradeDefinition upgrade)
@@ -88,15 +89,16 @@ public class UpgradeManager : MonoBehaviour
         return GetStackCount(upgrade) > 0;
     }
 
-    public bool IsFullUpgraded(ModuleDefinition module)
+    // Evolution check: every capped upgrade bound to the module is at max stacks, owned or not.
+    // Infinite upgrades are skipped, so they never block evolution.
+    public bool AreCappedUpgradesMaxed(ModuleDefinition module, IEnumerable<UpgradeDefinition> allUpgrades)
     {
-        foreach (var upgradeStack in stackCounts)
+        foreach (var upgrade in allUpgrades)
         {
-            UpgradeDefinition upgrade = upgradeStack.Key;
-            if (!upgrade.IsBoundTo(module))
+            if (upgrade == null || !upgrade.IsBoundTo(module) || upgrade.IsInfinite)
                 continue;
 
-            if (!upgrade.IsMaxStacks(upgradeStack.Value))
+            if (!upgrade.IsMaxStacks(GetStackCount(upgrade)))
                 return false;
         }
 

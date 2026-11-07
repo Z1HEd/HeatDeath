@@ -18,6 +18,9 @@ public class BurstThrusterModule : MovementModule
 
     public void Update()
     {
+        if (maxSpeed <= 0f) // Stunned: no burst, and the cooldown pauses
+            return;
+
         cooldownTimer -= Time.deltaTime;
 
         if (cooldownTimer > 0f || Time.timeScale <= 0f)
@@ -70,19 +73,11 @@ public class BurstThrusterModule : MovementModule
         body.AddForce(requiredAccel * body.mass, ForceMode2D.Force);
     }
 
-    protected override void ApplyModifiers()
+    protected override void CollectStats(List<IStat> stats)
     {
-        base.ApplyModifiers();
+        base.CollectStats(stats);
 
-        steeringThrust.Recalculate(currentModifiers);
-        burstCooldown.Recalculate(currentModifiers);
-    }
-
-    protected override void ResetModifiers()
-    {
-        base.ResetModifiers();
-        
-        steeringThrust.ResetToBase();
-        burstCooldown.ResetToBase();
+        stats.Add(steeringThrust);
+        stats.Add(burstCooldown);
     }
 }

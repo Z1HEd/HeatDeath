@@ -24,19 +24,11 @@ public class MissileModule : ProjectileModule
             spriteRenderer.sprite = textureWithoutRocket;
     }
 
-    protected override void ApplyModifiers()
+    protected override void CollectStats(List<IStat> stats)
     {
-        base.ApplyModifiers();
+        base.CollectStats(stats);
 
-        ExplosionRange.Recalculate(currentModifiers);
-        SeekingRange.Recalculate(currentModifiers);
-    }
-
-    protected override void ResetModifiers()
-    {
-        base.ResetModifiers();
-
-        ExplosionRange.ResetToBase();
-        SeekingRange.ResetToBase();
+        stats.Add(ExplosionRange);
+        stats.Add(SeekingRange);
     }
 }
