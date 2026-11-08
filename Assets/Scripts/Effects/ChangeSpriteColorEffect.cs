@@ -1,13 +1,15 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
+// Tints the ship's hull and guns.
 [Serializable]
 public class ChangeSpriteColorEffect : Effect
 {
     [SerializeField]
     private Color color = Color.white;
 
-    private Color storedColor;
+    private readonly List<(SpriteRenderer renderer, Color original)> tinted = new();
 
     public ChangeSpriteColorEffect() { }
 
@@ -26,21 +28,28 @@ public class ChangeSpriteColorEffect : Effect
 
     public override void ApplyToShip(Ship ship)
     {
-        var spriteRenderer = ship.GetComponent<SpriteRenderer>();
+        tinted.Clear();
+        Tint(ship.GetComponent<SpriteRenderer>());
+        foreach (var weapon in ship.moduleManager.WeaponModules)
+            Tint(weapon.GetComponent<SpriteRenderer>());
+    }
+
+    private void Tint(SpriteRenderer spriteRenderer)
+    {
         if (spriteRenderer == null)
             return;
 
-        storedColor = spriteRenderer.color;
+        tinted.Add((spriteRenderer, spriteRenderer.color));
         spriteRenderer.color = color;
     }
 
     public override void RemoveFromShip(Ship ship)
     {
-        var spriteRenderer = ship.GetComponent<SpriteRenderer>();
-        if (spriteRenderer == null)
-            return;
+        foreach (var (spriteRenderer, original) in tinted)
+            if (spriteRenderer != null)
+                spriteRenderer.color = original;
 
-        spriteRenderer.color = storedColor;
+        tinted.Clear();
     }
 
     public override Effect Stacked(float times)

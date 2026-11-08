@@ -21,6 +21,8 @@ public class TeslaModule : WeaponModule, IHitter
     [Tooltip("Seconds between re-rolls of the bolt shape.")]
     [SerializeField] private float jitterInterval = 0.03f;
     [SerializeField] private Material lightningMaterial;
+    [Tooltip("Lightning drawn over the hull of each ship hit. Leave empty to turn it off.")]
+    [SerializeField] private Material shipLightningMaterial;
 
 
     private const float CHAIN_RANGE_FALLOFF = 0.6f;
@@ -38,7 +40,7 @@ public class TeslaModule : WeaponModule, IHitter
         if (rangeDetector == null)
             return;
         var currentTarget = rangeDetector.GetClosestTarget();
-        if (firePoint != null && currentTarget != null)
+        if (firePoint != null && currentTarget != null && !IsStunned)
         {
             Vector3 towardsTarget = currentTarget.transform.position - transform.position;
             Vector3 currentAim = firePoint.position - transform.position;
@@ -117,6 +119,11 @@ public class TeslaModule : WeaponModule, IHitter
 
             LightningBolt.Spawn(from, from.position, target.transform, lightningDuration, jitterInterval,
                 lightningMaterial, sortingLayerID, sortingOrder);
+
+            if (shipLightningMaterial != null && !target.IsDead)
+                ShipLightningOverlay.Spawn(target, lightningDuration, jitterInterval,
+                    shipLightningMaterial, sortingLayerID, sortingOrder);
+
             from = target.transform;
         }
     }

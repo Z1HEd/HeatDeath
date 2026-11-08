@@ -31,7 +31,17 @@ public abstract class WeaponModule : ModuleBase
         firePoint = transform.GetChild(0);
     }
 
-    public virtual bool CanFire => timeScale > 0f && fireCooldown == fireCooldown.MinValue;
+    protected override void Start()
+    {
+        base.Start();
+
+        var sprite = GetComponent<SpriteRenderer>();
+        if (sprite != null)
+            ship.AddFlashRenderer(sprite);
+    }
+
+    protected bool IsStunned => timeScale <= 0f;
+    public virtual bool CanFire => !IsStunned && fireCooldown == fireCooldown.MinValue;
     public virtual float CooldownFraction => Mathf.Clamp01(1f - fireCooldown.Fraction);
 
     protected virtual void Update()

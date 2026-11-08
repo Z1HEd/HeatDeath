@@ -147,7 +147,7 @@ MonoBehaviour:
   canAim:
     currentValue: 0
     baseValue: 1
-  projectilePrefab: {fileID: 8872413515496322224, guid: 32fde49ac5ad8ea49a2d1db61f4fb5d4, type: 3}
+  projectilePrefab: {fileID: 8872413515496322224, guid: 975c65d3b963455d9b9954c884328c9e, type: 3}
   projectileSpeed:
     currentValue: 0
     baseValue: 8

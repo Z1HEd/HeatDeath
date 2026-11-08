@@ -6,6 +6,9 @@ using System.Collections;
 [RequireComponent(typeof(SpriteRenderer))]
 public class ShipCoreModule : ModuleBase, IHitter
 {
+    private static readonly int RippleOriginId = Shader.PropertyToID("_RippleOrigin");
+    private static readonly int RippleAgeId = Shader.PropertyToID("_RippleAge");
+
     [Header("Base Core Stats")]
     [SerializeField] private ResourceStat health = new ResourceStat(StatType.Health, 100f, 1f);
     [SerializeField] private ResourceStat shields = new ResourceStat(StatType.Shields, 100f, 0f);
@@ -19,7 +22,12 @@ public class ShipCoreModule : ModuleBase, IHitter
     [SerializeField] private ScalarStat backstabMultiplier = new ScalarStat(StatType.BackstabMultiplier, 1f, 0f);
     [SerializeReference, SubclassSelector] private List<Effect> appliesEffects = new();
 
+    [Header("Shield Visual")]
+    [Tooltip("Size of the shield overlay relative to the ship's sprite.")]
+    [SerializeField] private float shieldScale = 1.12f;
+
     protected SpriteRenderer shieldRenderer;
+    private float rippleStartTime = float.NegativeInfinity;
 
     public event Action OnHPShieldsChanged;
 
@@ -43,6 +51,17 @@ public class ShipCoreModule : ModuleBase, IHitter
     {
         base.Awake();
         shieldRenderer = GetComponent<SpriteRenderer>();
+
+        // The shield is a copy of the ship's sprite, drawn by Custom/ShipShield above ship and guns.
+        shieldRenderer.sprite = ship.GetComponent<SpriteRenderer>().sprite;
+        // Own copy per ship: with one shared material, shields drew the newest ship's texture.
+        shieldRenderer.sharedMaterial = Instantiate(Resources.Load<Material>("ShieldMaterial"));
+        shieldRenderer.sortingLayerName = "Shields";
+        shieldRenderer.sortingOrder = 0;
+        transform.localScale = Vector3.one * shieldScale;
+
+        // Only drawn while flashing: the shader is too costly to run invisibly on every ship.
+        shieldRenderer.enabled = false;
     }
 
     private void Update()
@@ -66,28 +85,67 @@ public class ShipCoreModule : ModuleBase, IHitter
         if (hitter.transform.position.y>transform.position.y) 
             damage *= hitter.BackstabMultiplier;
         
+        bool hadShields = shields.CurrentValue > 0f;
         damage = shields.Consume(damage,hitter.ShieldDamageMultiplier);
         if (damage > 0f)
             health.Consume(damage,hitter.HPDamageMultiplier);
-        else
+
+        bool shieldsGone = shields.CurrentValue <= 0f;
+        if (shieldsGone)
+            HideShield();
+        else if (damage <= 0f)
         {
             StopAllCoroutines();
-            StartCoroutine(FlashShield());
+            StartCoroutine(FlashShield(hitter.transform.position));
         }
 
         OnHPShieldsChanged?.Invoke();
-        return damage>0;
+        return damage>0 || (hadShields && shieldsGone);
     }
-    
-    protected IEnumerator FlashShield()
+
+    private void HideShield()
     {
-        const float SHIELD_FLASH_DURATION = 0.5f;
-        for (float a = 0.65f; a>0; a-=0.01f)
+        StopAllCoroutines();
+        shieldRenderer.enabled = false;
+    }
+
+    protected IEnumerator FlashShield(Vector3 hitPoint)
+    {
+        const float SHIELD_FLASH_DURATION = 0.7f;
+        const float MIN_RIPPLE_INTERVAL = 0.35f;
+        Material shieldMaterial = shieldRenderer.sharedMaterial;
+        shieldRenderer.enabled = true;
+
+        // Rapid fire must not restart a young ripple, or it would never get to spread.
+        if (Time.time - rippleStartTime >= MIN_RIPPLE_INTERVAL)
         {
-            shieldRenderer.color = new Color(1,1,1,a);
-            yield return new WaitForSeconds(0.01f*SHIELD_FLASH_DURATION);
+            rippleStartTime = Time.time;
+            shieldMaterial.SetVector(RippleOriginId, WorldToSpriteTexels(hitPoint));
         }
-        
+
+        float flashStartTime = Time.time;
+        for (float t = 0f; t < SHIELD_FLASH_DURATION; t = Time.time - flashStartTime)
+        {
+            shieldRenderer.color = new Color(1,1,1,0.65f * (1f - t / SHIELD_FLASH_DURATION));
+            shieldMaterial.SetFloat(RippleAgeId, Time.time - rippleStartTime);
+            yield return null;
+        }
+
+        shieldRenderer.enabled = false;
+    }
+
+    // Clamped to the sprite, so distant attackers (Tesla, ramming) ripple from the nearest side.
+    private Vector2 WorldToSpriteTexels(Vector3 worldPoint)
+    {
+        Sprite sprite = shieldRenderer.sprite;
+        Vector2 fromPivot = (Vector2)transform.InverseTransformPoint(worldPoint) * sprite.pixelsPerUnit;
+        return sprite.pivot + Vector2.ClampMagnitude(fromPivot, sprite.rect.width * 0.5f);
+    }
+
+    protected override void OnDestroy()
+    {
+        Destroy(shieldRenderer.sharedMaterial);
+        base.OnDestroy();
     }
 
     protected override void CollectStats(List<IStat> stats)

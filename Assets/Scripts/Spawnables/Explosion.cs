@@ -15,7 +15,7 @@ public class Explosion : MonoBehaviour, IHitter
     public List<Effect> GetEffects() => appliesEffects;
 
     public const float EXPANSION_DURATION = 0.2f;
-    public const float FADE_DURATION = 0.3f;
+    [SerializeField] private float fadeDuration = 0.3f;
 
     private float timer;
     private float targetRadius;
@@ -79,7 +79,7 @@ public class Explosion : MonoBehaviour, IHitter
         }
         else
         {
-            float t = Mathf.Clamp01(timer / FADE_DURATION);
+            float t = Mathf.Clamp01(timer / fadeDuration);
 
             transform.localScale = Vector3.one * targetRadius;
 

@@ -31,6 +31,8 @@ public class Ship : MonoBehaviour, IHittable
     protected bool dead;
     protected Material _material;
     protected SpriteRenderer spriteRenderer;
+    // One copy per renderer: sprites with different textures must not share a material.
+    private readonly List<Material> flashMaterials = new List<Material>();
 
     public bool IsKnockedBack => knockbackTimeRemaining > 0f;
     public bool IsDead => dead;
@@ -43,13 +45,29 @@ public class Ship : MonoBehaviour, IHittable
         upgradeManager = GetComponent<UpgradeManager>();
         shipRigidbody = GetComponent<Rigidbody2D>();
         coreModule = GetComponentInChildren<ShipCoreModule>();
-    }
 
-    public virtual void Start()
-    {
+        // In Awake so it exists before any weapon's Start.
         spriteRenderer = GetComponent<SpriteRenderer>();
         _material = Instantiate(spriteRenderer.sharedMaterial);
-        spriteRenderer.material = _material;
+        spriteRenderer.sharedMaterial = _material;
+        flashMaterials.Add(_material);
+    }
+
+    protected virtual void OnDestroy()
+    {
+        foreach (var material in flashMaterials)
+            Destroy(material);
+    }
+
+    // Makes a renderer on this ship (a gun) take part in the damage flash.
+    public void AddFlashRenderer(SpriteRenderer flashRenderer)
+    {
+        if (_material == null)
+            return;
+
+        Material copy = Instantiate(_material);
+        flashRenderer.sharedMaterial = copy;
+        flashMaterials.Add(copy);
     }
 
     protected virtual void Update()
@@ -133,17 +151,12 @@ public class Ship : MonoBehaviour, IHittable
     }
     public virtual IEnumerator DamageFlash()
     {
-        _material.SetColor(FlashColorID, Color.white);
-        _material.SetFloat(FlashAmountID, 1f);
+        SetFlash(Color.white, 1f);
 
         yield return new WaitForSeconds(0.03f);
 
         // red damage fade
-
-        _material.SetColor(
-            FlashColorID,
-            new Color(1f, 0.2f, 0.2f)
-        );
+        Color red = new Color(1f, 0.2f, 0.2f);
 
         float duration = 0.08f;
         float t = 0f;
@@ -152,19 +165,23 @@ public class Ship : MonoBehaviour, IHittable
         {
             t += Time.deltaTime;
 
-            float amount = 1f - (t / duration);
-
-            _material.SetFloat(
-                FlashAmountID,
-                amount
-            );
+            SetFlash(red, 1f - (t / duration));
 
             yield return null;
         }
 
-        _material.SetFloat(FlashAmountID, 0f);
+        SetFlash(red, 0f);
     }
-    
+
+    private void SetFlash(Color color, float amount)
+    {
+        foreach (var material in flashMaterials)
+        {
+            material.SetColor(FlashColorID, color);
+            material.SetFloat(FlashAmountID, amount);
+        }
+    }
+
 
     private void OnCollisionEnter2D(Collision2D collision)
     {

@@ -40,7 +40,7 @@ public class ProjectileModule : WeaponModule
         if (currentTarget == null)
             return;
 
-        if (firePoint != null && canAim)
+        if (firePoint != null && canAim && !IsStunned)
         {
             Vector3 towardsTarget = currentTarget.transform.position - transform.position;
             Vector3 currentAim = firePoint.position - transform.position;
