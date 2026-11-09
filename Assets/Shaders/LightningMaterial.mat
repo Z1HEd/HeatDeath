@@ -19,16 +19,16 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
-  m_LockedProperties:
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _Amplitude: 0.25
-    - _CoreWidth: 0.04
-    - _Frequency: 3
-    - _GlowWidth: 0.2
+    - _Amplitude: 0.15
+    - _CoreWidth: 0.03
+    - _Frequency: 4
+    - _GlowWidth: 0.15
     - _PixelsPerUnit: 50
     - _SecondaryStrength: 0.5
     - _Taper: 0.3
