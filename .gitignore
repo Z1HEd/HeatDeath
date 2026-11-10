@@ -105,3 +105,9 @@ InitTestScene*.unity*
 /.VSCodeCounter/
 /Assets/~$Docs.docx
 /Assets/~$Docs.docx.meta
+
+# Temporary plans from planning agents
+/Docs/Plans/
+# Personal roadmap
+/Assets/ToDo.md
+/Assets/ToDo.md.meta

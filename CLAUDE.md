@@ -6,7 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 HeatDeath is a 2D roguelike space combat game built in Unity 6 (`6000.4.1f1`) with URP, the Input System, and UI Toolkit. It has one scene, `Assets/Scenes/SampleScene.unity`.
 
-The code and assets are the source of truth. `README.md` describes the intended game and `Assets/ToDo.md` is out of date, so verify against the project before relying on either. `Assets/Docs.docx` holds the design notes.
+The code and assets are the source of truth. `README.md` describes the intended game, so verify against the project before relying on it. `Assets/Docs.docx` holds the design notes. `Assets/ToDo.md` is the user's personal roadmap; it's gitignored, and it should stay current when work it lists is finished.
+
+Balance targets (level curve, enemy scaling, module and upgrade budgets) are in `Docs/Balance.md`. The work in progress is planned in `Docs/Plans/ModulesAndBalance/`: start with its `README.md`, then the brief for your block. `Docs/Plans/` holds temporary plans and is gitignored, so anything that should last goes into `Docs/Balance.md` or this file.
 
 Current state: 5 ships, 7 weapons, and one playable sector, Outer Belt. Iron Reach and Storm Verge have sprites only. Run saving, run statistics, weapon evolution, a main menu, and a game-over flow are not implemented yet. The 4 existing upgrades are placeholders for testing; the upgrade system is work in progress.
 
@@ -14,7 +16,7 @@ Terminology: "scrap" is the in-game name for XP, not a separate currency. The pl
 
 ## Rules
 
-Do not edit Unity assets (prefabs, scenes, ScriptableObject `.asset` files, materials, `.meta` files, and similar) without explicit permission given at that moment. Permission from an earlier request does not carry over. If a code change needs an asset change, describe what is needed and ask. Once told to make asset changes, make all of them in one go without asking again for each file.
+Unity assets (prefabs, scenes, ScriptableObject `.asset` files, materials, `.meta` files, and similar) may be edited directly. Give every new asset, prefab, and folder a `.meta` with a fresh unique GUID. The user may have `SampleScene` open in the editor, where saving overwrites scene edits made on disk, so say whenever you change the scene.
 
 The user reviews every code change in batches. Split big refactors into separate logical batches, ideally no more than 100 changed lines each. Work through a whole batch without stopping, then stop editing until the user approves it.
 
