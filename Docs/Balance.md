@@ -96,7 +96,7 @@ Model behind it (rebuild it if the structure below changes): each level-up is dr
 Agreed design. Slots, evolution, and infinite-upgrade gating are not implemented yet; the balance assumes them.
 
 - **9 modules:** 4 drafted weapons (first at run start), 4 drafted ship modules (first at level 5), and the ship-specific **ShipCore**.
-- **Ship modules** cover survival, mobility, and economy. Most are passive; some add a buff that triggers on its own, such as invisibility on taking damage or a rage mode after several quick kills. The player never activates them: the ship's ability stays the only active control. They never deal damage themselves, so offense and defense stay separable; a triggered buff that raises offense still counts on the defense side. The draft wants a pool of about 8 ship modules for 4 slots, as weapons have 7 for 4, and at least 6 so the 4th draft still offers 3. The count is the length of the ship-module draft-level list.
+- **Ship modules** cover survival, mobility, and economy. Most are passive; some add a buff that triggers on its own, such as invisibility on taking damage or a rage mode after several quick kills. The player never activates them: the ship's ability stays the only active control. They aren't weapons, though a module may deal incidental damage, such as reflection or a burst on hit. That damage, like a triggered buff that raises offense, counts on the defense side, so offense stays the weapons' share. The draft wants a pool of about 8 ship modules for 4 slots, as weapons have 7 for 4, and at least 6 so the 4th draft still offers 3. The count is the length of the ship-module draft-level list. A health or shield bonus is optional, up to each module's design. Some modules are purely utility (economy, for example, costs only the slot it takes), some are situational, and their value comes from that.
 - **ShipCore** covers the ship's core, thruster, and ability as one module: one set of slots and one share of draft rolls. It follows the same slot rules. Its pool holds generic hull upgrades plus upgrades specific to the chosen ship, its movement, and its ability. It has no infinite upgrade. Its evolution starts as a stat package and can later evolve the ship's ability.
 - **Slots:** 3 before evolution. Filling them with Commons takes 12 picks and gives ×2.5 the module's base value.
 - **Evolution:** triggers when all 3 slots hold max-stack upgrades. It keeps the slotted upgrades and gives ×1.6. It opens a 4th slot drawing from a pool specific to that evolution path, and unlocks the module's infinite upgrade if it has one. Evolved modules keep the base module's tag so slotted upgrades still apply. Weapons have 2 paths, and the player picks one when evolution triggers. Evolutions start as stat packages; the new mechanics of evolved weapons come later.
@@ -135,3 +135,17 @@ A full pool is about 6 Common, 3 Rare, 2 Epic, and 1 Legendary per module. That 
 **Modules:**
 - Each weapon at base: about the same DPS as any other weapon.
 - Each ship module at base, counting its unique bonus: about the defensive value of the bare ShipCore, so one ship module roughly doubles a fresh ship's durability. Grant flat amounts where possible: percents from different modules multiply (+200% and +200% give ×9), while flats add up as the model assumes.
+- Fire-rate bonuses use `TimeScale`, not Cooldown reductions. DPS grows linearly with TimeScale (+36% gives +36%), while Cooldown −36% gives +56% and −100% fires every frame.
+- Effects scaled by a multiplier (a module's or ability's `EffectMultiplier`, enemy scaling) avoid negative percents unless the drawback should grow with it: −75% at ×1.33 is −100%. A percent below −100% counts as −100%.
+
+**Ship modules, first pass** (*tunable*). Sized at about +175 effective HP each, about one fresh ship (today's ships have 115-225). These are placeholders until playtesting: some modules should give up the health or shield part in favour of their role.
+
+| Module | Passive (ShipCore) | Trigger → buff (duration / cooldown) |
+|---|---|---|
+| Armor Plating | +150 health, +10 ramming damage | none |
+| Shield Capacitor | +110 shields, +4 shield regen | none |
+| Repair Nanites | +100 health, +1.5 HP regen | none |
+| Salvage Processor | +100 shields, scrap gain +0.25 | none |
+| Phase Shroud | +100 health | Hull damage → Ghost, 1.5s / 10s |
+| Berserker Core | +100 shields | 5 kills in 4s → weapon TimeScale +33%, 5s / 5s |
+| Emergency Thrusters | +100 health | Shields broken → MaxSpeed and Thrust +50%, 3s / 12s |

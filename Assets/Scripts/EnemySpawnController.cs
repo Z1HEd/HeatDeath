@@ -379,7 +379,7 @@ public class EnemySpawnController : MonoBehaviour
 
         float scalingFraction = waveEnemyMultiplier - 1f;
         foreach (var effect in enemyScalerEffects)
-            enemy.GetComponent<EffectManager>().AddEffect(effect.Stacked(scalingFraction));
+            enemy.effectManager.AddEffect(effect.Copy(scalingFraction));
 
         enemy.SetXPMultiplier(waveXPMultiplier);
 

@@ -17,11 +17,13 @@ public class GameUIController : MonoBehaviour
     private Player player;
     private UpgradeManager upgradeManager;
     private UpgradeDraftService upgradeDraftService;
-    private WeaponDraftService weaponDraftService;
+    private ModuleDraftService<WeaponDefinition> weaponDraftService;
+    private ModuleDraftService<ShipModuleDefinition> shipModuleDraftService;
     private ShipDraftService shipDraftService;
 
     private List<ShipDefinition> currentShipOptions = new List<ShipDefinition>();
-    private List<WeaponDefinition> currentWeaponOptions = new List<WeaponDefinition>();
+    private readonly List<WeaponDefinition> currentWeaponOptions = new List<WeaponDefinition>();
+    private readonly List<ShipModuleDefinition> currentShipModuleOptions = new List<ShipModuleDefinition>();
     private List<UpgradeDefinition> currentOptions = new List<UpgradeDefinition>();
 
     private VisualElement healthFill;
@@ -43,6 +45,7 @@ public class GameUIController : MonoBehaviour
     private int pendingShipDrafts;
     private int pendingUpgradeDrafts;
     private int pendingWeaponDrafts;
+    private int pendingShipModuleDrafts;
 
     private void Awake()
     {
@@ -60,7 +63,8 @@ public class GameUIController : MonoBehaviour
 
         shipDraftService = new ShipDraftService();
         upgradeDraftService = new UpgradeDraftService();
-        weaponDraftService = new WeaponDraftService();
+        weaponDraftService = new ModuleDraftService<WeaponDefinition>("Weapons");
+        shipModuleDraftService = new ModuleDraftService<ShipModuleDefinition>("ShipModules");
 
         GameController.Instance.OnXPChanged += UpdateXPBar;
         GameController.Instance.OnLevelChanged += UpdateLevelText;
@@ -154,22 +158,25 @@ public class GameUIController : MonoBehaviour
     {
         Time.timeScale = 0f;
         if (pendingShipDrafts > 0)
-        {
             ShowShipDraft();
-            return;
-        }
-
-        if (pendingUpgradeDrafts <= 0 && pendingWeaponDrafts <= 0)
+        else if (pendingWeaponDrafts > 0)
+            ShowModuleDraft(weaponDraftService, currentWeaponOptions, ref pendingWeaponDrafts, "Choose Weapon", def => def.Description);
+        else if (pendingShipModuleDrafts > 0)
+            ShowModuleDraft(shipModuleDraftService, currentShipModuleOptions, ref pendingShipModuleDrafts, "Choose Ship Module", def => def.Description);
+        else if (pendingUpgradeDrafts > 0)
+            ShowUpgradeDraft();
+        else
         {
             SetUpgradeOverlayVisible(false);
             Time.timeScale = 1f;
-            return;
         }
+    }
 
-        if (pendingWeaponDrafts > 0)
-            ShowWeaponDraft();
-        else
-            ShowUpgradeDraft();
+    // Dev shortcut: an extra ship-module draft, shown at once.
+    public void QueueShipModuleDraft()
+    {
+        pendingShipModuleDrafts++;
+        ShowNextDraftOrResume();
     }
 
     private void ShowShipDraft()
@@ -195,30 +202,31 @@ public class GameUIController : MonoBehaviour
             });
     }
 
-    private void ShowWeaponDraft()
+    // Weapon and ship-module drafts. With no candidates, the draft becomes an upgrade draft, so no level is lost.
+    private void ShowModuleDraft<T>(ModuleDraftService<T> service, List<T> options, ref int pending,
+        string title, Func<T, string> describe) where T : ModuleDefinition
     {
         upgradePanel?.AddToClassList("weapon-draft-active");
         upgradePanel?.RemoveFromClassList("ship-draft-active");
 
-        currentWeaponOptions = weaponDraftService.GetDraftOptions(player, 3);
+        options.Clear();
+        options.AddRange(service.GetDraftOptions(player, 3));
 
-        if (currentWeaponOptions.Count == 0)
+        if (options.Count == 0)
         {
-            pendingWeaponDrafts--;
+            pending--;
+            pendingUpgradeDrafts++;
             ShowNextDraftOrResume();
             return;
         }
 
-        string header = pendingWeaponDrafts > 1
-            ? $"Choose Weapon ({pendingWeaponDrafts} picks remaining)"
-            : "Choose Weapon";
+        string header = pending > 1 ? $"{title} ({pending} picks remaining)" : title;
 
-        PopulateDraftButtons(header, currentWeaponOptions.Count,
+        PopulateDraftButtons(header, options.Count,
             i =>
             {
-                WeaponDefinition def = currentWeaponOptions[i];
                 ClearRarityClasses(optionButtons[i]);
-                optionButtons[i].text = $"{def.DisplayName}\n{def.Description}";
+                optionButtons[i].text = $"{options[i].DisplayName}\n{describe(options[i])}";
             });
     }
 
@@ -301,6 +309,14 @@ public class GameUIController : MonoBehaviour
             player.moduleManager.AddWeapon(currentWeaponOptions[index]);
             pendingWeaponDrafts--;
         }
+        else if (pendingShipModuleDrafts > 0)
+        {
+            if (index < 0 || index >= currentShipModuleOptions.Count)
+                return;
+
+            player.moduleManager.AddShipModule(currentShipModuleOptions[index]);
+            pendingShipModuleDrafts--;
+        }
         else
         {
             if (index < 0 || index >= currentOptions.Count)
@@ -322,6 +338,8 @@ public class GameUIController : MonoBehaviour
         {
             if (GameController.Instance.IsWeaponDraftLevel(level))
                 pendingWeaponDrafts++;
+            else if (GameController.Instance.IsShipModuleDraftLevel(level))
+                pendingShipModuleDrafts++;
             else
                 pendingUpgradeDrafts++;
         }

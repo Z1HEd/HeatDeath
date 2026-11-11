@@ -3,6 +3,23 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 
+// What one hit took from a ship.
+public readonly struct DamageTaken
+{
+    public readonly IHitter Attacker;
+    public readonly float Shields;
+    public readonly float Hull;
+    public readonly bool ShieldsBroken;
+
+    public DamageTaken(IHitter attacker, float shields, float hull, bool shieldsBroken)
+    {
+        Attacker = attacker;
+        Shields = shields;
+        Hull = hull;
+        ShieldsBroken = shieldsBroken;
+    }
+}
+
 [RequireComponent(typeof(SpriteRenderer))]
 public class ShipCoreModule : ModuleBase, IHitter
 {
@@ -32,6 +49,8 @@ public class ShipCoreModule : ModuleBase, IHitter
     private float rippleStartTime = float.NegativeInfinity;
 
     public event Action OnHPShieldsChanged;
+    // Each hit that takes shields or health. Regen never raises it, and neither do hits while invincible.
+    public event Action<DamageTaken> OnDamageTaken;
 
     public float CurrentHealth => health.CurrentValue;
     public float CurrentShields => shields.CurrentValue;
@@ -97,7 +116,8 @@ public class ShipCoreModule : ModuleBase, IHitter
         if (hitter.transform.position.y>transform.position.y) 
             damage *= hitter.BackstabMultiplier;
         
-        bool hadShields = shields.CurrentValue > 0f;
+        float shieldsBefore = shields.CurrentValue, healthBefore = health.CurrentValue;
+        bool hadShields = shieldsBefore > 0f;
         damage = shields.Consume(damage,hitter.ShieldDamageMultiplier);
         if (damage > 0f)
             health.Consume(damage,hitter.HPDamageMultiplier);
@@ -111,6 +131,10 @@ public class ShipCoreModule : ModuleBase, IHitter
             StartCoroutine(FlashShield(hitter.transform.position));
         }
 
+        var taken = new DamageTaken(hitter, shieldsBefore - shields.CurrentValue,
+            healthBefore - health.CurrentValue, hadShields && shieldsGone);
+        if (taken.Shields > 0f || taken.Hull > 0f)
+            OnDamageTaken?.Invoke(taken);
         OnHPShieldsChanged?.Invoke();
         return damage>0 || (hadShields && shieldsGone);
     }

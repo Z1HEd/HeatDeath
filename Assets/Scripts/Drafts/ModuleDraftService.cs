@@ -1,30 +1,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WeaponDraftService
+// Drafts modules of one kind, such as weapons or ship modules, from a Resources folder.
+public class ModuleDraftService<T> where T : ModuleDefinition
 {
-    private readonly List<WeaponDefinition> definitions;
+    private readonly List<T> definitions;
     private readonly System.Random random;
 
-    public WeaponDraftService(int? seed = null)
+    public ModuleDraftService(string resourcesFolder, int? seed = null)
     {
-        definitions = new List<WeaponDefinition>(Resources.LoadAll<WeaponDefinition>("Weapons"));
+        definitions = new List<T>(Resources.LoadAll<T>(resourcesFolder));
         random = seed.HasValue ? new System.Random(seed.Value) : new System.Random();
     }
 
-    // Returns up to optionCount random uninstalled weapons.
-    public List<WeaponDefinition> GetDraftOptions(Player player, int optionCount)
+    // Returns up to optionCount random modules the player hasn't installed.
+    public List<T> GetDraftOptions(Player player, int optionCount)
     {
-        var result = new List<WeaponDefinition>();
+        var result = new List<T>();
         if (player == null || optionCount <= 0)
             return result;
 
         ModuleManager moduleManager = player.GetComponent<ModuleManager>();
 
-        var candidates = new List<WeaponDefinition>();
+        var candidates = new List<T>();
         for (int i = 0; i < definitions.Count; i++)
         {
-            WeaponDefinition def = definitions[i];
+            T def = definitions[i];
             if (def != null && (moduleManager == null || !moduleManager.HasModule(def)))
                 candidates.Add(def);
         }

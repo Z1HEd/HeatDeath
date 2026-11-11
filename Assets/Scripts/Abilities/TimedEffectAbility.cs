@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using MackySoft.SerializeReferenceExtensions;
 public class TimedEffectAbility : AbilityModule
 {
     [SerializeField]
@@ -13,7 +12,6 @@ public class TimedEffectAbility : AbilityModule
     [SerializeReference]
     [SubclassSelector]
     protected List<Effect> baseEffects = new();
-    private List<Effect> appliedEffects = new List<Effect>();
     private bool isActive = false;
     public override bool IsActivatable => !isActive && cooldown.CurrentValue == 0f;
     public override bool IsActive => isActive;
@@ -38,11 +36,7 @@ public class TimedEffectAbility : AbilityModule
         if (!IsActivatable) return;
         isActive = true;
         duration.ResetToMax();
-        foreach (var appliedEffect in EmitEffects(baseEffects, effectMultiplier))
-        {
-            appliedEffects.Add(appliedEffect);
-            ship.effectManager.AddEffect(appliedEffect);
-        }
+        ship.effectManager.Apply(this, EmitEffects(baseEffects, effectMultiplier));
         InvokeUpdateActivatable();
     }
 
@@ -52,9 +46,7 @@ public class TimedEffectAbility : AbilityModule
         isActive = false;
         cooldown.ResetToMax();
         InvokeUpdateActivatable();
-        foreach (var effect in appliedEffects)
-            ship.effectManager.RemoveEffect(effect);
-        appliedEffects.Clear();
+        ship.effectManager.Remove(this);
     }
 
     protected override void CollectStats(List<IStat> stats)

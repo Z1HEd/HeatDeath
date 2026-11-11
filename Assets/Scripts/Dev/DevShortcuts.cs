@@ -10,9 +10,6 @@ public class DevShortcuts : MonoBehaviour
     // Jump to the start of sector 1, 2, ... Past the sector list it's endless mode.
     private static readonly Key[] SectorKeys = { Key.F5, Key.F6, Key.F7, Key.F8, Key.F9, Key.F10 };
 
-    private StatModifierEffect invincibilityEffect;
-    private Player invinciblePlayer;
-
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Install()
     {
@@ -22,7 +19,7 @@ public class DevShortcuts : MonoBehaviour
 
         Debug.Log($"[Dev] Shortcuts: F1 +1 level, F2 +{BigLevelStep} levels, " +
                   "F3 skip wave, F4 toggle invincibility, " +
-                  $"F5-F{4 + SectorKeys.Length} jump to sector 1-{SectorKeys.Length}");
+                  $"F5-F{4 + SectorKeys.Length} jump to sector 1-{SectorKeys.Length}, F11 ship-module draft");
     }
 
     private void Update()
@@ -35,6 +32,7 @@ public class DevShortcuts : MonoBehaviour
         if (keyboard.f2Key.wasPressedThisFrame) AddLevels(BigLevelStep);
         if (keyboard.f3Key.wasPressedThisFrame) SkipWave();
         if (keyboard.f4Key.wasPressedThisFrame) ToggleInvincibility();
+        if (keyboard.f11Key.wasPressedThisFrame) DraftShipModule();
 
         for (int i = 0; i < SectorKeys.Length; i++)
             if (keyboard[SectorKeys[i]].wasPressedThisFrame)
@@ -59,6 +57,17 @@ public class DevShortcuts : MonoBehaviour
             EnemySpawnController.Instance.SkipWave();
     }
 
+    private static void DraftShipModule()
+    {
+        if (GameController.Instance == null || GameController.Instance.Player == null)
+        {
+            Debug.Log("[Dev] No player yet.");
+            return;
+        }
+
+        GameUIController.Instance.QueueShipModuleDraft();
+    }
+
     private void ToggleInvincibility()
     {
         Player player = GameController.Instance != null ? GameController.Instance.Player : null;
@@ -68,20 +77,18 @@ public class DevShortcuts : MonoBehaviour
             return;
         }
 
-        if (invincibilityEffect != null && invinciblePlayer == player)
+        if (player.effectManager.IsActive(this))
         {
-            player.effectManager.RemoveEffect(invincibilityEffect);
+            player.effectManager.Remove(this);
             player.IgnoresKnockback = false;
-            invincibilityEffect = null;
             Debug.Log("[Dev] Invincibility off");
             return;
         }
 
         var tags = new List<TagDefinition> { Resources.Load<TagDefinition>("ModuleTags/ShipCore") };
         var permanent = new ResourceStat(StatType.Duration, float.PositiveInfinity, 0f);
-        invincibilityEffect = new StatModifierEffect(StatType.Invincibility, new StatModifier(1f, 0f), tags, permanent);
-        invinciblePlayer = player;
-        player.effectManager.AddEffect(invincibilityEffect);
+        var invincibility = new StatModifierEffect(StatType.Invincibility, new StatModifier(1f, 0f), tags, permanent);
+        player.effectManager.Apply(this, new Effect[] { invincibility });
         player.IgnoresKnockback = true;
         Debug.Log("[Dev] Invincibility on");
     }

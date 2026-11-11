@@ -1,27 +1,22 @@
 using System;
 using UnityEngine;
 
+// Multiplies the ship's velocity once, when added.
 [Serializable]
 public class MultiplyRigidbodyVelocityEffect : Effect
 {
     [SerializeField]
     private float multiplier;
-    public MultiplyRigidbodyVelocityEffect(){}
-    public MultiplyRigidbodyVelocityEffect(ResourceStat duration, float Multiplier)
+
+    public override void ApplyToShip(Ship ship)
     {
-        this.duration = duration;
-        multiplier = Multiplier;
+        ship.GetComponent<Rigidbody2D>().linearVelocity *= multiplier;
     }
-    public override bool IsApplicableTo(ModuleDefinition definition){return false;}
-    public override void ApplyToModule(ModuleBase module) {}
-    public override void ApplyToShip(Ship ship) 
+
+    protected override Effect Stacked(float times)
     {
-        ship.GetComponent<Rigidbody2D>().linearVelocity *=multiplier;
-    }
-    public override void RemoveFromShip(Ship ship) {}
-    public override Effect Stacked(float times)
-    {
-        var durationCopy = new ResourceStat(duration.Type, duration.BaseValue, duration.MinValue);
-        return new MultiplyRigidbodyVelocityEffect(durationCopy,Mathf.Pow(multiplier,times));
+        var copy = (MultiplyRigidbodyVelocityEffect)base.Stacked(times);
+        copy.multiplier = Mathf.Pow(multiplier, times);
+        return copy;
     }
 }

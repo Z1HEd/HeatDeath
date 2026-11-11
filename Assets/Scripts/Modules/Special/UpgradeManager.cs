@@ -7,7 +7,6 @@ public class UpgradeManager : MonoBehaviour
 {
     private Ship ship;
     private readonly Dictionary<UpgradeDefinition, int> stackCounts = new Dictionary<UpgradeDefinition, int>();
-    private readonly Dictionary<UpgradeDefinition,List<Effect>> relatedEffects = new Dictionary<UpgradeDefinition, List<Effect>>();
     public void Awake()
     {
         ship = GetComponent<Ship>();
@@ -47,36 +46,19 @@ public class UpgradeManager : MonoBehaviour
     }
     public void ClearAll()
     {
-        if (stackCounts.Count == 0)
-            return;
-
+        foreach (var upgrade in stackCounts.Keys)
+            ship.effectManager.Remove(upgrade);
         stackCounts.Clear();
-        ClearRelatedEffects();
-    }
-    private void ClearRelatedEffects()
-    {
-        foreach (var upgrade in relatedEffects.Keys)
-            foreach (var effect in relatedEffects[upgrade])
-                ship.effectManager.RemoveEffect(effect);
-        relatedEffects.Clear();
     }
 
+    // The upgrade is the effects' source, so the new copies replace those of the old stack count.
     private void UpdateRelatedEffects(UpgradeDefinition upgrade)
     {
-        if (relatedEffects.ContainsKey(upgrade))
-            foreach (var effect in relatedEffects[upgrade])
-                ship.effectManager.RemoveEffect(effect);
         int stacks = stackCounts[upgrade];
-        List<Effect> newEffects = new List<Effect>();
+        var copies = new List<Effect>();
         foreach (var effect in upgrade.Effects)
-        {
-            newEffects.Add(effect.Stacked(stacks));
-        }
-        foreach (var newEffect in newEffects)
-        {
-            ship.effectManager.AddEffect(newEffect);
-        }
-        relatedEffects[upgrade] = newEffects;
+            copies.Add(effect.Copy(stacks));
+        ship.effectManager.Apply(upgrade, copies);
     }
 
     public int GetStackCount(UpgradeDefinition upgrade)

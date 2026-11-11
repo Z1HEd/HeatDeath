@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8810421351343413019
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3654065959531851838}
+  - component: {fileID: 1580705594319498226}
+  m_Layer: 0
+  m_Name: ArmorPlating
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3654065959531851838
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8810421351343413019}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1580705594319498226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8810421351343413019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cce6a178c1d4055a7de3c7423a5ee51, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::ShipModule
+  moduleDefinition: {fileID: 11400000, guid: e243e6385d6b46dc86aed3cb54125a5f, type: 2}
+  effectMultiplier:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0
+  features:
+  - rid: 4969173875565801123
+  references:
+    version: 2
+    RefIds:
+    - rid: 4969173875565801123
+      type: {class: PassiveEffects, ns: , asm: Assembly-CSharp}
+      data:
+        effects:
+        - rid: 4330477105993631725
+        - rid: 8505861915625796002
+    - rid: 4330477105993631725
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: Infinity
+          baseValue: Infinity
+          minValue: 0
+        stat: 1
+        statModifier:
+          Flat: 150
+          Percent: 0
+        targetTags:
+        - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
+    - rid: 8505861915625796002
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: Infinity
+          baseValue: Infinity
+          minValue: 0
+        stat: 6
+        statModifier:
+          Flat: 10
+          Percent: 0
+        targetTags:
+        - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}

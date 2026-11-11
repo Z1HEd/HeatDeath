@@ -10032,10 +10032,10 @@ MonoBehaviour:
           currentValue: 0
           baseValue: Infinity
           minValue: 0
-        stat: 8
+        stat: 22
         statModifier:
           Flat: 0
-          Percent: -50
+          Percent: 100
         targetTags:
         - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
     - rid: 7682644111872491731

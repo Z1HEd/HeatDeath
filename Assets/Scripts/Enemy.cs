@@ -1,7 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Enemy: Ship
 {
+    // Every enemy killed in play. Enemies cleared without rewards (dev shortcuts) don't count.
+    public static event Action<Enemy> OnAnyKilled;
+
     [SerializeField]
     protected Player _player;
     [SerializeField]
@@ -32,6 +36,7 @@ public class Enemy: Ship
             return;
 
         GameController.Instance.AddXP(xpReward * xpMultiplier);
+        OnAnyKilled?.Invoke(this);
         base.Die();
     }
 }

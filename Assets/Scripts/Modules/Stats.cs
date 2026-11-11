@@ -51,9 +51,11 @@ public struct StatModifier
     }
 
     // Flats add up. Percents multiply as factors, so a -100% stays exactly -100% whatever else applies.
+    // A percent below -100% (say, scaled up by a multiplier) counts as -100%: two negative factors
+    // would otherwise multiply into a positive one.
     public static StatModifier Combine(StatModifier a, StatModifier b)
     {
-        float factor = (1f + a.Percent / 100f) * (1f + b.Percent / 100f);
+        float factor = Mathf.Max(0f, 1f + a.Percent / 100f) * Mathf.Max(0f, 1f + b.Percent / 100f);
         return new StatModifier(a.Flat + b.Flat, (factor - 1f) * 100f);
     }
 }

@@ -1,13 +1,11 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.Serialization;
 
 public abstract class ModuleBase: MonoBehaviour
 {
     [SerializeField] private ModuleDefinition moduleDefinition;
 
     protected Ship ship;
-    protected UpgradeManager upgradeManager;
     public ModuleDefinition ModuleDefinition => moduleDefinition;
     public Dictionary<StatType, StatModifier> currentModifiers = new Dictionary<StatType, StatModifier>();
     private readonly List<IStat> collectedStats = new List<IStat>();
@@ -63,7 +61,7 @@ public abstract class ModuleBase: MonoBehaviour
             if (template == null)
                 continue;
 
-            Effect copy = template.Stacked(times);
+            Effect copy = template.Copy(times);
             copy.ModifyDuration(durationModifier);
             result.Add(copy);
         }

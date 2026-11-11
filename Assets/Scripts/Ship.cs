@@ -39,6 +39,7 @@ public class Ship : MonoBehaviour, IHittable
     public bool IsKnockedBack => knockbackTimeRemaining > 0f;
     public bool IsDead => dead;
     public ShipCoreModule CoreModule => coreModule;
+    public ShipAppearance Appearance { get; private set; }
 
     protected virtual void Awake()
     {
@@ -53,6 +54,8 @@ public class Ship : MonoBehaviour, IHittable
         _material = Instantiate(spriteRenderer.sharedMaterial);
         spriteRenderer.sharedMaterial = _material;
         flashMaterials.Add(_material);
+
+        Appearance = new ShipAppearance(this);
     }
 
     protected virtual void OnDestroy()
@@ -135,7 +138,7 @@ public class Ship : MonoBehaviour, IHittable
 
         foreach (var effect in effects)
             if (effect != null)
-                effectManager.AddStatusEffect(effect.Stacked(1f));
+                effectManager.AddStatusEffect(effect.Copy());
     }
 
     public virtual void Die()

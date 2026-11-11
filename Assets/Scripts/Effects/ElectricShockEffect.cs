@@ -20,24 +20,6 @@ public class ElectricShockEffect : Effect
     private Ship target;
     private float timeToNextShock;
 
-    public ElectricShockEffect() { }
-
-    private ElectricShockEffect(ResourceStat duration, Material material, float regionRadius,
-        float minInterval, float maxInterval, float flickerLength, int maxFlickers)
-    {
-        this.duration = duration;
-        this.material = material;
-        this.regionRadius = regionRadius;
-        this.minInterval = minInterval;
-        this.maxInterval = maxInterval;
-        this.flickerLength = flickerLength;
-        this.maxFlickers = maxFlickers;
-    }
-
-    public override bool IsApplicableTo(ModuleDefinition definition) => false;
-
-    public override void ApplyToModule(ModuleBase module) { }
-
     public override void ApplyToShip(Ship ship)
     {
         target = ship;
@@ -62,12 +44,5 @@ public class ElectricShockEffect : Effect
         }
 
         return stillActive;
-    }
-
-    public override Effect Stacked(float times)
-    {
-        var durationCopy = new ResourceStat(duration.Type, duration.BaseValue, duration.MinValue);
-        return new ElectricShockEffect(durationCopy, material, regionRadius, minInterval, maxInterval,
-            flickerLength, maxFlickers);
     }
 }

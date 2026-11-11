@@ -11,12 +11,12 @@ public class StatModifierEffect : Effect
 
     public bool HasTargetTags => targetTags != null && targetTags.Count > 0;
     public StatModifierEffect(){}
-    public StatModifierEffect(StatType Stat, StatModifier Modifier, List<TagDefinition> TargetTags, ResourceStat Duration)
+    public StatModifierEffect(StatType stat, StatModifier statModifier, List<TagDefinition> targetTags, ResourceStat duration)
     {
-        stat = Stat;
-        statModifier = Modifier;
-        targetTags = TargetTags;
-        duration = Duration;
+        this.stat = stat;
+        this.statModifier = statModifier;
+        this.targetTags = targetTags;
+        this.duration = duration;
     }
 
     public override bool IsApplicableTo(ModuleDefinition moduleDefinition)
@@ -24,9 +24,6 @@ public class StatModifierEffect : Effect
         if (moduleDefinition == null) return false;
         return moduleDefinition.MatchesAnyTag(targetTags);
     }
-
-    public override void ApplyToShip(Ship ship){}
-    public override void RemoveFromShip(Ship ship){}
 
     public override void ApplyToModule(ModuleBase module)
     {
@@ -70,9 +67,10 @@ public class StatModifierEffect : Effect
         return true;
     }
 
-    public override Effect Stacked(float times)
+    protected override Effect Stacked(float times)
     {
-        var durationCopy = new ResourceStat(duration.Type, duration.BaseValue, duration.MinValue);
-        return new StatModifierEffect(stat,statModifier*times,targetTags, durationCopy);
+        var copy = (StatModifierEffect)base.Stacked(times);
+        copy.statModifier = statModifier * times;
+        return copy;
     }
 }

@@ -96,4 +96,16 @@ public class ModuleManager : MonoBehaviour
         Debug.LogError("Failed to add weapon: missing turret mount");
         return null;
     }
+
+    // Ship modules sit on the ship root, with no mount and no HUD button.
+    public ShipModule AddShipModule(ShipModuleDefinition definition)
+    {
+        var module = Instantiate(definition.ModulePrefab, transform).GetComponent<ShipModule>();
+        if (module == null)
+            Debug.LogError($"Ship module prefab for {definition.DisplayName} has no ShipModule");
+
+        // Now rather than in its Start, so a second draft in the same frame doesn't offer it again.
+        AddModule(module);
+        return module;
+    }
 }

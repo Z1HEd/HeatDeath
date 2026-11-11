@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using MackySoft.SerializeReferenceExtensions;
 public class ExplosionAbility : AbilityModule, IHitter
 {
     [SerializeField] protected ScalarStat damage = new ScalarStat(StatType.Damage,0f,0f);
@@ -22,7 +21,6 @@ public class ExplosionAbility : AbilityModule, IHitter
     protected List<Effect> baseEffects = new();
     [SerializeField]
     private int explosionLayer;
-    private List<Effect> appliedEffects = new();
     public override bool IsActivatable => cooldown.CurrentValue == 0f;
     public override bool IsActive => false;
     public override float CooldownFraction => cooldown.Fraction;
