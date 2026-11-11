@@ -34,6 +34,8 @@ public class Ship : MonoBehaviour, IHittable
     // One copy per renderer: sprites with different textures must not share a material.
     private readonly List<Material> flashMaterials = new List<Material>();
 
+    // Set by dev shortcuts only.
+    public bool IgnoresKnockback { get; set; }
     public bool IsKnockedBack => knockbackTimeRemaining > 0f;
     public bool IsDead => dead;
     public ShipCoreModule CoreModule => coreModule;
@@ -103,7 +105,7 @@ public class Ship : MonoBehaviour, IHittable
 
     public void ApplyKnockback(IHitter hitter, Vector3 direction)
     {
-        if (dead)
+        if (dead || IgnoresKnockback)
             return;
 
         if (shipRigidbody == null || hitter.KnockbackPower <= 0f)

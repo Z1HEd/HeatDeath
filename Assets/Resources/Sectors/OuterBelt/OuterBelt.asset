@@ -14,8 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SectorDefinition
   sectorName: Outer Belt
   waves:
+  - {fileID: 11400000, guid: c23a210757fc7f64090a707803af9fd0, type: 2}
+  - {fileID: 11400000, guid: 491a188eee664862ac2c3fa41be9216f, type: 2}
   - {fileID: 11400000, guid: b5629ce4501d9ff47805e4382ee00454, type: 2}
   - {fileID: 11400000, guid: a8e7698a38fe79a4e97634dfa06768bd, type: 2}
-  - {fileID: 11400000, guid: c23a210757fc7f64090a707803af9fd0, type: 2}
   - {fileID: 11400000, guid: 9b04afdbbe9465e458ead75172d29096, type: 2}
+  - {fileID: 11400000, guid: 0553829e90b1473cb2ca37718fdad486, type: 2}
+  - {fileID: 11400000, guid: eac419ab848a4df7895c068d60b6b64e, type: 2}
+  - {fileID: 11400000, guid: 210724ab204448d08c4adeacc44203f9, type: 2}
   - {fileID: 11400000, guid: b113db65a0e7eb040a0d9fc591fdc8fa, type: 2}
+  cachedTotalXP: 600
+  cachedTotalEnemyCount: 148

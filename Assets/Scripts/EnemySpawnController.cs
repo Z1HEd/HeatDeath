@@ -7,7 +7,6 @@ using UnityEngine;
 public class EnemySpawnController : MonoBehaviour
 {
     private static EnemySpawnController instance;
-    public const float ENEMY_SCALING_COEFFICIENT = 1.25f;
 
     [Header("Pacing")]
     [Tooltip("Pause before each wave (after the first wave of a sector).")]
@@ -28,6 +27,14 @@ public class EnemySpawnController : MonoBehaviour
     [SerializeField] private bool randomizeWaveOrder = true;
 
     [Header("Scaling")]
+    [Tooltip("Enemy multiplier at the start of sector 1, 2, 3... It grows geometrically between keys. " +
+             "Run progress counts sectors played, never which sector it is.")]
+    [SerializeField] private List<float> enemyMultiplierAtSectorStart = new List<float> { 1f, 3.5f, 9f, 20f, 30f, 42f };
+    [Tooltip("Enemy multiplier growth per sector past the last key.")]
+    [SerializeField] private float endlessMultiplierGrowth = 1.3f;
+    [Tooltip("Enemy scrap rewards grow by this fraction of their base value per sector of run progress.")]
+    [SerializeField] private float xpRewardGrowthPerSector = 0.3f;
+    [Tooltip("Each spawned enemy gets these stacked by (enemy multiplier - 1), so +100% gives exactly the multiplier.")]
     [SerializeField] private List<StatModifierEffect> enemyScalerEffects = new List<StatModifierEffect>();
     
     private BoxCollider2D spawnCollider;
@@ -47,8 +54,15 @@ public class EnemySpawnController : MonoBehaviour
     private int spawnedThisWave;
     private float spawnTimer;
     private readonly List<Enemy> aliveEnemies = new List<Enemy>();
+    private readonly List<Enemy> waveBosses = new List<Enemy>();
+    // Lowest point the bosses reached, so shield regen can't take back released escorts.
+    private float lowestBossFraction = 1f;
 
-    private float xpCounter;
+    // Scaling state, set once per wave in StartWave.
+    private int sectorsStarted;
+    private float waveEnemyMultiplier = 1f;
+    private float waveXPMultiplier = 1f;
+
     private int waveCounter;
     public int WaveCounter => waveCounter;
 
@@ -90,7 +104,8 @@ public class EnemySpawnController : MonoBehaviour
                 ? currentWave.SpawnCooldown * aliveEnemies.Count / denom
                 : 0f;
  
-            if (spawnTimer >= dynamicCooldown && aliveEnemies.Count < currentWave.MaxConcurrentEnemies)
+            // The escort check runs every frame, so it sees the bosses' lowest point.
+            if (!IsEscortHeld() && spawnTimer >= dynamicCooldown && aliveEnemies.Count < currentWave.MaxConcurrentEnemies)
             {
                 TrySpawnFromWave();
                 spawnTimer = 0f;
@@ -130,6 +145,7 @@ public class EnemySpawnController : MonoBehaviour
 
         currentSector = sectorQueue[sectorQueueIndex];
         sectorQueueIndex++;
+        sectorsStarted++;
         currentWaveOrder = BuildWaveOrder(currentSector, randomizeWaveOrder);
         currentWaveIndex = 0;
         currentWave = null;
@@ -166,6 +182,12 @@ public class EnemySpawnController : MonoBehaviour
         spawnedThisWave = 0;
         spawnTimer = wave.SpawnCooldown; // spawn first enemy immediately
         aliveEnemies.Clear();
+        waveBosses.Clear();
+        lowestBossFraction = 1f;
+
+        float progress = sectorsStarted - 1 + (float)currentWaveIndex / currentWaveOrder.Count;
+        waveEnemyMultiplier = EnemyMultiplier(progress, enemyMultiplierAtSectorStart, endlessMultiplierGrowth);
+        waveXPMultiplier = XPRewardMultiplier(progress, xpRewardGrowthPerSector);
 
         remainingCounts.Clear();
         foreach (var entry in wave.EnemyEntries)
@@ -178,10 +200,28 @@ public class EnemySpawnController : MonoBehaviour
             OnWaveCleared();
     }
 
+    // M(p): geometric between the sector-start keys, then ×endlessGrowth per sector past the last key.
+    public static float EnemyMultiplier(float progress, IReadOnlyList<float> keys, float endlessGrowth)
+    {
+        if (keys == null || keys.Count == 0)
+            return 1f;
+
+        int last = keys.Count - 1;
+        if (progress >= last)
+            return keys[last] * Mathf.Pow(endlessGrowth, progress - last);
+
+        progress = Mathf.Max(0f, progress);
+        int i = Mathf.FloorToInt(progress);
+        return keys[i] * Mathf.Pow(keys[i + 1] / keys[i], progress - i);
+    }
+
+    public static float XPRewardMultiplier(float progress, float growthPerSector)
+    {
+        return 1f + growthPerSector * progress;
+    }
+
     private void OnWaveCleared()
     {
-        xpCounter += currentWave.TotalXP;
-
         currentWaveIndex++;
         if (currentWaveIndex < currentWaveOrder.Count)
         {
@@ -193,6 +233,54 @@ public class EnemySpawnController : MonoBehaviour
             currentWave = null;
             AdvanceToNextSector();
         }
+    }
+
+    // Dev shortcut: removes the wave's enemies without rewards and starts the next wave at once.
+    // During the pause between waves, it starts the upcoming wave at once instead.
+    public void SkipWave()
+    {
+        if (currentWaveOrder.Count == 0)
+            return;
+
+        StopAllCoroutines();
+        bool waveActive = currentWave != null;
+        ClearEnemiesWithoutRewards();
+        currentWave = null;
+
+        if (waveActive)
+            currentWaveIndex++;
+
+        if (currentWaveIndex < currentWaveOrder.Count)
+            StartWave(currentWaveOrder[currentWaveIndex]);
+        else
+            AdvanceToNextSector();
+    }
+
+    // Dev shortcut: starts sector N (from 1) as if N - 1 sectors had been played, so scaling uses its progress.
+    public void JumpToSector(int sector)
+    {
+        if (sector < 1 || sectorQueue.Count == 0)
+            return;
+
+        StopAllCoroutines();
+        ClearEnemiesWithoutRewards();
+        currentWave = null;
+
+        sectorsStarted = sector - 1;
+        endlessMode = sector > sectors.Count;
+        // Past the list, AdvanceToNextSector rebuilds the queue for endless mode.
+        sectorQueueIndex = endlessMode ? sectorQueue.Count : sector - 1;
+        AdvanceToNextSector();
+    }
+
+    // Destroy rather than Die, so no scrap is awarded.
+    private void ClearEnemiesWithoutRewards()
+    {
+        foreach (var enemy in aliveEnemies)
+            if (enemy != null)
+                Destroy(enemy.gameObject);
+
+        aliveEnemies.Clear();
     }
 
     // currentWave stays null for the duration of the pause, so Update() simply
@@ -219,7 +307,35 @@ public class EnemySpawnController : MonoBehaviour
 
         remainingCounts[entryIndex]--;
         spawnedThisWave++;
-        SpawnEnemy(prefab);
+        Enemy enemy = SpawnEnemy(prefab);
+        if (currentWave.EnemyEntries[entryIndex].isBoss)
+            waveBosses.Add(enemy);
+    }
+
+    // Boss waves: bosses spawn first, then bossEscortAtStart others. The rest are released in
+    // bossEscortReleaseSteps even groups as the bosses lose health + shields, all of them by
+    // releaseAllAtBossFraction, so a boss never fights alone.
+    // Dead bosses count as 0, so every escort is released by the time they die and the wave's scrap stays fixed.
+    private bool IsEscortHeld()
+    {
+        int bossCount = currentWave.BossCount;
+        if (bossCount == 0 || waveBosses.Count < bossCount)
+            return false;
+
+        float fraction = 0f;
+        foreach (var boss in waveBosses)
+            if (boss != null && !boss.IsDead && boss.CoreModule != null)
+                fraction += boss.CoreModule.DurabilityFraction;
+        lowestBossFraction = Mathf.Min(lowestBossFraction, fraction / bossCount);
+
+        int escorts = currentWave.TotalEnemyCount - bossCount;
+        int atStart = Mathf.Min(currentWave.BossEscortAtStart, escorts);
+        int steps = currentWave.BossEscortReleaseSteps;
+        float progress = Mathf.InverseLerp(1f, currentWave.ReleaseAllAtBossFraction, lowestBossFraction);
+        float releasedShare = Mathf.Floor(progress * steps) / steps;
+        int released = atStart + Mathf.FloorToInt((escorts - atStart) * releasedShare);
+
+        return spawnedThisWave - bossCount >= released;
     }
 
    private int PickWeightedRemainingEntry()
@@ -256,19 +372,20 @@ public class EnemySpawnController : MonoBehaviour
         return -1;
     }
 
-    private void SpawnEnemy(Enemy prefab)
+    private Enemy SpawnEnemy(Enemy prefab)
     {
         Vector2 spawnPosition = GetRandomSpawnPosition();
         Enemy enemy = Instantiate(prefab, spawnPosition, Quaternion.identity);
 
-        float levelEquivalent = xpCounter / GameController.XP_PER_LEVEL;
-        float scalingFraction = Mathf.Pow(ENEMY_SCALING_COEFFICIENT, levelEquivalent) - 1f;
-
+        float scalingFraction = waveEnemyMultiplier - 1f;
         foreach (var effect in enemyScalerEffects)
             enemy.GetComponent<EffectManager>().AddEffect(effect.Stacked(scalingFraction));
 
+        enemy.SetXPMultiplier(waveXPMultiplier);
+
         enemy.OnDeath += () => RemoveEnemy(enemy);
         aliveEnemies.Add(enemy);
+        return enemy;
     }
 
     private void RemoveEnemy(Enemy enemy)

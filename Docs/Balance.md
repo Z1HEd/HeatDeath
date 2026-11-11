@@ -59,7 +59,7 @@ Where they land in an 8-wave sector without scrap boosts:
 
 ## Enemy scaling
 
-- One multiplier `M(p)` applies to enemy health, shields, shield regen, and weapon damage, through `EnemySpawnController.enemyScalerEffects`. Health and damage scale together, so felt pressure grows roughly with M².
+- One multiplier `M(p)` applies to enemy health, shields, shield regen, weapon damage, and ramming damage, through `EnemySpawnController.enemyScalerEffects`. Health and damage scale together, so felt pressure grows roughly with M².
 - Keys at sector starts: `1, 3.5, 9, 20, 30, 42` (sectors 1-6). Between keys, M grows geometrically: `M = key[i] × (key[i+1] / key[i])^(p − i)`. *Tunable.*
 - Past the last key, M grows ×**1.3** per sector: `M = 42 × 1.3^(p − 5)`. *Tunable.*
 - M is computed once per wave, when the wave starts.
@@ -124,11 +124,13 @@ A full pool is about 6 Common, 3 Rare, 2 Epic, and 1 Legendary per module. That 
 **Sectors** (all 5 must match):
 - 600 base scrap in total, within 2%.
 - 8-10 waves. The last wave group is a single boss wave.
-- Total enemy count and total base durability (health + shields, before scaling) within ~10% of the reference. Reference: today's Outer Belt has 148 enemies and 10,650 durability over 5 waves; update this line when Outer Belt is re-authored.
+- `SectorDefinition` warns in the editor when a sector breaks one of these rules.
+- Equal difficulty is checked by playtest, not by a stat total. Health + shields ignores enemy damage and shield regen, so it doesn't show whether two sectors are equally hard.
 
 **Waves:**
-- Short and frequent: about 15-20 enemies per regular wave, so a sector's total stays near the reference.
-- Use `waveOrder` groups for structure: opener(s), shuffled middle waves, mini-boss wave(s), boss.
+- Short and frequent: about 15-20 enemies per regular wave.
+- Use `waveOrder` groups so difficulty ramps through the sector, with the order varying within each tier. Outer Belt's tiers: a calm opener (1), light waves (2), medium waves (3), heavy waves led by Strikers and Breakers (4), and the boss (5).
+- Boss wave: the boss starts with a small escort, and the rest of its wave is released as it takes damage. A boss shouldn't fight alone, and its minions shouldn't overshadow it.
 
 **Modules:**
 - Each weapon at base: about the same DPS as any other weapon.

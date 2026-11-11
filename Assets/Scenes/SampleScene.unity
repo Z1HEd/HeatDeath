@@ -651,7 +651,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a92966f9d27545c4ba8133d07267cd92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
-  waveEntryDelay: 2
+  waveEntryDelay: 1
   sectorEntryDelay: 3
   sectors:
   - {fileID: 11400000, guid: cae10b8d41c13734ebfe4adaf80de7b6, type: 2}
@@ -660,8 +660,8 @@ MonoBehaviour:
   randomizeWaveOrder: 1
   enemyScalerEffects:
   - duration:
-      currentValue: 0
-      baseValue: 0
+      currentValue: Infinity
+      baseValue: Infinity
       minValue: 0
     stat: 1
     statModifier:
@@ -670,8 +670,8 @@ MonoBehaviour:
     targetTags:
     - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
   - duration:
-      currentValue: 0
-      baseValue: 0
+      currentValue: Infinity
+      baseValue: Infinity
       minValue: 0
     stat: 2
     statModifier:
@@ -680,8 +680,8 @@ MonoBehaviour:
     targetTags:
     - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
   - duration:
-      currentValue: 0
-      baseValue: 0
+      currentValue: Infinity
+      baseValue: Infinity
       minValue: 0
     stat: 3
     statModifier:
@@ -690,8 +690,8 @@ MonoBehaviour:
     targetTags:
     - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
   - duration:
-      currentValue: 0
-      baseValue: 0
+      currentValue: Infinity
+      baseValue: Infinity
       minValue: 0
     stat: 6
     statModifier:
@@ -699,6 +699,16 @@ MonoBehaviour:
       Percent: 100
     targetTags:
     - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
+  - duration:
+      currentValue: Infinity
+      baseValue: Infinity
+      minValue: 0
+    stat: 6
+    statModifier:
+      Flat: 0
+      Percent: 100
+    targetTags:
+    - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
 --- !u!61 &1304093821
 BoxCollider2D:
   m_ObjectHideFlags: 0

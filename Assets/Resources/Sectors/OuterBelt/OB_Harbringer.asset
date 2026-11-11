@@ -23,8 +23,11 @@ MonoBehaviour:
   - enemyPrefab: {fileID: 362748142000764873, guid: 7d41aeaf1146e9842acf84602235018f, type: 3}
     count: 2
     isBoss: 0
-  maxConcurrentEnemies: 4
+  maxConcurrentEnemies: 5
   spawnCooldown: 2
-  waveOrder: 3
-  cachedTotalXP: 300
+  waveOrder: 5
+  bossEscortAtStart: 2
+  releaseAllAtBossFraction: 0.25
+  bossEscortReleaseSteps: 2
+  cachedTotalXP: 92
   cachedTotalEnemyCount: 7

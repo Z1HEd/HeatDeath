@@ -5,13 +5,25 @@ using System.Collections.Generic;
 public class GameController : MonoBehaviour
 {
     private static GameController instance;
-    public const float XP_PER_LEVEL = 100f;
-    
+
     [SerializeField]
     private int currentLevel = 0;
     [SerializeField]
     private float currentXP = 0f;
-    private List<int> weaponDraftLevels = new List<int> { 0, 10, 20, 40 };
+
+    [Header("Level curve")]
+    [Tooltip("Scrap needed to go from level 1 to 2.")]
+    [SerializeField] private float baseXPPerLevel = 20f;
+    [Tooltip("How much more scrap each following level needs. The cost is rounded.")]
+    [SerializeField] private float xpIncreasePerLevel = 1.2f;
+
+    [Header("Module drafts")]
+    [Tooltip("Levels that give a weapon draft instead of an upgrade draft. The first weapon is drafted at run start.")]
+    [SerializeField] private List<int> weaponDraftLevels = new List<int> { 10, 30, 45 };
+    [Tooltip("Levels that give a ship module draft instead of an upgrade draft.")]
+    [SerializeField] private List<int> shipModuleDraftLevels = new List<int> { 5, 20, 35, 50 };
+
+    [Space]
     [SerializeField]
     private GameObject gameUIPrefab;
     [SerializeField]
@@ -23,8 +35,13 @@ public class GameController : MonoBehaviour
     public int CurrentLevel => currentLevel;
     public float CurrentXP => currentXP;
 
-    public float XPRequiredForNextLevel => XP_PER_LEVEL;
+    public float XPRequiredForNextLevel =>
+        Mathf.Round(baseXPPerLevel + xpIncreasePerLevel * (Mathf.Max(currentLevel, 1) - 1));
     public float CurrentLevelProgress => currentXP / XPRequiredForNextLevel;
+
+    // Null until the ship draft spawns it.
+    public Player Player => player;
+    private Player player;
 
     public static GameController Instance => instance;
 
@@ -35,9 +52,17 @@ public class GameController : MonoBehaviour
 
     public bool IsWeaponDraftLevel(int level)
     {
-        if (level <= 0 || weaponDraftLevels == null || weaponDraftLevels.Count == 0)
-            return false;
-        return weaponDraftLevels.IndexOf(level) != -1;
+        return IsDraftLevel(weaponDraftLevels, level);
+    }
+
+    public bool IsShipModuleDraftLevel(int level)
+    {
+        return IsDraftLevel(shipModuleDraftLevels, level);
+    }
+
+    private static bool IsDraftLevel(List<int> draftLevels, int level)
+    {
+        return level > 0 && draftLevels != null && draftLevels.Contains(level);
     }
 
     private void Awake()
@@ -67,14 +92,31 @@ public class GameController : MonoBehaviour
         Vector3 spawnPos = playerSpawnPoint != null ? playerSpawnPoint.position : Vector3.zero;
         Quaternion spawnRot = playerSpawnPoint != null ? playerSpawnPoint.rotation : Quaternion.identity;
 
-        return Instantiate(shipDefinition.ShipPrefab, spawnPos, spawnRot);
+        GameObject playerObject = Instantiate(shipDefinition.ShipPrefab, spawnPos, spawnRot);
+        player = playerObject.GetComponent<Player>();
+        return playerObject;
     }
 
+    // The player's scrap gain multiplies all scrap. Without a player it counts as 1.
     public void AddXP(float xpAmount)
     {
+        if (player != null && player.CoreModule != null)
+            xpAmount *= player.CoreModule.XPGain;
+
         currentXP += xpAmount;
         
         ProcessLevelUpsFromCurrentXP();
+        OnXPChanged?.Invoke();
+    }
+
+    // Dev shortcut: levels without scrap, so scrap gain can't distort the count.
+    public void AddLevels(int levels)
+    {
+        if (levels <= 0)
+            return;
+
+        currentLevel += levels;
+        OnLevelChanged?.Invoke(levels);
         OnXPChanged?.Invoke();
     }
 

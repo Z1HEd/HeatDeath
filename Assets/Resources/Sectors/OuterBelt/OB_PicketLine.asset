@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e9ef6053a7977b4ead1d08050cd97c9, type: 3}
+  m_Name: OB_PicketLine
+  m_EditorClassIdentifier: Assembly-CSharp::WaveDefinition
+  waveName: Picket line
+  enemyEntries:
+  - enemyPrefab: {fileID: 362748142000764873, guid: f126ee99fc3e081428df0a3a0e563fe5, type: 3}
+    count: 8
+    isBoss: 0
+  - enemyPrefab: {fileID: 362748142000764873, guid: dae3405c2a5009d4eb2a61a0fed516a3, type: 3}
+    count: 6
+    isBoss: 0
+  - enemyPrefab: {fileID: 362748142000764873, guid: 9343f78637b59a24fbf333c5fed56051, type: 3}
+    count: 2
+    isBoss: 0
+  maxConcurrentEnemies: 4
+  spawnCooldown: 2
+  waveOrder: 2
+  cachedTotalXP: 50
+  cachedTotalEnemyCount: 16

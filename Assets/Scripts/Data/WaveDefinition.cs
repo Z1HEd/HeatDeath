@@ -9,7 +9,8 @@ public class WaveEnemyEntry
     [Min(1)]
     public int count = 1;
 
-    [Tooltip("Informational flag - has no effect on spawning behavior itself.")]
+    [Tooltip("Spawns before the wave's other enemies, which then come as the boss takes damage. " +
+             "A sector's last wave needs one.")]
     public bool isBoss = false;
 }
 
@@ -29,6 +30,20 @@ public class WaveDefinition : ScriptableObject
     [Tooltip("Waves with same waveOrder are played in random order")]
     [SerializeField] private int waveOrder = 1;
 
+    [Header("Boss escort (only in waves with a boss)")]
+    [Tooltip("Other enemies that may spawn before the boss takes damage.")]
+    [Min(0)]
+    [SerializeField] private int bossEscortAtStart = 2;
+
+    [Tooltip("The other enemies are released evenly as the boss's health + shields fall, " +
+             "all of them by this fraction.")]
+    [Range(0f, 0.95f)]
+    [SerializeField] private float releaseAllAtBossFraction = 0.25f;
+
+    [Tooltip("How many groups the held-back enemies are released in. Fewer steps give bigger groups.")]
+    [Min(1)]
+    [SerializeField] private int bossEscortReleaseSteps = 2;
+
     [ReadOnly, SerializeField] private float cachedTotalXP;
     [ReadOnly, SerializeField] private int cachedTotalEnemyCount;
 
@@ -37,6 +52,9 @@ public class WaveDefinition : ScriptableObject
     public int MaxConcurrentEnemies => maxConcurrentEnemies;
     public float SpawnCooldown => spawnCooldown;
     public int WaveOrder => waveOrder;
+    public int BossEscortAtStart => bossEscortAtStart;
+    public float ReleaseAllAtBossFraction => releaseAllAtBossFraction;
+    public int BossEscortReleaseSteps => Mathf.Max(1, bossEscortReleaseSteps);
 
     public int TotalEnemyCount
     {
@@ -48,6 +66,20 @@ public class WaveDefinition : ScriptableObject
             return total;
         }
     }
+
+    public int BossCount
+    {
+        get
+        {
+            int total = 0;
+            foreach (var entry in enemyEntries)
+                if (entry.isBoss)
+                    total += Mathf.Max(0, entry.count);
+            return total;
+        }
+    }
+
+    public bool HasBoss => BossCount > 0;
 
     public float TotalXP
     {

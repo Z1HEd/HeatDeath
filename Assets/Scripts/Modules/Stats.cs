@@ -31,6 +31,7 @@ public enum StatType
     Duration = 24,
     EffectMultiplier = 25,
     Invincibility = 26,
+    XPGain = 27,
 }
 
 [Serializable]

@@ -15,6 +15,8 @@ public class ShipCoreModule : ModuleBase, IHitter
     [SerializeField] private ScalarStat shieldRegen = new ScalarStat(StatType.ShieldRegen, 2f, 0f);
     [SerializeField] private ScalarStat hpRegen = new ScalarStat(StatType.HPRegen, 0f, 0f);
     [SerializeField] private BoolStat invincibility = new BoolStat(StatType.Invincibility,false);
+    [Tooltip("Multiplies all scrap the player gains. Unused on enemies.")]
+    [SerializeField] private ScalarStat xpGain = new ScalarStat(StatType.XPGain, 1f, 0f);
 
     [Header("Ramming")]
     [SerializeField] private ScalarStat damage = new ScalarStat(StatType.Damage, 10f, 0f);
@@ -37,8 +39,18 @@ public class ShipCoreModule : ModuleBase, IHitter
     public int CurrentMaxShields => Mathf.RoundToInt(shields.MaxValue);
     public float HealthFraction => health.Fraction;
     public float ShieldFraction => shields.Fraction;
+    // Health + shields against their maximums, or 0 when both maximums are 0.
+    public float DurabilityFraction
+    {
+        get
+        {
+            float max = health.MaxValue + shields.MaxValue;
+            return max > 0f ? (health.CurrentValue + shields.CurrentValue) / max : 0f;
+        }
+    }
     public float CurrentShieldRegen => shieldRegen.CurrentValue;
     public float CurrentHPRegen => hpRegen.CurrentValue;
+    public float XPGain => xpGain;
     public bool IsFull => health.CurrentValue >= health.MaxValue && shields.CurrentValue >= shields.MaxValue;
     public float Damage => damage;
     public float KnockbackPower => knockbackPower;
@@ -157,6 +169,7 @@ public class ShipCoreModule : ModuleBase, IHitter
         stats.Add(shieldRegen);
         stats.Add(hpRegen);
         stats.Add(invincibility);
+        stats.Add(xpGain);
         stats.Add(damage);
         stats.Add(knockbackPower);
         stats.Add(backstabMultiplier);

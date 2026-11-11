@@ -31,6 +31,13 @@ Never commit unless the user explicitly asks for it.
 ~/Unity/Hub/Editor/6000.4.1f1/Editor/Unity -batchmode -nographics -quit -projectPath . -logFile /tmp/unity.log
 ```
 
+Dev shortcuts work in the editor and in development builds. `Assets/Scripts/Dev/DevShortcuts.cs` installs itself at startup, so the scene doesn't contain it, and logs the key list once:
+
+- F1: gain one level. F2: gain five. Each level opens its draft as usual, but levels gained before the ship draft open none.
+- F3: skip the current wave without rewards and start the next one at once. During the pause between waves, it starts the upcoming wave at once.
+- F4: toggle the player's invincibility and knockback immunity.
+- F5-F10: jump to the start of sector 1-6, removing current enemies without rewards. Enemy scaling then uses that sector's run progress; past the sector list it's endless mode.
+
 There are no tests yet and no `.asmdef` files; all scripts compile into `Assembly-CSharp`. `com.unity.test-framework` is installed, so tests would need a test assembly first. Then run them with:
 
 ```bash
@@ -71,7 +78,7 @@ To add an `Effect`, implement `Stacked` so it returns a new instance. Definition
 Content is defined by ScriptableObjects (`Assets/Scripts/Data`, created under the `HeatDeath/` asset menu). How each type is found differs:
 
 - **Ships, weapons, upgrades:** loaded by `Resources.LoadAll` from `Assets/Resources/{Ships,Weapons,Upgrades}` in the draft services. Adding an asset there adds it to the game.
-- **Sectors:** not loaded from `Resources`. They must be added to the `sectors` list on `EnemySpawnController` in the scene.
+- **Sectors:** not loaded from `Resources`. They must be added to the `sectors` list on `EnemySpawnController` in the scene. Every sector needs 600 base scrap (within 2%), 8-10 waves, and a single wave holding an `isBoss` entry in its highest `waveOrder` group; `SectorDefinition` warns otherwise. Its totals don't refresh when a wave asset changes, so use its "Recalculate totals" context menu then.
 - **Tags:** `Assets/Resources/ModuleTags`, referenced from module definitions and effects. A `StatModifierEffect` with no `targetTags` applies to nothing.
 
 `Effect` lists use `[SerializeReference]` with `[SubclassSelector]` from the MackySoft package. Assets store the concrete class name, so renaming or moving an `Effect` subclass breaks them unless you add `[MovedFrom]`.
@@ -82,7 +89,13 @@ Content is defined by ScriptableObjects (`Assets/Scripts/Data`, created under th
 
 No player exists at scene start. The ship is picked in a draft, and `GameUIController` then calls `GameController.SpawnPlayer`, so code must not assume a player is present.
 
-`GameController.OnLevelChanged` drives `GameUIController.StartDraftSequence`, which sets `Time.timeScale = 0` while drafts are shown. Levels in `weaponDraftLevels` give a weapon draft; other levels give an upgrade draft. `Time.deltaTime`-based code therefore stops during drafts and pause.
+`GameController.OnLevelChanged` drives `GameUIController.StartDraftSequence`, which sets `Time.timeScale = 0` while drafts are shown. Levels in `weaponDraftLevels` (10, 30, 45) give a weapon draft instead of an upgrade draft; other levels give an upgrade draft. `shipModuleDraftLevels` (5, 20, 35, 50) works the same way, but nothing reads it until ship modules exist. `Time.deltaTime`-based code therefore stops during drafts and pause.
+
+A level costs `round(baseXPPerLevel + xpIncreasePerLevel × (level − 1))` scrap: 20, 21, 22, 24, and so on. `GameController.AddXP` multiplies all scrap by the player's ShipCore `XPGain` stat (base 1).
+
+Enemy scaling follows run progress, not level or XP. `EnemySpawnController.StartWave` computes p = sectors started − 1 + wave index ÷ waves in the sector, once per wave. Each enemy spawned in that wave gets `enemyScalerEffects` stacked by M(p) − 1. They cover health, shields, shield regen, weapon damage, and ramming damage, and must have infinite duration. Its scrap reward is multiplied by `1 + xpRewardGrowthPerSector × p`. `Enemy.XPReward` and `WaveDefinition.TotalXP` stay base values. The formulas and keys are in `Docs/Balance.md`.
+
+In a wave with an `isBoss` entry, the bosses spawn first, followed by the wave's `bossEscortAtStart` other enemies. The remaining enemies are held back and released in `bossEscortReleaseSteps` even groups as the bosses' health + shields fall, all of them by `releaseAllAtBossFraction`. The boss counts toward `maxConcurrentEnemies`, so leave room for a group. Dead bosses count as 0, so every escort spawns and the wave's scrap stays fixed.
 
 ### Prefab conventions the code assumes
 
