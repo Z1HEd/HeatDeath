@@ -7,9 +7,22 @@ public class StatModifierEffect : Effect
 {
     [SerializeField] public StatType stat;
     [SerializeField] public StatModifier statModifier;
+    [Tooltip("Added once per player level on top of statModifier: weak early, strong late.")]
+    [SerializeField] public StatModifier perLevel;
     [SerializeField] public List<TagDefinition> targetTags = new List<TagDefinition>();
 
     public bool HasTargetTags => targetTags != null && targetTags.Count > 0;
+
+    // The modifier at the player's current level. The player's effects are recalculated on each level-up.
+    public StatModifier CurrentModifier
+    {
+        get
+        {
+            int level = GameController.Instance != null ? GameController.Instance.CurrentLevel : 0;
+            return new StatModifier(statModifier.Flat + perLevel.Flat * level,
+                                    statModifier.Percent + perLevel.Percent * level);
+        }
+    }
     public StatModifierEffect(){}
     public StatModifierEffect(StatType stat, StatModifier statModifier, List<TagDefinition> targetTags, ResourceStat duration)
     {
@@ -29,7 +42,7 @@ public class StatModifierEffect : Effect
     {
         var map = module.currentModifiers;
         map.TryGetValue(stat, out StatModifier currentModifier);
-        map[stat] = StatModifier.Combine(currentModifier, statModifier);
+        map[stat] = StatModifier.Combine(currentModifier, CurrentModifier);
     }
     // Same stat, same targets, same direction: a slow and a speed-up never share a slot.
     public override bool SharesSlotWith(Effect other)
@@ -40,20 +53,29 @@ public class StatModifierEffect : Effect
             && HasSameTags(o.targetTags);
     }
 
-    // Percent decides first, flat breaks ties.
+    // Percent decides first, flat breaks ties, then the same for the per-level part.
     public override bool IsAtLeastAsStrongAs(Effect other)
     {
         if (other is not StatModifierEffect o)
             return true;
 
-        float percent = Mathf.Abs(statModifier.Percent), otherPercent = Mathf.Abs(o.statModifier.Percent);
-        if (percent != otherPercent)
-            return percent > otherPercent;
+        float[] mine = { statModifier.Percent, statModifier.Flat, perLevel.Percent, perLevel.Flat };
+        float[] theirs = { o.statModifier.Percent, o.statModifier.Flat, o.perLevel.Percent, o.perLevel.Flat };
+        for (int i = 0; i < mine.Length; i++)
+            if (Mathf.Abs(mine[i]) != Mathf.Abs(theirs[i]))
+                return Mathf.Abs(mine[i]) > Mathf.Abs(theirs[i]);
 
-        return Mathf.Abs(statModifier.Flat) >= Mathf.Abs(o.statModifier.Flat);
+        return true;
     }
 
-    private float Direction => statModifier.Percent != 0f ? statModifier.Percent : statModifier.Flat;
+    private float Direction
+    {
+        get
+        {
+            StatModifier current = CurrentModifier;
+            return current.Percent != 0f ? current.Percent : current.Flat;
+        }
+    }
 
     private bool HasSameTags(List<TagDefinition> otherTags)
     {
@@ -71,6 +93,7 @@ public class StatModifierEffect : Effect
     {
         var copy = (StatModifierEffect)base.Stacked(times);
         copy.statModifier = statModifier * times;
+        copy.perLevel = perLevel * times;
         return copy;
     }
 }

@@ -116,8 +116,16 @@ public class GameController : MonoBehaviour
             return;
 
         currentLevel += levels;
-        OnLevelChanged?.Invoke(levels);
+        RaiseLevelChanged(levels);
         OnXPChanged?.Invoke();
+    }
+
+    private void RaiseLevelChanged(int levelsGained)
+    {
+        // Level-scaled effects (StatModifierEffect.perLevel) grow with each level.
+        if (player != null)
+            player.effectManager.MarkDirty();
+        OnLevelChanged?.Invoke(levelsGained);
     }
 
     private void ProcessLevelUpsFromCurrentXP()
@@ -134,7 +142,7 @@ public class GameController : MonoBehaviour
         if (levelsGained <= 0)
             return;
 
-        OnLevelChanged?.Invoke(levelsGained);
+        RaiseLevelChanged(levelsGained);
     }
 
     private void OnDestroy()

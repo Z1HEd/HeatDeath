@@ -10,7 +10,7 @@ The code and assets are the source of truth. `README.md` describes the intended 
 
 Balance targets (level curve, enemy scaling, module and upgrade budgets) are in `Docs/Balance.md`. The work in progress is planned in `Docs/Plans/ModulesAndBalance/`: start with its `README.md`, then the brief for your block. `Docs/Plans/` holds temporary plans and is gitignored, so anything that should last goes into `Docs/Balance.md` or this file.
 
-Current state: 5 ships, 7 weapons, 7 ship modules, and one playable sector, Outer Belt. Iron Reach and Storm Verge have sprites only. Run saving, run statistics, weapon evolution, a main menu, and a game-over flow are not implemented yet. The 4 existing upgrades are placeholders for testing; the upgrade system is work in progress.
+Current state: 5 ships, 7 weapons, 7 ship modules, and one playable sector, Outer Belt. Iron Reach and Storm Verge have sprites only. Run saving, run statistics, core evolution, the new mechanics of evolved weapons, a main menu, and a game-over flow are not implemented yet. The upgrade system (slots, evolution, infinite upgrades) is in place; its content is a Cannon test set and 3 placeholder core upgrades.
 
 Terminology: "scrap" is the in-game name for XP, not a separate currency. The planned 21 weapons are the 7 base weapons plus 2 evolution paths each.
 
@@ -19,6 +19,11 @@ Terminology: "scrap" is the in-game name for XP, not a separate currency. The pl
 Unity assets (prefabs, scenes, ScriptableObject `.asset` files, materials, `.meta` files, and similar) may be edited directly. Give every new asset, prefab, and folder a `.meta` with a fresh unique GUID. The user may have `SampleScene` open in the editor, where saving overwrites scene edits made on disk, so say whenever you change the scene.
 
 The user reviews every code change in batches. Split big refactors into separate logical batches, ideally no more than 100 changed lines each. Work through a whole batch without stopping, then stop editing until the user approves it.
+
+When the user brings up a new idea for later:
+1. Note it where future content work will find it: `Docs/Balance.md` for balance and content rules, the matching brief in `Docs/Plans/` for planned work.
+2. Check whether the current code supports it.
+3. If it doesn't, decide by how it relates to the current task. Do it now if it's small and part of the current work. Add it to the current plan as a batch if it belongs to the current block. Otherwise, add it to the matching later plan and to `Assets/ToDo.md`. Say which you chose.
 
 Git belongs to the user: staged changes are the ones they approved, unstaged ones are up for review. Never stage, unstage, or commit, and ask before any other change to git state. `git mv` stages, so move files without it.
 
@@ -63,6 +68,8 @@ This pipeline spans most of the code:
 2. `EffectManager` owns the active effects, ticks their durations, and sets `shouldRecalculate` when the list changes. The recalculation runs once in its `Update`, not immediately.
 3. Each module clears its modifiers, applies every effect where `IsApplicableTo(moduleDefinition)` is true (matched by `TagDefinition`), recalculates every stat listed in its `CollectStats`, then calls `OnStatsChanged`.
 
+A `StatModifierEffect` can also grow with the player's level: its `perLevel` modifier is added once per level, and `GameController` marks the player's effects for recalculation on every level-up.
+
 Stats (`ResourceStat`, `ScalarStat`, `BoolStat` in `Assets/Scripts/Modules/Stats.cs`) resolve to `(base + Flat) * (1 + Percent/100)`. Stacks of one upgrade add up (+25% × 4 = +100%), and percents from different sources multiply (×2 and ×2 give ×4), so -100% always wins. A percent below -100% counts as -100%. `BoolStat` is true if `Flat > 0`, false if `Flat < 0`, otherwise its base value.
 
 To add a stat:
@@ -88,11 +95,37 @@ So applying again refreshes a timed buff instead of stacking it. Make copies wit
 
 Overlapping effects therefore never leave a stale colour or layer.
 
+### Upgrade slots and evolution
+
+The rules and numbers are in `Docs/Balance.md` → "Module structure". In gameplay a module is a weapon, a ship module, or the core. The core is everything the base ship comes with, including its thruster and ability.
+
+**Binding.** Every upgrade is bound to one module definition (`boundModule`). It's offered only while that module is installed and fills that module's slots. Its effects may target any tags.
+- Each player ship has its own core definition (`Assets/Resources/Modules/<Ship>Core`), whose `baseDefinition` is the shared `ShipCore.asset`. Enemies use the shared core directly.
+- Bind a ship-specific upgrade to that ship's core, and an upgrade for every ship to the shared core. `ModuleManager.FindInstalled` matches a definition or one built on it, so `UpgradeManager.GroupOf` maps both to the ship's own core.
+- Never bind to a thruster or ability definition: they have no slots of their own.
+
+**Slots and roles.** `UpgradeManager` keeps 3 base slots per module, in pick order, plus the chosen evolution path. `CanTake` is the only rule for what drafts may offer. `UpgradeRole`:
+- Base fills one of the 3 slots.
+- Evolution fills the 4th slot, and only for its `evolutionPath` once the module evolved along it.
+- Infinite takes no slot, ignores `maxStacks`, and appears only after evolution.
+
+Owned upgrades can always stack up to `maxStacks`. `mutuallyExclusiveWith` blocks an upgrade while any listed one is owned, in either direction.
+
+**Evolution.** A module is ready once its 3 slots hold max-stack upgrades and its definition lists `evolutionPaths`. `UpgradeDraftService` then mixes evolution options into upgrade drafts (`UpgradeDraftOption` is an upgrade or a module plus a path). Picking one calls `UpgradeManager.Evolve`:
+- it records the path, which opens the 4th slot and the infinite upgrade;
+- it calls `ModuleManager.ReplaceModule`, which swaps every instance of the module (including Yamato's copy) for the path's `evolvedPrefab` in the same parent;
+- `OnModuleReplaced` lets the HUD weapon button and `DuplicateWeaponAbility` follow the swap.
+
+An evolved prefab keeps the module's definition, so tags and upgrades carry over. Core evolution will swap the whole ship by rebuilding it from definitions and upgrade state. For now `Evolve` stubs it with an error, readiness skips the core, and cores have no paths.
+
+**Validation.** `UpgradeValidation` (editor only) checks bindings, roles, paths, evolved prefabs, and ship cores. It runs from `HeatDeath/Validate Upgrades` and whenever drafts load in the editor.
+
 ### Data
 
 Content is defined by ScriptableObjects (`Assets/Scripts/Data`, created under the `HeatDeath/` asset menu). How each type is found differs:
 
 - **Ships, weapons, ship modules, upgrades:** loaded by `Resources.LoadAll` from `Assets/Resources/{Ships,Weapons,ShipModules,Upgrades}` in the draft services. Adding an asset there adds it to the game.
+- **Evolution paths:** `Assets/Resources/EvolutionPaths`, listed on the module definition they evolve. Evolved prefabs are in `Assets/Prefabs/Modules/Weapons/Evolved`.
 - **Sectors:** not loaded from `Resources`. They must be added to the `sectors` list on `EnemySpawnController` in the scene. Every sector needs 600 base scrap (within 2%), 8-10 waves, and a single wave holding an `isBoss` entry in its highest `waveOrder` group; `SectorDefinition` warns otherwise. Its totals don't refresh when a wave asset changes, so use its "Recalculate totals" context menu then.
 - **Tags:** `Assets/Resources/ModuleTags`, referenced from module definitions and effects. A `StatModifierEffect` with no `targetTags` applies to nothing.
 
@@ -104,7 +137,7 @@ Content is defined by ScriptableObjects (`Assets/Scripts/Data`, created under th
 
 No player exists at scene start. The ship is picked in a draft, and `GameUIController` then calls `GameController.SpawnPlayer`, so code must not assume a player is present.
 
-`GameController.OnLevelChanged` drives `GameUIController.StartDraftSequence`, which sets `Time.timeScale = 0` while drafts are shown. Levels in `weaponDraftLevels` (10, 30, 45) give a weapon draft, levels in `shipModuleDraftLevels` (5, 20, 35, 50) a ship-module draft, and other levels an upgrade draft. Pending drafts show in the order ship, weapon, ship module, upgrade. A weapon or ship-module draft with no candidates becomes an upgrade draft. `Time.deltaTime`-based code therefore stops during drafts and pause.
+`GameController.OnLevelChanged` drives `GameUIController.StartDraftSequence`, which sets `Time.timeScale = 0` while drafts are shown. Levels in `weaponDraftLevels` (10, 30, 45) give a weapon draft, levels in `shipModuleDraftLevels` (5, 20, 35, 50) a ship-module draft, and other levels an upgrade draft. Pending drafts show in the order ship, weapon, ship module, upgrade. A weapon or ship-module draft with no candidates becomes an upgrade draft. Evolutions are options inside upgrade drafts, not a draft of their own. `Time.deltaTime`-based code therefore stops during drafts and pause.
 
 A level costs `round(baseXPPerLevel + xpIncreasePerLevel × (level − 1))` scrap: 20, 21, 22, 24, and so on. `GameController.AddXP` multiplies all scrap by the player's ShipCore `XPGain` stat (base 1).
 
@@ -133,6 +166,8 @@ New behaviour (an explosion on hit, damage reflection, a bonus that holds only u
 - Ship prefabs need a child named `TurretMounts`; `ModuleManager.AddWeapon` fills the first empty mount.
 - A weapon prefab's first child is its fire point (`transform.GetChild(0)`).
 - Ship-module prefabs hold only a `ShipModule` on the root, with its `moduleDefinition` set.
+- Evolved prefabs have their module on the root with the base module's `moduleDefinition`. The Cannon's evolved versions show two ways to build one: a copy with new values (Minigun), or another module type with prefab variants for its projectile and explosion (Vacuum Cannon is a `MissileModule` whose shell doesn't steer).
+- A player ship's `ShipCoreModule` sits on a child named `ShipCore`, with the ship's own core definition. `Ship` finds it with `GetComponentInChildren`.
 - Player prefabs need an `AbilityModule` on the root, because `Player.Update` reads it without a null check. Space activates it.
 - `WeaponModule` sets its own layer from the owning ship: `DetectEnemy` on the player's weapons, `DetectPlayer` on enemies'. `RangeDetector` targeting depends on these layers.
 - `WeaponModule`, `ProjectileModule`, and `TeslaModule` are `[ExecuteAlways]`, so they run in edit mode. Each class declares the attribute itself; `MissileModule` and `MineModule` don't.

@@ -15,7 +15,7 @@ MonoBehaviour:
   displayName: Thrust
   key: upgrade.thruster.speed
   description: +25% max movement speed, +25% thrust
-  boundModule: {fileID: 11400000, guid: a3f144a87eb1d22449ea79a4d0b8c12b, type: 2}
+  boundModule: {fileID: 11400000, guid: f4b1836a0ae68c6498413a6f2ec0caef, type: 2}
   rarity: 0
   maxStacks: 4
   effects:
@@ -33,6 +33,7 @@ MonoBehaviour:
           Percent: 25
         targetTags:
         - {fileID: 11400000, guid: 46fd95cd7afab1d4995cfbc4038ac37b, type: 2}
+        - {fileID: 11400000, guid: 37908810bbf1486fbf700a9dca30ed6f, type: 2}
     - rid: 7560140318346838742
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
@@ -42,3 +43,4 @@ MonoBehaviour:
           Percent: 25
         targetTags:
         - {fileID: 11400000, guid: 46fd95cd7afab1d4995cfbc4038ac37b, type: 2}
+        - {fileID: 11400000, guid: 37908810bbf1486fbf700a9dca30ed6f, type: 2}

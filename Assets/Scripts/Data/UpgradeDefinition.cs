@@ -10,6 +10,13 @@ public enum UpgradeRarity
     Legendary = 3
 }
 
+public enum UpgradeRole
+{
+    Base = 0,       // Fills one of the module's 3 slots.
+    Evolution = 1,  // Fills the 4th slot, which evolving along its path opens.
+    Infinite = 2    // Takes no slot and stacks without limit; offered only once the module evolved.
+}
+
 [CreateAssetMenu(fileName = "UpgradeDefinition", menuName = "HeatDeath/Upgrade Definition")]
 [Serializable]
 public class UpgradeDefinition : ScriptableObject
@@ -17,8 +24,14 @@ public class UpgradeDefinition : ScriptableObject
     [SerializeField] private string displayName;
     [SerializeField] private string key;
     [SerializeField, TextArea(2, 4)] private string description;
+    [Tooltip("The module this upgrade is for: a weapon, a ship module, one ship's core, or the shared core for every " +
+             "ship. It's offered only while that module is installed, and fills its slots.")]
     [SerializeField] private ModuleDefinition boundModule;
+    [SerializeField] private UpgradeRole role;
+    [Tooltip("Evolution upgrades only: the path whose 4th slot this fills.")]
+    [SerializeField] private EvolutionPathDefinition evolutionPath;
     [SerializeField] private UpgradeRarity rarity;
+    [Tooltip("Ignored by infinite upgrades.")]
     [SerializeField] private int maxStacks = 1;
     [SerializeField] private List<UpgradeDefinition> mutuallyExclusiveWith = new List<UpgradeDefinition>();
     
@@ -28,10 +41,11 @@ public class UpgradeDefinition : ScriptableObject
     public string Key => key;
     public string Description => description;
     public ModuleDefinition BoundModule => boundModule;
-    public bool IsGeneral => boundModule == null;
+    public UpgradeRole Role => role;
+    public EvolutionPathDefinition EvolutionPath => evolutionPath;
     public UpgradeRarity Rarity => rarity;
     public int MaxStacks => maxStacks;
-    public bool IsInfinite => maxStacks < 1;
+    public bool IsInfinite => role == UpgradeRole.Infinite;
     public IReadOnlyList<Effect> Effects => effects;
 
     public IReadOnlyList<UpgradeDefinition> MutuallyExclusiveWith => mutuallyExclusiveWith;
@@ -44,25 +58,11 @@ public class UpgradeDefinition : ScriptableObject
         return mutuallyExclusiveWith.Contains(other);
     }
 
-    public bool IsBoundTo(ModuleDefinition module)
-    {
-        return module != null && boundModule == module;
-    }
-
     public bool IsMaxStacks(int currentCount)
     {
         if (IsInfinite)
             return false;
 
         return currentCount >= maxStacks;
-    }
-    public bool IsApplicableTo(ModuleDefinition module)
-    {
-        if (boundModule == module) return true;
-        foreach (var effect in effects)
-        {
-            if (effect.IsApplicableTo(module)) return true;
-        }
-        return false;
     }
 }

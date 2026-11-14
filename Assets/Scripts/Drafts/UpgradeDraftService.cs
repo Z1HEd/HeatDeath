@@ -3,6 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+// One upgrade-draft option: an upgrade, or evolving a module along one of its paths.
+public class UpgradeDraftOption
+{
+    public UpgradeDefinition Upgrade { get; }
+    public ModuleDefinition Module { get; }
+    public EvolutionPathDefinition Path { get; }
+    public bool IsEvolution => Path != null;
+
+    public UpgradeDraftOption(UpgradeDefinition upgrade) => Upgrade = upgrade;
+
+    public UpgradeDraftOption(ModuleDefinition module, EvolutionPathDefinition path)
+    {
+        Module = module;
+        Path = path;
+    }
+}
+
 public class UpgradeDraftService
 {
     private static readonly Dictionary<UpgradeRarity, UpgradeRarity[]> RarityFallbackMap =
@@ -26,109 +43,97 @@ public class UpgradeDraftService
     private readonly List<UpgradeDefinition> definitions;
     private readonly System.Random random;
 
-    public IReadOnlyList<UpgradeDefinition> AllUpgrades => definitions;
-
     public UpgradeDraftService(int? seed = null)
     {
         definitions = new List<UpgradeDefinition>(Resources.LoadAll<UpgradeDefinition>("Upgrades"));
         random = seed.HasValue ? new System.Random(seed.Value) : new System.Random();
+#if UNITY_EDITOR
+        UpgradeValidation.Run(definitions);
+#endif
     }
 
-    public List<UpgradeDefinition> GetDraftOptions(Player player, int optionCount)
+    // Each option's chances: that it offers an evolution (while a module is ready), and otherwise that it stacks
+    // an owned upgrade rather than offering a new one. One option leans to stacking and one to new upgrades,
+    // both rarely evolving; any others are free, even on stacking and likelier to evolve. Positions are shuffled.
+    private static readonly (float stack, float evolution)[] SkewedSlots = { (0.8f, 0.2f), (0.2f, 0.2f) };
+    private static readonly (float stack, float evolution) FreeSlot = (0.5f, 0.6f);
+
+    public List<UpgradeDraftOption> GetDraftOptions(Player player, int optionCount)
     {
-        var result = new List<UpgradeDefinition>();
+        var result = new List<UpgradeDraftOption>();
         if (player == null || optionCount <= 0)
             return result;
 
-        List<UpgradeDefinition> candidates = GetAvailableUpgrades(player);
-        if (candidates.Count == 0)
-            return result;
+        UpgradeManager upgrades = player.upgradeManager;
+        List<UpgradeDefinition> candidates = definitions.FindAll(upgrades.CanTake);
+        var evolutions = new List<UpgradeDraftOption>();
+        foreach (var module in upgrades.GetGroupsReadyToEvolve())
+            foreach (var path in module.EvolutionPaths)
+                evolutions.Add(new UpgradeDraftOption(module, path));
 
-        for (int i = 0; i < optionCount; i++)
+        foreach (var slot in ShuffledSlots(optionCount))
         {
-            if (candidates.Count == 0)
+            // With no upgrades left, an evolution fills the option.
+            if (evolutions.Count > 0 && (random.NextDouble() < slot.evolution || candidates.Count == 0))
+            {
+                UpgradeDraftOption evolution = PickEvolution(evolutions);
+                result.Add(evolution);
+                evolutions.Remove(evolution);
+                continue;
+            }
+
+            bool stack = random.NextDouble() < slot.stack;
+            List<UpgradeDefinition> pool = candidates.FindAll(u => upgrades.HasUpgrade(u) == stack);
+            // None of the drawn kind: all candidates left are of the other kind.
+            if (pool.Count == 0)
+                pool = candidates;
+            if (pool.Count == 0)
                 break;
 
-            UpgradeRarity rolledRarity = RollRarity();
-            UpgradeDefinition picked = PickWithRarityFallback(candidates, rolledRarity);
-            if (picked == null)
-                break;
-
-            result.Add(picked);
+            UpgradeDefinition picked = PickFromRandomGroup(pool, upgrades);
+            result.Add(new UpgradeDraftOption(picked));
             candidates.Remove(picked);
         }
 
         return result;
     }
 
-    public List<UpgradeDefinition> GetAvailableUpgrades(Player player)
+    private List<(float stack, float evolution)> ShuffledSlots(int count)
     {
-        var result = new List<UpgradeDefinition>();
-        if (player == null)
-            return result;
+        var slots = new List<(float stack, float evolution)>();
+        for (int i = 0; i < count; i++)
+            slots.Add(i < SkewedSlots.Length ? SkewedSlots[i] : FreeSlot);
 
-        for (int i = 0; i < definitions.Count; i++)
+        for (int i = slots.Count - 1; i > 0; i--)
         {
-            UpgradeDefinition upgrade = definitions[i];
-            if (IsEligibleForDraft(upgrade, player))
-                result.Add(upgrade);
+            int j = random.Next(i + 1);
+            (slots[i], slots[j]) = (slots[j], slots[i]);
         }
-
-        return result;
+        return slots;
     }
 
-    private static bool IsEligibleForDraft(UpgradeDefinition upgrade, Player player)
+    // A ready module first, uniformly, then one of its paths not offered yet.
+    private UpgradeDraftOption PickEvolution(List<UpgradeDraftOption> evolutions)
     {
-        if (upgrade == null || player == null)
-            return false;
-
-        ModuleManager moduleManager = player.moduleManager;
-        UpgradeManager upgradeManager = player.GetComponent<UpgradeManager>();
-
-        if (moduleManager == null || upgradeManager == null)
-            return false;
-
-        if (!upgradeManager.CanAddUpgrade(upgrade))
-            return false;
-
-        if (upgradeManager.HasMutuallyExclusiveUpgradeEquipped(upgrade))
-        return false;
-
-        return upgrade.BoundModule != null
-            ? moduleManager.HasModule(upgrade.BoundModule)
-            : IsApplicableToAnyInstalledModule(upgrade, moduleManager);
+        List<ModuleDefinition> modules = evolutions.Select(e => e.Module).Distinct().ToList();
+        ModuleDefinition module = modules[random.Next(modules.Count)];
+        List<UpgradeDraftOption> paths = evolutions.FindAll(e => e.Module == module);
+        return paths[random.Next(paths.Count)];
     }
 
-    public bool HasAnyAvailableUpgradeForModule(ModuleDefinition moduleDefinition, Player player)
+    // A module first, uniformly among those in the pool, then a rarity among its upgrades.
+    private UpgradeDefinition PickFromRandomGroup(List<UpgradeDefinition> pool, UpgradeManager upgrades)
     {
-        if (moduleDefinition == null)
-            return false;
-
-        List<UpgradeDefinition> available = GetAvailableUpgrades(player);
-        for (int i = 0; i < available.Count; i++)
+        var groups = new List<ModuleDefinition>();
+        foreach (var upgrade in pool)
         {
-            UpgradeDefinition upgrade = available[i];
-            if (upgrade != null && upgrade.IsBoundTo(moduleDefinition))
-                return true;
-
-            if (upgrade != null && upgrade.IsGeneral && upgrade.IsApplicableTo( moduleDefinition))
-                return true;
+            ModuleDefinition group = upgrades.GroupOf(upgrade);
+            if (!groups.Contains(group))
+                groups.Add(group);
         }
 
-        return false;
-    }
-
-    private static bool IsApplicableToAnyInstalledModule(UpgradeDefinition upgrade, ModuleManager moduleManager)
-    {
-        HashSet<ModuleDefinition> installedModules = moduleManager.GetInstalledModuleDefinitions();
-
-        foreach (var module in installedModules)
-        {
-            if (upgrade.IsApplicableTo(module))
-                return true;
-        }
-
-        return false;
+        ModuleDefinition chosen = groups[random.Next(groups.Count)];
+        return PickWithRarityFallback(pool.FindAll(u => upgrades.GroupOf(u) == chosen), RollRarity());
     }
 
     private UpgradeDefinition PickWithRarityFallback(List<UpgradeDefinition> candidates, UpgradeRarity rolledRarity)

@@ -5407,7 +5407,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eede7cedb1d541847bd05d4f273563b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShipCoreModule
-  moduleDefinition: {fileID: 11400000, guid: f4b1836a0ae68c6498413a6f2ec0caef, type: 2}
+  moduleDefinition: {fileID: 11400000, guid: c346302c9fe44c2b84fa6754642132db, type: 2}
   health:
     currentValue: 0
     baseValue: 75

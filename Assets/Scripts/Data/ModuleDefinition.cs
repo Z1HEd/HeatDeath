@@ -8,10 +8,17 @@ public class ModuleDefinition : ScriptableObject
     [SerializeField] private string displayName;
     [SerializeField] private string componentTypeName;
     [SerializeField] private List<TagDefinition> tags = new List<TagDefinition>();
+    [Tooltip("The paths this module can evolve along. A ship's paths go on its own core.")]
+    [SerializeField] private List<EvolutionPathDefinition> evolutionPaths = new List<EvolutionPathDefinition>();
+    [Tooltip("Ship cores only: the shared core this one builds on. Upgrades bound to the shared core are offered " +
+             "to every ship whose core builds on it, and fill that ship's core slots.")]
+    [SerializeField] private ModuleDefinition baseDefinition;
 
     public string DisplayName => displayName;
     public string ComponentTypeName => componentTypeName;
     public IReadOnlyList<TagDefinition> Tags => tags;
+    public IReadOnlyList<EvolutionPathDefinition> EvolutionPaths => evolutionPaths;
+    public ModuleDefinition BaseDefinition => baseDefinition;
 
     public bool HasTag(TagDefinition tag)
     {

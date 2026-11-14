@@ -9,11 +9,22 @@ public class DuplicateWeaponAbility : AbilityModule
     {
         base.Awake();
         ship.moduleManager.OnWeaponAdded += DuplicateWeapon;
+        ship.moduleManager.OnModuleReplaced += FollowReplacement;
     }
     protected void DuplicateWeapon(WeaponDefinition definition)
     {
         ship.moduleManager.OnWeaponAdded -= DuplicateWeapon;
-        spawnedWeapon = ship.moduleManager.AddWeapon(definition);
+        SetCopy(ship.moduleManager.AddWeapon(definition));
+    }
+    // The copy evolves along with the weapon it copies.
+    private void FollowReplacement(ModuleBase old, ModuleBase replacement)
+    {
+        if (old == spawnedWeapon)
+            SetCopy(replacement as WeaponModule);
+    }
+    private void SetCopy(WeaponModule weapon)
+    {
+        spawnedWeapon = weapon;
         icon = spawnedWeapon.GetComponent<SpriteRenderer>().sprite.texture;
         InvokeUpdateIcon();
     }

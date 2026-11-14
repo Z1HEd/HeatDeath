@@ -15,6 +15,8 @@ public class ModuleManager : MonoBehaviour
     [SerializeField]
     protected Transform turretMounts;
     public event Action<WeaponDefinition> OnWeaponAdded;
+    // The old module and its replacement, raised before the old one is destroyed.
+    public event Action<ModuleBase, ModuleBase> OnModuleReplaced;
 
     public void Start()
     {
@@ -56,20 +58,6 @@ public class ModuleManager : MonoBehaviour
         return null;
     }
 
-    public HashSet<ModuleDefinition> GetInstalledModuleDefinitions()
-    {
-        var result = new HashSet<ModuleDefinition>();
-        foreach (var module in modules)
-        {
-            if (module == null || module.ModuleDefinition == null)
-                continue;
-
-            result.Add(module.ModuleDefinition);
-        }
-
-        return result;
-    }
-
     public bool HasModule(ModuleDefinition definition)
     {
         if (definition == null) return false;
@@ -79,6 +67,19 @@ public class ModuleManager : MonoBehaviour
                 return true;
         }
         return false;
+    }
+
+    // The installed definition that is this one or builds on it (a ship's core on the shared core), or null.
+    public ModuleDefinition FindInstalled(ModuleDefinition definition)
+    {
+        if (definition == null) return null;
+        foreach (var module in modules)
+        {
+            ModuleDefinition installed = module != null ? module.ModuleDefinition : null;
+            if (installed != null && (installed == definition || installed.BaseDefinition == definition))
+                return installed;
+        }
+        return null;
     }
 
     public WeaponModule AddWeapon(WeaponDefinition definition)
@@ -95,6 +96,27 @@ public class ModuleManager : MonoBehaviour
         }
         Debug.LogError("Failed to add weapon: missing turret mount");
         return null;
+    }
+
+    // Swaps every installed module with this definition (a weapon and Yamato's copy of it) for an instance of
+    // the prefab in the same parent. The prefab keeps the definition, so the module's upgrades apply to it too.
+    public void ReplaceModule(ModuleDefinition definition, GameObject prefab)
+    {
+        foreach (var old in modules.FindAll(m => m != null && m.ModuleDefinition == definition))
+        {
+            var replacement = Instantiate(prefab, old.transform.parent).GetComponent<ModuleBase>();
+            if (replacement == null)
+            {
+                Debug.LogError($"Replacement prefab {prefab.name} has no module");
+                return;
+            }
+
+            // Now rather than in Start, like AddShipModule.
+            AddModule(replacement);
+            RemoveModule(old);
+            OnModuleReplaced?.Invoke(old, replacement);
+            Destroy(old.gameObject);
+        }
     }
 
     // Ship modules sit on the ship root, with no mount and no HUD button.

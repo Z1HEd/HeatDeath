@@ -24,7 +24,7 @@ public class GameUIController : MonoBehaviour
     private List<ShipDefinition> currentShipOptions = new List<ShipDefinition>();
     private readonly List<WeaponDefinition> currentWeaponOptions = new List<WeaponDefinition>();
     private readonly List<ShipModuleDefinition> currentShipModuleOptions = new List<ShipModuleDefinition>();
-    private List<UpgradeDefinition> currentOptions = new List<UpgradeDefinition>();
+    private List<UpgradeDraftOption> currentOptions = new List<UpgradeDraftOption>();
 
     private VisualElement healthFill;
     private VisualElement shieldFill;
@@ -40,6 +40,8 @@ public class GameUIController : MonoBehaviour
     private Button[] optionButtons;
     public UICooldownDurationOverlay[] weaponButtonOverlays;
     public UICooldownDurationOverlay abilityButtonOverlay;
+    // The weapon each weapon button shows.
+    private WeaponModule[] boundWeapons;
     private Action[] optionHandlers;
 
     private int pendingShipDrafts;
@@ -113,18 +115,34 @@ public class GameUIController : MonoBehaviour
             new UICooldownDurationOverlay(root.Q<Button>("Weapon4"))
         };
         abilityButtonOverlay = new UICooldownDurationOverlay(root.Q<Button>("Ability1"));
+        boundWeapons = new WeaponModule[weaponButtonOverlays.Length];
     }
     public void BindWeaponButton(GameObject weapon, int index){
-        weapon.GetComponent<WeaponModule>().updateCooldownOverlay+=
+        if (boundWeapons[index] != null)
+            boundWeapons[index].updateCooldownOverlay -= weaponButtonOverlays[index].SetCooldownFill;
+        boundWeapons[index] = weapon.GetComponent<WeaponModule>();
+        boundWeapons[index].updateCooldownOverlay+=
                 weaponButtonOverlays[index].SetCooldownFill;
-        weaponButtonOverlays[index].button.style.backgroundImage = 
+        weaponButtonOverlays[index].button.style.backgroundImage =
                 new StyleBackground(weapon.GetComponent<SpriteRenderer>().sprite.texture);
+    }
+
+    // An evolved weapon takes over its predecessor's button.
+    private void OnModuleReplaced(ModuleBase old, ModuleBase replacement)
+    {
+        if (old is not WeaponModule weapon)
+            return;
+
+        int index = Array.IndexOf(boundWeapons, weapon);
+        if (index >= 0)
+            BindWeaponButton(replacement.gameObject, index);
     }
 
     private void BindPlayer(GameObject playerObject)
     {
         player = playerObject.GetComponent<Player>();
         player.CoreModule.OnHPShieldsChanged += UpdateBars;
+        player.moduleManager.OnModuleReplaced += OnModuleReplaced;
         
         abilityButtonOverlay.button.clicked += player.ability.Activate;
         player.ability.updateCooldown += abilityButtonOverlay.SetCooldownFill;
@@ -252,10 +270,39 @@ public class GameUIController : MonoBehaviour
         PopulateDraftButtons(header, currentOptions.Count,
             i =>
             {
-                UpgradeDefinition opt = currentOptions[i];
-                ApplyRarityClass(optionButtons[i], opt.Rarity);
-                optionButtons[i].text = $"[{opt.Rarity}] {opt.DisplayName}\n{opt.Description}";
+                UpgradeDraftOption opt = currentOptions[i];
+                if (opt.IsEvolution)
+                {
+                    ClearRarityClasses(optionButtons[i]);
+                    optionButtons[i].text = $"[Evolution] {opt.Path.DisplayName}\n{opt.Module.DisplayName} · evolve\n{opt.Path.Description}";
+                    return;
+                }
+
+                UpgradeDefinition upgrade = opt.Upgrade;
+                ApplyRarityClass(optionButtons[i], upgrade.Rarity);
+                optionButtons[i].text = $"[{upgrade.Rarity}] {upgrade.DisplayName}\n{DescribeSlot(upgrade)}\n{upgrade.Description}";
             });
+    }
+
+    // Where the pick goes, counted after it: "Cannon · new slot 2/3", "Core · stack 3/4", "Minigun · infinite ×5".
+    private string DescribeSlot(UpgradeDefinition upgrade)
+    {
+        UpgradeManager upgrades = player.upgradeManager;
+        ModuleDefinition group = upgrades.GroupOf(upgrade);
+        EvolutionPathDefinition path = upgrades.GetPath(group);
+        string module = path != null ? path.DisplayName : group.DisplayName;
+        int stacks = upgrades.GetStackCount(upgrade) + 1;
+
+        string slot;
+        if (upgrade.IsInfinite)
+            slot = $"infinite ×{stacks}";
+        else if (stacks > 1)
+            slot = $"stack {stacks}/{upgrade.MaxStacks}";
+        else if (upgrade.Role == UpgradeRole.Evolution)
+            slot = "evolution slot";
+        else
+            slot = $"new slot {upgrades.GetUsedBaseSlots(group) + 1}/{UpgradeManager.BaseSlots}";
+        return $"{module} · {slot}";
     }
 
     private void PopulateDraftButtons(string header, int activeCount, System.Action<int> configureButton)
@@ -322,7 +369,11 @@ public class GameUIController : MonoBehaviour
             if (index < 0 || index >= currentOptions.Count)
                 return;
 
-            player.upgradeManager.AddUpgrade(currentOptions[index]);
+            UpgradeDraftOption picked = currentOptions[index];
+            if (picked.IsEvolution)
+                player.upgradeManager.Evolve(picked.Module, picked.Path);
+            else
+                player.upgradeManager.AddUpgrade(picked.Upgrade);
             pendingUpgradeDrafts--;
         }
 

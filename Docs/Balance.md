@@ -89,24 +89,25 @@ D = the wave's M ÷ the player's power entering that wave. Power = √(offense �
 | Endless 2 | 7.15 | 4.94 | 1.59 | 1.48 |
 | Endless 3 | 8.26 | 5.51 | 1.77 | 1.62 |
 
-Model behind it (rebuild it if the structure below changes): each level-up is drafted per upgrade with the draft rule below. Each module has 12 base upgrades (6 Common, 3 Rare, 2 Epic, 1 Legendary), a 4-upgrade evolution pool, and 1 infinite upgrade. Each weapon or ship module at base is worth about as much as the bare ShipCore. Builds: worst = random picks realizing 40% of nominal power; bad = random, 70%; average = takes the highest rarity, 100%; good = keeps offense and defense even and finishes modules it started, 130%, with +25% scrap from level 8. Averaged over 200 runs. Absolute values depend on how much rarity and synergy pay off, so the keys stay tunable. The table predates two decisions: the ShipCore has no infinite upgrade, and first-pass pools hold only 3-4 base upgrades per module. Treat it as approximate, especially the endless rows, until the model is rerun.
+Model behind it (rebuild it if the structure below changes): each level-up is drafted per upgrade with the old stack/new/free draft rule, before the current rule below. Each module has 12 base upgrades (6 Common, 3 Rare, 2 Epic, 1 Legendary), a 4-upgrade evolution pool, and 1 infinite upgrade. Each weapon or ship module at base is worth about as much as the bare ShipCore. Builds: worst = random picks realizing 40% of nominal power; bad = random, 70%; average = takes the highest rarity, 100%; good = keeps offense and defense even and finishes modules it started, 130%, with +25% scrap from level 8. Averaged over 200 runs. Absolute values depend on how much rarity and synergy pay off, so the keys stay tunable. The table predates two decisions: the ShipCore has no infinite upgrade, and first-pass pools hold only 3-4 base upgrades per module. Treat it as approximate, especially the endless rows, until the model is rerun.
 
 ## Module structure
 
-Agreed design. Slots, evolution, and infinite-upgrade gating are not implemented yet; the balance assumes them.
+Implemented in block C, except core evolution (see ShipCore below).
 
-- **9 modules:** 4 drafted weapons (first at run start), 4 drafted ship modules (first at level 5), and the ship-specific **ShipCore**.
+- **9 modules:** 4 drafted weapons (first at run start), 4 drafted ship modules (first at level 5), and the ship-specific **ShipCore**, shown to the player as "Core".
 - **Ship modules** cover survival, mobility, and economy. Most are passive; some add a buff that triggers on its own, such as invisibility on taking damage or a rage mode after several quick kills. The player never activates them: the ship's ability stays the only active control. They aren't weapons, though a module may deal incidental damage, such as reflection or a burst on hit. That damage, like a triggered buff that raises offense, counts on the defense side, so offense stays the weapons' share. The draft wants a pool of about 8 ship modules for 4 slots, as weapons have 7 for 4, and at least 6 so the 4th draft still offers 3. The count is the length of the ship-module draft-level list. A health or shield bonus is optional, up to each module's design. Some modules are purely utility (economy, for example, costs only the slot it takes), some are situational, and their value comes from that.
-- **ShipCore** covers the ship's core, thruster, and ability as one module: one set of slots and one share of draft rolls. It follows the same slot rules. Its pool holds generic hull upgrades plus upgrades specific to the chosen ship, its movement, and its ability. It has no infinite upgrade. Its evolution starts as a stat package and can later evolve the ship's ability.
-- **Slots:** 3 before evolution. Filling them with Commons takes 12 picks and gives ×2.5 the module's base value.
-- **Evolution:** triggers when all 3 slots hold max-stack upgrades. It keeps the slotted upgrades and gives ×1.6. It opens a 4th slot drawing from a pool specific to that evolution path, and unlocks the module's infinite upgrade if it has one. Evolved modules keep the base module's tag so slotted upgrades still apply. Weapons have 2 paths, and the player picks one when evolution triggers. Evolutions start as stat packages; the new mechanics of evolved weapons come later.
+- **ShipCore** is everything the base ship comes with (hull, thruster, ability, and any ship part added later) as one module: one set of slots and one share of draft rolls. It follows the same slot rules. Each player ship has its own core definition, so its pool holds upgrades shared by every ship plus upgrades for that ship alone. It has no infinite upgrade. Its evolution will swap the whole ship for an evolved version (new ability, thruster, or look); until that exists, cores have no evolution paths.
+- **Slots:** 3 before evolution. Filling them with Commons takes 12 picks and gives ×2.5 the module's base value. Max stacks are set per upgrade by the module's design, not by rarity.
+- **Evolution:** possible once all 3 slots hold max-stack upgrades. It swaps the module for its evolved prefab, which keeps the module's definition, so slotted upgrades still apply. It opens a 4th slot drawing from a pool specific to that evolution path, and unlocks the module's infinite upgrade if it has one. Weapons have 2 paths. Paths differ in role, not only in size: one can be raw damage, the other utility that trades damage for control. Aim for an evolved prefab worth about ×1.6 in its role.
 - **Infinite upgrades:** exactly **one per weapon and per ship module**, on its primary output stat (weapon damage, a ship module's main defensive stat). The ShipCore has none. Stats with natural limits stay finite: cooldown, projectile count, range, speed. Infinite upgrades never take a slot, appear only for evolved modules, and never count toward evolution. Each stack adds +10% within the upgrade, so the relative gain falls from 10% toward ~3% after ~25 stacks.
-- **Draft rule:** of the 3 options, one stacks an owned upgrade, one is an unowned upgrade, and one is free. Each falls back to free when it has no candidates. Owned infinite upgrades count as stackable, unowned ones as new. Each option first picks a module uniformly among modules with a candidate, then rolls rarity (70/20/8/2) with the existing fallback. With 9 modules the ship side gets 5 of 9 rolls, so there is no separate side share.
-- **Rush or balance** is an intended choice. Rushing one module evolves it around level 14 (late sector 1) but leaves the rest bare, and its infinite upgrade then keeps competing for draft options. Balanced builds evolve later and grow evenly. Taking the highest rarity each time evolves around level 19; random picks around level 49. More stacks barely delay the rush (6-stack Commons: level 18). If sector-1 evolutions should be prevented, add a minimum evolution level.
+- **Draft rule:** each upgrade draft has 3 options in shuffled positions. Two are skewed: one stacks an owned upgrade 80% of the time, the other 20%, and each offers an evolution 20% of the time. The third is free: it stacks 50% of the time and offers an evolution 60% of the time. An option without candidates of its drawn kind takes the other kind. An upgrade option first picks a module uniformly among modules with a candidate, then rolls rarity (70/20/8/2) with the existing fallback. With 9 modules the ship side gets 5 of 9 rolls, so there is no separate side share.
+- **Evolutions are draft options and cost a level.** Evolution options appear only while a module is ready to evolve. Each names a ready module and one of its paths, picked at random; one draft never shows the same path twice, but can show both of a module's paths. With 3 options, at least one evolution appears in about 74% of drafts.
+- **Rush or balance** is an intended choice. Rushing one module evolves it around level 14 (late sector 1) but leaves the rest bare, and its infinite upgrade then keeps competing for draft options. Balanced builds evolve later and grow evenly. Taking the highest rarity each time evolves around level 19; random picks around level 49. More stacks barely delay the rush (6-stack Commons: level 18). These levels assume evolution on readiness; as a draft option it comes about 1-2 levels later. If sector-1 evolutions should be prevented, add a minimum evolution level.
 
 ## Upgrade power by rarity
 
-Percent of the targeted module's main output. Higher rarities fill a slot in fewer picks and give more per slot, so they carry tradeoffs or conditions.
+Percent of the targeted module's main output. Higher rarities fill a slot in fewer picks and give more per slot, so they carry tradeoffs or conditions. The table is a guideline: rarity sets roughly what a full slot is worth, and each upgrade's stacks follow its module's design. What matters is that rarer upgrades are stronger but more specific, situational, or costly.
 
 | Rarity | Stacks | Per stack | Full slot | Cost to use |
 |---|---|---|---|---|
@@ -116,6 +117,8 @@ Percent of the targeted module's main output. Higher rarities fill a slot in few
 | Legendary | 1 | ×2 or a mechanic | ×2 | Heavy tradeoff or very situational |
 
 Draft weights: Common 70, Rare 20, Epic 8, Legendary 2.
+
+**Level scaling as a tradeoff.** An Epic or Legendary effect can grow with the player's level through a stat effect's `perLevel` modifier, which is added once per level on top of its base value. It's weak when taken early, strong late, and it keeps growing in endless mode. Size it so it reaches the table's full-slot value around the level where such upgrades are usually taken, and stays below it before then.
 
 A full pool is about 6 Common, 3 Rare, 2 Epic, and 1 Legendary per module. That mix is a guideline, and pools may differ per module. Every upgrade follows the table above, so adding upgrades later widens choice without shifting the balance.
 
@@ -149,3 +152,14 @@ A full pool is about 6 Common, 3 Rare, 2 Epic, and 1 Legendary per module. That 
 | Phase Shroud | +100 health | Hull damage → Ghost, 1.5s / 10s |
 | Berserker Core | +100 shields | 5 kills in 4s → weapon TimeScale +33%, 5s / 5s |
 | Emergency Thrusters | +100 health | Shields broken → MaxSpeed and Thrust +50%, 3s / 12s |
+
+## Content ideas
+
+Ideas from the user for future content. Each says what the current code supports.
+
+- **Level-scaled upgrades:** see "Upgrade power by rarity". Supported (`perLevel` on stat effects).
+- **Support modules:** a weapon or upgrade that is weak alone but strengthens other modules: other weapons' damage or fire rate, the ability, or durability. Size its value as the bonus it gives the rest of the build, not its own DPS.
+  - Supported for upgrades: an upgrade's effects may target any tag (`Weapon` covers all 7 weapons; also `ShipCore`, `Ability`, `Thruster`).
+  - Not supported yet: a weapon granting effects just for being installed (ship modules can, through `PassiveEffects`), and "other weapons only" (a tag also matches the module that grants it). Block D adds them when it builds a support weapon.
+- **Knockback resistance by enemy rank:** minibosses resist knockback more than regular enemies, bosses more still. Not supported yet (no resistance stat; every ship has mass 1). Planned for block F.
+- **Evolution paths differ in role, not only in size:** for example Minigun is raw damage (much faster fire, weaker shots) and Vacuum Cannon is crowd control (strong knockback, splash, weaker shots). A utility path can trade damage for control.
