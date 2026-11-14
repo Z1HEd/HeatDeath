@@ -64,6 +64,7 @@ MonoBehaviour:
   canAim:
     currentValue: 1
     baseValue: 1
+  appliesEffects: []
   projectilePrefab: {fileID: 8872413515496322224, guid: 32fde49ac5ad8ea49a2d1db61f4fb5d4, type: 3}
   projectileSpeed:
     currentValue: 10
@@ -101,6 +102,9 @@ MonoBehaviour:
     currentValue: 10
     baseValue: 10
     minValue: 0
+  references:
+    version: 2
+    RefIds: []
 --- !u!212 &64666392978661299
 SpriteRenderer:
   serializedVersion: 2
@@ -5092,6 +5096,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c7053ac4060c754e89f6aff2e98b91d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpeedParticlesScaler
+  startSpeed: -1
+  emissionRate: 0
 --- !u!1 &3563653142378690141
 GameObject:
   m_ObjectHideFlags: 0
@@ -5239,6 +5245,7 @@ MonoBehaviour:
   canAim:
     currentValue: 1
     baseValue: 1
+  appliesEffects: []
   projectilePrefab: {fileID: 8872413515496322224, guid: 32fde49ac5ad8ea49a2d1db61f4fb5d4, type: 3}
   projectileSpeed:
     currentValue: 10
@@ -5276,6 +5283,9 @@ MonoBehaviour:
     currentValue: 10
     baseValue: 10
     minValue: 0
+  references:
+    version: 2
+    RefIds: []
 --- !u!212 &7336778078453810057
 SpriteRenderer:
   serializedVersion: 2
@@ -5482,6 +5492,7 @@ MonoBehaviour:
   canAim:
     currentValue: 1
     baseValue: 1
+  appliesEffects: []
   projectilePrefab: {fileID: 8872413515496322224, guid: 32fde49ac5ad8ea49a2d1db61f4fb5d4, type: 3}
   projectileSpeed:
     currentValue: 10
@@ -5519,6 +5530,9 @@ MonoBehaviour:
     currentValue: 10
     baseValue: 10
     minValue: 0
+  references:
+    version: 2
+    RefIds: []
 --- !u!212 &2820354622978104848
 SpriteRenderer:
   serializedVersion: 2
@@ -5662,7 +5676,7 @@ SpriteRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 8efac6b2a71ff2049ad237d20bca2742, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 91c95e7eaecf92f409fea676d191e5e9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -5701,6 +5715,7 @@ MonoBehaviour:
   canAim:
     currentValue: 1
     baseValue: 1
+  appliesEffects: []
   projectilePrefab: {fileID: 7383371667686300248, guid: 02383f17f405bb74ebe65694e48d20b1, type: 3}
   projectileSpeed:
     currentValue: 8
@@ -5748,6 +5763,9 @@ MonoBehaviour:
     minValue: 0
   textureWithRocket: {fileID: 21300000, guid: 8efac6b2a71ff2049ad237d20bca2742, type: 3}
   textureWithoutRocket: {fileID: 21300000, guid: 91c95e7eaecf92f409fea676d191e5e9, type: 3}
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &5062776889067888602
 GameObject:
   m_ObjectHideFlags: 0
@@ -5833,10 +5851,25 @@ MonoBehaviour:
     currentValue: 0
     baseValue: 500
     minValue: 0
+  shieldRegenDelay:
+    currentValue: 0
+    baseValue: 3
+    minValue: 0
+  shieldRechargeTime:
+    currentValue: 0
+    baseValue: 8
+    minValue: 0.1
+  shieldRechargeSpeed:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0
   shieldRegen:
     currentValue: 0
-    baseValue: 100
+    baseValue: 0
     minValue: 0
+  hardenedShields:
+    currentValue: 0
+    baseValue: 1
   hpRegen:
     currentValue: 0
     baseValue: 0
@@ -5844,6 +5877,14 @@ MonoBehaviour:
   invincibility:
     currentValue: 0
     baseValue: 0
+  damageTakenMultiplier:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0
+  xpGain:
+    currentValue: 0
+    baseValue: 1
+    minValue: 0
   damage:
     currentValue: 0
     baseValue: 10
@@ -5856,6 +5897,11 @@ MonoBehaviour:
     currentValue: 0
     baseValue: 1
     minValue: 0
+  appliesEffects: []
+  shieldScale: 1.12
+  references:
+    version: 2
+    RefIds: []
 --- !u!212 &1729788425180369425
 SpriteRenderer:
   serializedVersion: 2
@@ -5913,7 +5959,7 @@ SpriteRenderer:
   m_Size: {x: 1.28, y: 1.28}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!1 &5643443268395962120
 GameObject:
@@ -6262,8 +6308,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EffectManager
   activeEffects: []
-  ship: {fileID: 0}
-  shouldRecalculate: 0
   references:
     version: 2
     RefIds: []

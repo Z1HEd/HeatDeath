@@ -146,7 +146,7 @@ A level costs `round(baseXPPerLevel + xpIncreasePerLevel × (level − 1))` scra
 
 Enemy scaling follows run progress, not level or XP. `EnemySpawnController.StartWave` computes p = sectors started − 1 + wave index ÷ waves in the sector, once per wave. Each enemy spawned in that wave gets `enemyScalerEffects` stacked by M(p) − 1. They cover health, shields, shield regen, weapon damage, and ramming damage, and must have infinite duration. Its scrap reward is multiplied by `1 + xpRewardGrowthPerSector × p`. `Enemy.XPReward` and `WaveDefinition.TotalXP` stay base values. The formulas and keys are in `Docs/Balance.md`.
 
-In a wave with an `isBoss` entry, the bosses spawn first, followed by the wave's `bossEscortAtStart` other enemies. The remaining enemies are held back and released in `bossEscortReleaseSteps` even groups as the bosses' health + shields fall, all of them by `releaseAllAtBossFraction`. The boss counts toward `maxConcurrentEnemies`, so leave room for a group. Dead bosses count as 0, so every escort spawns and the wave's scrap stays fixed.
+In a wave with an `isBoss` entry, the bosses spawn first, followed by the wave's `bossEscortAtStart` other enemies. The remaining enemies are held back and released in `bossEscortReleaseSteps` even groups as the bosses' health falls (not shields, which recharge), all of them by `releaseAllAtBossFraction`. The boss counts toward `maxConcurrentEnemies`, so leave room for a group. Dead bosses count as 0, so every escort spawns and the wave's scrap stays fixed.
 
 ### Ship modules
 

@@ -1,7 +1,8 @@
 // Shield overlay: drawn on a slightly enlarged copy of the ship's own sprite. The sprite's
 // alpha is the silhouette: its edge gets a bright rim, its inside a faint fill with soft rings
-// rippling out from the hit point (or a hex grid, for comparison: raise _HexStrength). Additive, so the hull
-// stays visible; SpriteRenderer alpha fades the whole thing.
+// rippling out from the hit point (or a hex grid, for comparison: raise _HexStrength). Additive by default, so
+// the hull stays visible; purple shields switch _DstBlend to alpha blending, so their dark colour covers the hull.
+// SpriteRenderer alpha fades the whole thing.
 Shader "Custom/ShipShield"
 {
     Properties
@@ -25,6 +26,8 @@ Shader "Custom/ShipShield"
         _RippleHeadStart ("Ripple Head Start (seconds)", Float) = 0.17
         [HideInInspector] _RippleOrigin ("Ripple Origin (texels)", Vector) = (0, 0, 0, 0)
         [HideInInspector] _RippleAge ("Ripple Age (seconds)", Float) = 0
+        // 1 = One (additive), 10 = OneMinusSrcAlpha (alpha blending).
+        [HideInInspector] _DstBlend ("Destination Blend", Float) = 1
     }
 
     SubShader
@@ -41,7 +44,7 @@ Shader "Custom/ShipShield"
         Cull Off
         Lighting Off
         ZWrite Off
-        Blend SrcAlpha One
+        Blend SrcAlpha [_DstBlend]
 
         Pass
         {

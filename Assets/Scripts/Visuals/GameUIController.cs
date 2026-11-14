@@ -432,6 +432,9 @@ public class GameUIController : MonoBehaviour
         float fillPercent = maxShields > 0 ? currentShields / maxShields : 0;
         shieldFill.style.width = Length.Percent(Mathf.Clamp01(fillPercent) * 100f);
         shieldText.text = $"{currentShields:F0}/{maxShields}";
+        // Purple shields override the stylesheet colour; Null falls back to it.
+        shieldFill.style.backgroundColor = player.CoreModule.HasHardenedShields
+            ? new StyleColor(ShipCoreModule.HardenedShieldColor) : new StyleColor(StyleKeyword.Null);
     }
 
     private void UpdateXPBar()

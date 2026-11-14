@@ -33,6 +33,10 @@ public enum StatType
     Invincibility = 26,
     XPGain = 27,
     ShieldRegenDelay = 28,
+    ShieldRechargeTime = 29,
+    ShieldRechargeSpeed = 30,
+    HardenedShields = 31,
+    DamageTakenMultiplier = 32,
 }
 
 [Serializable]

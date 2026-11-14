@@ -35,7 +35,7 @@ public class WaveDefinition : ScriptableObject
     [Min(0)]
     [SerializeField] private int bossEscortAtStart = 2;
 
-    [Tooltip("The other enemies are released evenly as the boss's health + shields fall, " +
+    [Tooltip("The other enemies are released evenly as the boss's health falls (shields don't count), " +
              "all of them by this fraction.")]
     [Range(0f, 0.95f)]
     [SerializeField] private float releaseAllAtBossFraction = 0.25f;

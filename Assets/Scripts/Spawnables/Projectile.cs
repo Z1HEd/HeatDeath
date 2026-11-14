@@ -45,7 +45,7 @@ public class Projectile : MonoBehaviour, IHitter
         HPDamageMultiplier = sourceModule.HPDamageMultiplier;
         BackstabMultiplier = sourceModule.BackstabMultiplier;
         Source = sourceModule.ModuleDefinition;
-        appliesEffects = sourceModule.EmitAppliedEffects();
+        appliesEffects = sourceModule.GetHitEffects();
         ConfigurePiercing(sourceModule.projectilePiercing);
     }
 

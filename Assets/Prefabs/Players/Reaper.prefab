@@ -5164,6 +5164,7 @@ MonoBehaviour:
   - rid: 7560140318346838965
   - rid: 7560140318346838966
   - rid: 7560140318346838968
+  - rid: 7560140318346838969
   - rid: 7682644111872491743
   references:
     version: 2
@@ -5238,6 +5239,19 @@ MonoBehaviour:
         statModifier:
           Flat: 0
           Percent: -100
+        targetTags:
+        - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
+    - rid: 7560140318346838969
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
+        stat: 30
+        statModifier:
+          Flat: 0
+          Percent: 100
         targetTags:
         - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}
     - rid: 7682644111872491743
@@ -5432,7 +5446,7 @@ MonoBehaviour:
     minValue: 0
   shieldRegen:
     currentValue: 0
-    baseValue: 15
+    baseValue: 0
     minValue: 0
   shieldRegenDelay:
     currentValue: 0

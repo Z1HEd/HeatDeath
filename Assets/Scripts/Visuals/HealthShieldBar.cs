@@ -10,8 +10,13 @@ public class HealthShieldbar : MonoBehaviour
     [SerializeField]
     private bool hideWhenFull = true;
 
+    private SpriteRenderer shieldRenderer;
+    private Color defaultShieldColor;
+
     void Start()
     {
+        shieldRenderer = shieldBar.GetComponentInChildren<SpriteRenderer>();
+        defaultShieldColor = shieldRenderer.color;
         shipCore = transform.parent.GetComponentInChildren<ShipCoreModule>();
         shipCore.OnHPShieldsChanged += UpdateBars;
         UpdateBars();
@@ -27,5 +32,7 @@ public class HealthShieldbar : MonoBehaviour
                 healthBar.localScale.y,healthBar.localScale.z);
         shieldBar.localScale = new Vector3(Mathf.Clamp01(shipCore.ShieldFraction),
                 healthBar.localScale.y,healthBar.localScale.z);
+        shieldRenderer.color = shipCore.HasHardenedShields
+            ? ShipCoreModule.WithAlpha(ShipCoreModule.HardenedShieldColor, defaultShieldColor.a) : defaultShieldColor;
     }
 }

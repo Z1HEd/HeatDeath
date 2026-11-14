@@ -5284,7 +5284,7 @@ MonoBehaviour:
     minValue: 0
   shieldRegen:
     currentValue: 0
-    baseValue: 15
+    baseValue: 0
     minValue: 0
   shieldRegenDelay:
     currentValue: 0

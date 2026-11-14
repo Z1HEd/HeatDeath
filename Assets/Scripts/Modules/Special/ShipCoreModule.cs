@@ -28,15 +28,37 @@ public class ShipCoreModule : ModuleBase, IHitter
 {
     private static readonly int RippleOriginId = Shader.PropertyToID("_RippleOrigin");
     private static readonly int RippleAgeId = Shader.PropertyToID("_RippleAge");
+    private static readonly int RimColorId = Shader.PropertyToID("_RimColor");
+    private static readonly int FillColorId = Shader.PropertyToID("_FillColor");
+    private static readonly int DstBlendId = Shader.PropertyToID("_DstBlend");
+    private static readonly int RippleStrengthId = Shader.PropertyToID("_RippleStrength");
+    // Purple shields: shield bars and the shield's dark fill take this colour.
+    public static readonly Color HardenedShieldColor = new Color(0.32f, 0.02f, 0.55f);
+    // Purple shields stand out more than blue ones: a dark shroud over the hull, with a bright rim and ripples
+    // (the ripples take the rim colour), and a stronger flash.
+    private static readonly Color HardenedRimColor = new Color(0.85f, 0.4f, 1f);
+    private const float HardenedFillAlpha = 0.7f;
+    private const float HardenedRippleStrength = 1.2f;
+    private const float DefaultFlashOpacity = 0.65f, HardenedFlashOpacity = 1f;
 
     [Header("Base Core Stats")]
     [SerializeField] private ResourceStat health = new ResourceStat(StatType.Health, 100f, 1f);
     [SerializeField] private ResourceStat shields = new ResourceStat(StatType.Shields, 100f, 0f);
-    [SerializeField] private ScalarStat shieldRegen = new ScalarStat(StatType.ShieldRegen, 2f, 0f);
-    [Tooltip("Seconds without taking damage before shields start to regenerate.")]
+    [Tooltip("Seconds without taking damage before shields recharge.")]
     [SerializeField] private ScalarStat shieldRegenDelay = new ScalarStat(StatType.ShieldRegenDelay, 3f, 0f);
+    [Tooltip("Seconds a recharge takes from empty to full, so more max shields recharge just as fast.")]
+    [SerializeField] private ScalarStat shieldRechargeTime = new ScalarStat(StatType.ShieldRechargeTime, 8f, 0.1f);
+    [Tooltip("Multiplies the recharge rate. Upgrades raise it by +%, which grows linearly, unlike -% recharge time.")]
+    [SerializeField] private ScalarStat shieldRechargeSpeed = new ScalarStat(StatType.ShieldRechargeSpeed, 1f, 0f);
+    [Tooltip("Flat shields per second that always regenerate, even under fire.")]
+    [SerializeField] private ScalarStat shieldRegen = new ScalarStat(StatType.ShieldRegen, 0f, 0f);
+    [Tooltip("Purple shields: while shields are up, knockback and on-hit effects don't apply. Elites, bosses, " +
+             "and player modules only, never swarms.")]
+    [SerializeField] private BoolStat hardenedShields = new BoolStat(StatType.HardenedShields, false);
     [SerializeField] private ScalarStat hpRegen = new ScalarStat(StatType.HPRegen, 0f, 0f);
     [SerializeField] private BoolStat invincibility = new BoolStat(StatType.Invincibility,false);
+    [Tooltip("Multiplies all damage this ship takes. Exposed debuffs raise it.")]
+    [SerializeField] private ScalarStat damageTakenMultiplier = new ScalarStat(StatType.DamageTakenMultiplier, 1f, 0f);
     [Tooltip("Multiplies all scrap the player gains. Unused on enemies.")]
     [SerializeField] private ScalarStat xpGain = new ScalarStat(StatType.XPGain, 1f, 0f);
 
@@ -51,6 +73,8 @@ public class ShipCoreModule : ModuleBase, IHitter
     [SerializeField] private float shieldScale = 1.12f;
 
     protected SpriteRenderer shieldRenderer;
+    private Color defaultRimColor, defaultFillColor;
+    private float defaultRippleStrength;
     private float rippleStartTime = float.NegativeInfinity;
     // Game time of the last hit that took shields or hull. Shields wait shieldRegenDelay after it.
     private float lastDamageTime = float.NegativeInfinity;
@@ -67,16 +91,20 @@ public class ShipCoreModule : ModuleBase, IHitter
     public int CurrentMaxShields => Mathf.RoundToInt(shields.MaxValue);
     public float HealthFraction => health.Fraction;
     public float ShieldFraction => shields.Fraction;
-    // Health + shields against their maximums, or 0 when both maximums are 0.
-    public float DurabilityFraction
+    public bool HasHardenedShields => hardenedShields;
+    // Purple shields that are up: Ship ignores knockback and on-hit effects.
+    public bool BlocksControl => hardenedShields && shields.CurrentValue > 0f;
+    // Shields per second right now: the flat regen always, plus the recharge once the delay has passed.
+    public float CurrentShieldRegen
     {
         get
         {
-            float max = health.MaxValue + shields.MaxValue;
-            return max > 0f ? (health.CurrentValue + shields.CurrentValue) / max : 0f;
+            float rate = shieldRegen;
+            if (Time.time - lastDamageTime >= shieldRegenDelay)
+                rate += shields.MaxValue / shieldRechargeTime * shieldRechargeSpeed;
+            return rate;
         }
     }
-    public float CurrentShieldRegen => shieldRegen.CurrentValue;
     public float CurrentHPRegen => hpRegen.CurrentValue;
     public float XPGain => xpGain;
     public bool IsFull => health.CurrentValue >= health.MaxValue && shields.CurrentValue >= shields.MaxValue;
@@ -86,7 +114,7 @@ public class ShipCoreModule : ModuleBase, IHitter
     public float HPDamageMultiplier => 1f;
     public float BackstabMultiplier => backstabMultiplier;
     public ModuleDefinition Source => ModuleDefinition;
-    public List<Effect> GetEffects() {return EmitEffects(appliesEffects);}
+    public List<Effect> GetEffects() => EmitHitEffects(appliesEffects);
 
     protected override void Awake()
     {
@@ -97,6 +125,9 @@ public class ShipCoreModule : ModuleBase, IHitter
         shieldRenderer.sprite = ship.GetComponent<SpriteRenderer>().sprite;
         // Own copy per ship: with one shared material, shields drew the newest ship's texture.
         shieldRenderer.sharedMaterial = Instantiate(Resources.Load<Material>("ShieldMaterial"));
+        defaultRimColor = shieldRenderer.sharedMaterial.GetColor(RimColorId);
+        defaultFillColor = shieldRenderer.sharedMaterial.GetColor(FillColorId);
+        defaultRippleStrength = shieldRenderer.sharedMaterial.GetFloat(RippleStrengthId);
         shieldRenderer.sortingLayerName = "Shields";
         shieldRenderer.sortingOrder = 0;
         transform.localScale = Vector3.one * shieldScale;
@@ -107,8 +138,7 @@ public class ShipCoreModule : ModuleBase, IHitter
 
     private void Update()
     {
-        bool shieldsRecharging = Time.time - lastDamageTime >= shieldRegenDelay;
-        if (shieldsRecharging && shields.CurrentValue < shields.MaxValue){
+        if (shields.CurrentValue < shields.MaxValue){
             shields.AddCurrent(CurrentShieldRegen * Time.deltaTime);
             OnHPShieldsChanged?.Invoke();
         }
@@ -122,7 +152,7 @@ public class ShipCoreModule : ModuleBase, IHitter
 
     public bool ApplyDamage(IHitter hitter)
     {
-        float damage = hitter.Damage;
+        float damage = hitter.Damage * damageTakenMultiplier;
         if (invincibility) return false;
         if (hitter.transform.position.y>transform.position.y) 
             damage *= hitter.BackstabMultiplier;
@@ -178,7 +208,8 @@ public class ShipCoreModule : ModuleBase, IHitter
         float flashStartTime = Time.time;
         for (float t = 0f; t < SHIELD_FLASH_DURATION; t = Time.time - flashStartTime)
         {
-            shieldRenderer.color = new Color(1,1,1,0.65f * (1f - t / SHIELD_FLASH_DURATION));
+            float opacity = hardenedShields ? HardenedFlashOpacity : DefaultFlashOpacity;
+            shieldRenderer.color = new Color(1,1,1,opacity * (1f - t / SHIELD_FLASH_DURATION));
             shieldMaterial.SetFloat(RippleAgeId, Time.time - rippleStartTime);
             yield return null;
         }
@@ -208,8 +239,12 @@ public class ShipCoreModule : ModuleBase, IHitter
         stats.Add(shields);
         stats.Add(shieldRegen);
         stats.Add(shieldRegenDelay);
+        stats.Add(shieldRechargeTime);
+        stats.Add(shieldRechargeSpeed);
+        stats.Add(hardenedShields);
         stats.Add(hpRegen);
         stats.Add(invincibility);
+        stats.Add(damageTakenMultiplier);
         stats.Add(xpGain);
         stats.Add(damage);
         stats.Add(knockbackPower);
@@ -218,6 +253,18 @@ public class ShipCoreModule : ModuleBase, IHitter
 
     protected override void OnStatsChanged()
     {
+        // Purple shields blend normally instead of adding light, so the dark fill covers the hull instead of
+        // vanishing, and the bright rim and ripples stand out against it.
+        Material shieldMaterial = shieldRenderer.sharedMaterial;
+        shieldMaterial.SetFloat(DstBlendId, (float)(hardenedShields
+            ? UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha : UnityEngine.Rendering.BlendMode.One));
+        shieldMaterial.SetColor(RimColorId, hardenedShields ? WithAlpha(HardenedRimColor, defaultRimColor.a) : defaultRimColor);
+        shieldMaterial.SetColor(FillColorId, hardenedShields
+            ? WithAlpha(HardenedShieldColor, HardenedFillAlpha) : defaultFillColor);
+        shieldMaterial.SetFloat(RippleStrengthId, hardenedShields ? HardenedRippleStrength : defaultRippleStrength);
+
         OnHPShieldsChanged?.Invoke();
     }
+
+    public static Color WithAlpha(Color color, float alpha) => new Color(color.r, color.g, color.b, alpha);
 }

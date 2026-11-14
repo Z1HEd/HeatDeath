@@ -8,6 +8,8 @@ public abstract class ModuleBase: MonoBehaviour
     protected Ship ship;
     public ModuleDefinition ModuleDefinition => moduleDefinition;
     public Dictionary<StatType, StatModifier> currentModifiers = new Dictionary<StatType, StatModifier>();
+    // On-hit effects that effects (upgrades) give this module, rebuilt on every recalculation like the modifiers.
+    private readonly List<HitEffectsEffect> grantedHitEffects = new List<HitEffectsEffect>();
     private readonly List<IStat> collectedStats = new List<IStat>();
 
     protected virtual void Awake()
@@ -40,6 +42,7 @@ public abstract class ModuleBase: MonoBehaviour
     public void UpdateEffects(IReadOnlyCollection<Effect> effects)
     {
         currentModifiers.Clear();
+        grantedHitEffects.Clear();
         foreach (var effect in effects)
             if (effect.IsApplicableTo(moduleDefinition))
                 effect.ApplyToModule(this);
@@ -65,6 +68,19 @@ public abstract class ModuleBase: MonoBehaviour
             copy.ModifyDuration(durationModifier);
             result.Add(copy);
         }
+        return result;
+    }
+
+    public void GrantHitEffects(HitEffectsEffect granted) => grantedHitEffects.Add(granted);
+
+    // Copies for one shot or hit: the module's own on-hit effects (times the strength) plus the granted ones,
+    // each granted set rolled against its chance.
+    protected List<Effect> EmitHitEffects(IReadOnlyList<Effect> own, float times = 1f)
+    {
+        List<Effect> result = EmitEffects(own, times);
+        foreach (var granted in grantedHitEffects)
+            if (Random.value < granted.Chance)
+                result.AddRange(EmitEffects(granted.Effects));
         return result;
     }
 

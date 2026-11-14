@@ -37,6 +37,8 @@ public class Ship : MonoBehaviour, IHittable
     // Set by dev shortcuts only.
     public bool IgnoresKnockback { get; set; }
     public bool IsKnockedBack => knockbackTimeRemaining > 0f;
+    // Purple shields are up: no knockback, no on-hit effects.
+    private bool BlocksControl => coreModule != null && coreModule.BlocksControl;
     public bool IsDead => dead;
     public ShipCoreModule CoreModule => coreModule;
     public ShipAppearance Appearance { get; private set; }
@@ -108,7 +110,7 @@ public class Ship : MonoBehaviour, IHittable
 
     public void ApplyKnockback(IHitter hitter, Vector3 direction)
     {
-        if (dead || IgnoresKnockback)
+        if (dead || IgnoresKnockback || BlocksControl)
             return;
 
         if (shipRigidbody == null || hitter.KnockbackPower <= 0f)
@@ -130,10 +132,10 @@ public class Ship : MonoBehaviour, IHittable
 
         ApplyKnockback(hitter,direction);
     }
-    // Each ship gets its own copies: one explosion can hit several ships with the same list.
+    // On-hit effects. Each ship gets its own copies: one explosion can hit several ships with the same list.
     public void ApplyEffects(List<Effect> effects)
     {
-        if (effects == null)
+        if (effects == null || BlocksControl)
             return;
 
         foreach (var effect in effects)

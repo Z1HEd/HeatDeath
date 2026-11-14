@@ -55,7 +55,7 @@ public class EnemySpawnController : MonoBehaviour
     private float spawnTimer;
     private readonly List<Enemy> aliveEnemies = new List<Enemy>();
     private readonly List<Enemy> waveBosses = new List<Enemy>();
-    // Lowest point the bosses reached, so shield regen can't take back released escorts.
+    // Lowest point the bosses reached, so regen can't take back released escorts.
     private float lowestBossFraction = 1f;
 
     // Scaling state, set once per wave in StartWave.
@@ -319,8 +319,8 @@ public class EnemySpawnController : MonoBehaviour
     }
 
     // Boss waves: bosses spawn first, then bossEscortAtStart others. The rest are released in
-    // bossEscortReleaseSteps even groups as the bosses lose health + shields, all of them by
-    // releaseAllAtBossFraction, so a boss never fights alone.
+    // bossEscortReleaseSteps even groups as the bosses lose health, all of them by
+    // releaseAllAtBossFraction, so a boss never fights alone. Shields don't count: they recharge.
     // Dead bosses count as 0, so every escort is released by the time they die and the wave's scrap stays fixed.
     private bool IsEscortHeld()
     {
@@ -331,7 +331,7 @@ public class EnemySpawnController : MonoBehaviour
         float fraction = 0f;
         foreach (var boss in waveBosses)
             if (boss != null && !boss.IsDead && boss.CoreModule != null)
-                fraction += boss.CoreModule.DurabilityFraction;
+                fraction += boss.CoreModule.HealthFraction;
         lowestBossFraction = Mathf.Min(lowestBossFraction, fraction / bossCount);
 
         int escorts = currentWave.TotalEnemyCount - bossCount;

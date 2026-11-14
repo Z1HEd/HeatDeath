@@ -32,7 +32,7 @@ public class ExplosionAbility : AbilityModule, IHitter
     public float KnockbackPower => knockback;
     public ModuleDefinition Source => ModuleDefinition;
 
-    public List<Effect> GetEffects(){ return EmitEffects(baseEffects,effectMultiplier);}
+    public List<Effect> GetEffects() => EmitHitEffects(baseEffects, effectMultiplier);
     public void Update()
     {
         if (cooldown.Tick(Time.deltaTime)) InvokeUpdateActivatable();
