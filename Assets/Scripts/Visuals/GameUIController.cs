@@ -197,6 +197,13 @@ public class GameUIController : MonoBehaviour
         ShowNextDraftOrResume();
     }
 
+    // Dev shortcut: an extra weapon draft, shown at once.
+    public void QueueWeaponDraft()
+    {
+        pendingWeaponDrafts++;
+        ShowNextDraftOrResume();
+    }
+
     private void ShowShipDraft()
     {
         upgradePanel?.AddToClassList("ship-draft-active");

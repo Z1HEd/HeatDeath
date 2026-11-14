@@ -5297,19 +5297,23 @@ MonoBehaviour:
   moduleDefinition: {fileID: 11400000, guid: 24ceecfe48544c53ac078d3502238212, type: 2}
   health:
     currentValue: 0
-    baseValue: 125
+    baseValue: 225
     minValue: 1
   shields:
     currentValue: 0
-    baseValue: 100
+    baseValue: 0
     minValue: 0
   shieldRegen:
     currentValue: 0
-    baseValue: 6
+    baseValue: 0
+    minValue: 0
+  shieldRegenDelay:
+    currentValue: 0
+    baseValue: 3
     minValue: 0
   hpRegen:
     currentValue: 0
-    baseValue: 0
+    baseValue: 1
     minValue: 0
   invincibility:
     currentValue: 0

@@ -194,6 +194,9 @@ public class EnemySpawnController : MonoBehaviour
             remainingCounts.Add(Mathf.Max(0, entry.count));
 
         waveCounter++;
+        // A skipped wave never ends, so the next one simply replaces its statistics.
+        if (GameController.Instance != null)
+            GameController.Instance.Statistics.BeginWave();
         OnWaveChanged?.Invoke(currentWave, waveCounter);
 
         if (wave.TotalEnemyCount == 0)
@@ -222,6 +225,9 @@ public class EnemySpawnController : MonoBehaviour
 
     private void OnWaveCleared()
     {
+        if (GameController.Instance != null)
+            GameController.Instance.Statistics.EndWave();
+
         currentWaveIndex++;
         if (currentWaveIndex < currentWaveOrder.Count)
         {

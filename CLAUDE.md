@@ -43,6 +43,9 @@ Dev shortcuts work in the editor and in development builds. `Assets/Scripts/Dev/
 - F4: toggle the player's invincibility and knockback immunity.
 - F5-F10: jump to the start of sector 1-6, removing current enemies without rewards. Enemy scaling then uses that sector's run progress; past the sector list it's endless mode.
 - F11: open a ship-module draft at once.
+- F12: open a weapon draft at once.
+
+Each cleared wave also logs `[Stats]`: damage dealt per source (damage, DPS, shields and hull, kills) and damage the player took, from `RunStatistics`. Skipped waves don't log.
 
 There are no tests yet and no `.asmdef` files; all scripts compile into `Assembly-CSharp`. `com.unity.test-framework` is installed, so tests would need a test assembly first. Then run them with:
 

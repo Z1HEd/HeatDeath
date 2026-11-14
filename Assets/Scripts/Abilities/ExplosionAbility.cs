@@ -30,6 +30,7 @@ public class ExplosionAbility : AbilityModule, IHitter
     public float HPDamageMultiplier => hpDamageMultiplier;
     public float BackstabMultiplier => backstabMultiplier;
     public float KnockbackPower => knockback;
+    public ModuleDefinition Source => ModuleDefinition;
 
     public List<Effect> GetEffects(){ return EmitEffects(baseEffects,effectMultiplier);}
     public void Update()

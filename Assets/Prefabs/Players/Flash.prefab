@@ -10293,7 +10293,11 @@ MonoBehaviour:
     minValue: 0
   shieldRegen:
     currentValue: 0
-    baseValue: 3
+    baseValue: 20
+    minValue: 0
+  shieldRegenDelay:
+    currentValue: 0
+    baseValue: 2
     minValue: 0
   hpRegen:
     currentValue: 0

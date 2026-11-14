@@ -15,6 +15,7 @@ public class TeslaModule : WeaponModule, IHitter
     public float ShieldDamageMultiplier => shieldDamageMultiplier;
     public float HPDamageMultiplier => hpDamageMultiplier;
     public float BackstabMultiplier => backstabMultiplier;
+    public ModuleDefinition Source => ModuleDefinition;
     public List<Effect> GetEffects(){ return EmitEffects(appliesEffects);}
     [SerializeField] private int maxChainTargets = 3;
     [SerializeField] private float lightningDuration = 0.2f;

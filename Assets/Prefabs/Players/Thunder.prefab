@@ -5378,11 +5378,15 @@ MonoBehaviour:
     minValue: 0
   shieldRegen:
     currentValue: 0
-    baseValue: 3
+    baseValue: 25
+    minValue: 0
+  shieldRegenDelay:
+    currentValue: 0
+    baseValue: 2.5
     minValue: 0
   hpRegen:
     currentValue: 0
-    baseValue: 0
+    baseValue: 0.1
     minValue: 0
   invincibility:
     currentValue: 0

@@ -10,6 +10,7 @@ public class Explosion : MonoBehaviour, IHitter
     public float HPDamageMultiplier { get; private set; }
     public float ShieldDamageMultiplier { get; private set; }
     public float BackstabMultiplier { get; private set; }
+    public ModuleDefinition Source { get; private set; }
 
     public List<Effect> appliesEffects { get; private set; }
     public List<Effect> GetEffects() => appliesEffects;
@@ -35,6 +36,7 @@ public class Explosion : MonoBehaviour, IHitter
         HPDamageMultiplier = hitter.HPDamageMultiplier;
         ShieldDamageMultiplier = hitter.ShieldDamageMultiplier;
         BackstabMultiplier = hitter.BackstabMultiplier;
+        Source = hitter.Source;
         appliesEffects = hitter.GetEffects();
 
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();

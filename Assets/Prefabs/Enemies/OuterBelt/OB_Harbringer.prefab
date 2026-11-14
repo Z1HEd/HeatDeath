@@ -5835,7 +5835,7 @@ MonoBehaviour:
     minValue: 0
   shieldRegen:
     currentValue: 0
-    baseValue: 20
+    baseValue: 100
     minValue: 0
   hpRegen:
     currentValue: 0

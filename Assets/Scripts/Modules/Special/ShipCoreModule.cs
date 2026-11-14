@@ -10,13 +10,16 @@ public readonly struct DamageTaken
     public readonly float Shields;
     public readonly float Hull;
     public readonly bool ShieldsBroken;
+    // This hit took the hull to 0.
+    public readonly bool Killed;
 
-    public DamageTaken(IHitter attacker, float shields, float hull, bool shieldsBroken)
+    public DamageTaken(IHitter attacker, float shields, float hull, bool shieldsBroken, bool killed)
     {
         Attacker = attacker;
         Shields = shields;
         Hull = hull;
         ShieldsBroken = shieldsBroken;
+        Killed = killed;
     }
 }
 
@@ -30,6 +33,8 @@ public class ShipCoreModule : ModuleBase, IHitter
     [SerializeField] private ResourceStat health = new ResourceStat(StatType.Health, 100f, 1f);
     [SerializeField] private ResourceStat shields = new ResourceStat(StatType.Shields, 100f, 0f);
     [SerializeField] private ScalarStat shieldRegen = new ScalarStat(StatType.ShieldRegen, 2f, 0f);
+    [Tooltip("Seconds without taking damage before shields start to regenerate.")]
+    [SerializeField] private ScalarStat shieldRegenDelay = new ScalarStat(StatType.ShieldRegenDelay, 3f, 0f);
     [SerializeField] private ScalarStat hpRegen = new ScalarStat(StatType.HPRegen, 0f, 0f);
     [SerializeField] private BoolStat invincibility = new BoolStat(StatType.Invincibility,false);
     [Tooltip("Multiplies all scrap the player gains. Unused on enemies.")]
@@ -47,10 +52,14 @@ public class ShipCoreModule : ModuleBase, IHitter
 
     protected SpriteRenderer shieldRenderer;
     private float rippleStartTime = float.NegativeInfinity;
+    // Game time of the last hit that took shields or hull. Shields wait shieldRegenDelay after it.
+    private float lastDamageTime = float.NegativeInfinity;
 
     public event Action OnHPShieldsChanged;
     // Each hit that takes shields or health. Regen never raises it, and neither do hits while invincible.
     public event Action<DamageTaken> OnDamageTaken;
+    // The same for every ship, with the ship that took it.
+    public static event Action<Ship, DamageTaken> OnAnyDamageTaken;
 
     public float CurrentHealth => health.CurrentValue;
     public float CurrentShields => shields.CurrentValue;
@@ -76,6 +85,7 @@ public class ShipCoreModule : ModuleBase, IHitter
     public float ShieldDamageMultiplier => 1f;
     public float HPDamageMultiplier => 1f;
     public float BackstabMultiplier => backstabMultiplier;
+    public ModuleDefinition Source => ModuleDefinition;
     public List<Effect> GetEffects() {return EmitEffects(appliesEffects);}
 
     protected override void Awake()
@@ -97,7 +107,8 @@ public class ShipCoreModule : ModuleBase, IHitter
 
     private void Update()
     {
-        if (shields.CurrentValue < shields.MaxValue){
+        bool shieldsRecharging = Time.time - lastDamageTime >= shieldRegenDelay;
+        if (shieldsRecharging && shields.CurrentValue < shields.MaxValue){
             shields.AddCurrent(CurrentShieldRegen * Time.deltaTime);
             OnHPShieldsChanged?.Invoke();
         }
@@ -132,9 +143,14 @@ public class ShipCoreModule : ModuleBase, IHitter
         }
 
         var taken = new DamageTaken(hitter, shieldsBefore - shields.CurrentValue,
-            healthBefore - health.CurrentValue, hadShields && shieldsGone);
+            healthBefore - health.CurrentValue, hadShields && shieldsGone,
+            healthBefore > 0f && health.CurrentValue <= 0f);
         if (taken.Shields > 0f || taken.Hull > 0f)
+        {
+            lastDamageTime = Time.time;
             OnDamageTaken?.Invoke(taken);
+            OnAnyDamageTaken?.Invoke(ship, taken);
+        }
         OnHPShieldsChanged?.Invoke();
         return damage>0 || (hadShields && shieldsGone);
     }
@@ -191,6 +207,7 @@ public class ShipCoreModule : ModuleBase, IHitter
         stats.Add(health);
         stats.Add(shields);
         stats.Add(shieldRegen);
+        stats.Add(shieldRegenDelay);
         stats.Add(hpRegen);
         stats.Add(invincibility);
         stats.Add(xpGain);

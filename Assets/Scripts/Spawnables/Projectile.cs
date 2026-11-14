@@ -19,6 +19,7 @@ public class Projectile : MonoBehaviour, IHitter
     public float HPDamageMultiplier { get; protected set; } = 1f;
     public float BackstabMultiplier { get; protected set; } = 1f;
     public float KnockbackPower { get; protected set; } = 0f;
+    public ModuleDefinition Source { get; private set; }
     public List<Effect> appliesEffects = new();
     public List<Effect> GetEffects() { return appliesEffects; }
     protected Rigidbody2D rb;
@@ -43,6 +44,7 @@ public class Projectile : MonoBehaviour, IHitter
         ShieldDamageMultiplier = sourceModule.ShieldDamageMultiplier;
         HPDamageMultiplier = sourceModule.HPDamageMultiplier;
         BackstabMultiplier = sourceModule.BackstabMultiplier;
+        Source = sourceModule.ModuleDefinition;
         appliesEffects = sourceModule.EmitAppliedEffects();
         ConfigurePiercing(sourceModule.projectilePiercing);
     }

@@ -43,6 +43,8 @@ public class GameController : MonoBehaviour
     public Player Player => player;
     private Player player;
 
+    public RunStatistics Statistics { get; private set; }
+
     public static GameController Instance => instance;
 
     public bool IsWeaponDraftLevel()
@@ -73,6 +75,7 @@ public class GameController : MonoBehaviour
             return;
         }
         instance = this;
+        Statistics = new RunStatistics();
     }
 
     private void Start()
@@ -150,5 +153,7 @@ public class GameController : MonoBehaviour
         if (instance == this)
             instance = null;
 
+        // Its event subscription is static, so it would outlive the scene.
+        Statistics?.Dispose();
     }
 }

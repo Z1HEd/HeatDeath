@@ -8,6 +8,8 @@ public interface IHitter
     float HPDamageMultiplier {get;}
     float BackstabMultiplier {get;}
     float KnockbackPower { get; }
+    // The module the damage comes from, for statistics. A definition, so it outlives the module itself.
+    ModuleDefinition Source { get; }
     List<Effect> GetEffects();
 }
 

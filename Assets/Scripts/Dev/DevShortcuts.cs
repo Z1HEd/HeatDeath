@@ -1,5 +1,7 @@
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -19,7 +21,39 @@ public class DevShortcuts : MonoBehaviour
 
         Debug.Log($"[Dev] Shortcuts: F1 +1 level, F2 +{BigLevelStep} levels, " +
                   "F3 skip wave, F4 toggle invincibility, " +
-                  $"F5-F{4 + SectorKeys.Length} jump to sector 1-{SectorKeys.Length}, F11 ship-module draft");
+                  $"F5-F{4 + SectorKeys.Length} jump to sector 1-{SectorKeys.Length}, F11 ship-module draft, " +
+                  "F12 weapon draft. Each cleared wave logs [Stats]: damage dealt per source.");
+    }
+
+    // After the scene's Awake, so GameController's statistics exist.
+    private void Start()
+    {
+        if (GameController.Instance != null)
+            GameController.Instance.Statistics.OnWaveEnded += LogWave;
+    }
+
+    private void OnDestroy()
+    {
+        if (GameController.Instance != null)
+            GameController.Instance.Statistics.OnWaveEnded -= LogWave;
+    }
+
+    // One line per source, highest damage first, then the damage the player took.
+    private static void LogWave(StatisticsPeriod wave)
+    {
+        int number = EnemySpawnController.Instance != null ? EnemySpawnController.Instance.WaveCounter : 0;
+        float seconds = Mathf.Max(wave.Duration, 0.01f);
+        var report = new StringBuilder($"[Stats] Wave {number}, {seconds:F1} s");
+
+        foreach (var pair in wave.DealtBySource.OrderByDescending(pair => pair.Value.Damage))
+        {
+            SourceStatistics stats = pair.Value;
+            report.Append($"\n  {pair.Key.DisplayName}: {stats.Damage:F0} damage ({stats.Damage / seconds:F1}/s), " +
+                          $"shields {stats.ShieldDamage:F0}, hull {stats.HullDamage:F0}, {stats.Kills} kills");
+        }
+
+        report.Append($"\n  Taken: shields {wave.ShieldDamageTaken:F0}, hull {wave.HullDamageTaken:F0}");
+        Debug.Log(report.ToString());
     }
 
     private void Update()
@@ -32,7 +66,8 @@ public class DevShortcuts : MonoBehaviour
         if (keyboard.f2Key.wasPressedThisFrame) AddLevels(BigLevelStep);
         if (keyboard.f3Key.wasPressedThisFrame) SkipWave();
         if (keyboard.f4Key.wasPressedThisFrame) ToggleInvincibility();
-        if (keyboard.f11Key.wasPressedThisFrame) DraftShipModule();
+        if (keyboard.f11Key.wasPressedThisFrame) QueueDraft(ui => ui.QueueShipModuleDraft());
+        if (keyboard.f12Key.wasPressedThisFrame) QueueDraft(ui => ui.QueueWeaponDraft());
 
         for (int i = 0; i < SectorKeys.Length; i++)
             if (keyboard[SectorKeys[i]].wasPressedThisFrame)
@@ -57,7 +92,7 @@ public class DevShortcuts : MonoBehaviour
             EnemySpawnController.Instance.SkipWave();
     }
 
-    private static void DraftShipModule()
+    private static void QueueDraft(System.Action<GameUIController> queue)
     {
         if (GameController.Instance == null || GameController.Instance.Player == null)
         {
@@ -65,7 +100,7 @@ public class DevShortcuts : MonoBehaviour
             return;
         }
 
-        GameUIController.Instance.QueueShipModuleDraft();
+        queue(GameUIController.Instance);
     }
 
     private void ToggleInvincibility()
