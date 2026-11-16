@@ -12,19 +12,21 @@ public class MineProjectile : Projectile
         if (rb != null)
             rb.linearDamping = drag;
     }
-    public override void Initialize(Vector2 velocity, ProjectileModule sourceModule)
+    public override void Initialize(Vector2 direction, float speed, ProjectileModule sourceModule)
     {
-        base.Initialize(velocity,sourceModule);
+        base.Initialize(direction, speed, sourceModule);
         if (sourceModule is MineModule) 
             explosionRange = (sourceModule as MineModule).ExplosionRange;
         else
             Debug.LogError("Mine expects MineModule, got: "+ sourceModule);
     }
 
+    // Explodes and always removes the mine, even one that survives its explosions (infinite piercing).
     public void ForceExplode()
     {
         Explode();
-        Kill();
+        if (!isDead)
+            StartCoroutine(Kill());
     }
 
     protected override void OnTriggerEnter2D(Collider2D collision)

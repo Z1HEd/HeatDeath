@@ -51,7 +51,7 @@ MonoBehaviour:
   firePoint: {fileID: 3116449676911722161}
   fireCooldown:
     currentValue: 0
-    baseValue: 1.75
+    baseValue: 1.5
     minValue: 0
   timeScale:
     currentValue: 0
@@ -67,11 +67,11 @@ MonoBehaviour:
   projectilePrefab: {fileID: 8872413515496322224, guid: 975c65d3b963455d9b9954c884328c9e, type: 3}
   projectileSpeed:
     currentValue: 0
-    baseValue: 25
+    baseValue: 35
     minValue: 0
   projectileDamage:
     currentValue: 0
-    baseValue: 35
+    baseValue: 55
     minValue: 0
   ShieldDamageMultiplier:
     currentValue: 0

@@ -83,7 +83,7 @@ public class ProjectileModule : WeaponModule
 
             Projectile projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
             projectile.gameObject.layer = DetectLayer;
-            projectile.Initialize(shotDirection * projectileSpeed, this);
+            projectile.Initialize(shotDirection, projectileSpeed, this);
             OnProjectileSpawned(projectile);
         }
     }

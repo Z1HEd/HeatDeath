@@ -134,7 +134,7 @@ MonoBehaviour:
   firePoint: {fileID: 6463813337267142307}
   fireCooldown:
     currentValue: 0
-    baseValue: 0.15
+    baseValue: 0.18
     minValue: 0
   timeScale:
     currentValue: 0

@@ -34,10 +34,11 @@ public class Projectile : MonoBehaviour, IHitter
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
-    public virtual void Initialize(Vector2 velocity, ProjectileModule sourceModule)
+    // Direction apart from speed, so a projectile with speed 0 (a laser) still knows where it points.
+    public virtual void Initialize(Vector2 direction, float speed, ProjectileModule sourceModule)
     {
         if (rb != null)
-            rb.linearVelocity = velocity;
+            rb.linearVelocity = direction * speed;
 
         Damage = sourceModule.projectileDamage;
         KnockbackPower = sourceModule.projectileKnockback;

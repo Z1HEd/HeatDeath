@@ -19,5 +19,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 65c2c2d09c4c8984097657f3721a900c, type: 2}
   - {fileID: 11400000, guid: 4cdf19654488b534c884978c57188286, type: 2}
   key: weapon.missile
-  description: Launches missiles that explode and deal area damage.
+  description: Homing missiles that explode, pushing back enemies around them. Strong
+    against hull, weak against shields.
   weaponPrefab: {fileID: 2658622645487082905, guid: 333b2d7feaf8bb849a304d8ccafb9be8, type: 3}

@@ -19,6 +19,9 @@ Shader "Custom/LaserBeam"
             "IgnoreProjector"="True"
             "RenderType"="Transparent"
             "PreviewType"="Plane"
+            // The beam's size comes from unity_ObjectToWorld. Batching merges beams into one world-space mesh
+            // with an identity matrix, which made beams fired together (Yamato's copy) invisible.
+            "DisableBatching"="True"
         }
 
         Cull Off

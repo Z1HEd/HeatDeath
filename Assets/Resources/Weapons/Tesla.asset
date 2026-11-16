@@ -19,5 +19,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2c382f2690590cb48a53051168322d54, type: 2}
   - {fileID: 11400000, guid: b03028a4aa56fc64a8afacd5404ea678, type: 2}
   key: weapon.tesla
-  description: Hits enemies with electricity. Chains 2 times.
+  description: Lightning that never misses and jumps between up to 3 enemies. Strong
+    against shields, weak against hull.
   weaponPrefab: {fileID: 2658622645487082905, guid: 386636682fee00e4a99ee49361a80efc, type: 3}

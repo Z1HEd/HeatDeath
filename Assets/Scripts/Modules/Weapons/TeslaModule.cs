@@ -16,7 +16,8 @@ public class TeslaModule : WeaponModule, IHitter
     public float BackstabMultiplier => backstabMultiplier;
     public ModuleDefinition Source => ModuleDefinition;
     public List<Effect> GetEffects() => GetHitEffects();
-    [SerializeField] private int maxChainTargets = 3;
+    [Tooltip("Ships one bolt hits, the first included. Rounded down.")]
+    [SerializeField] protected ScalarStat chainTargets = new ScalarStat(StatType.ChainTargets, 3f, 1f);
     [SerializeField] private float lightningDuration = 0.2f;
     [Tooltip("Seconds between re-rolls of the bolt shape.")]
     [SerializeField] private float jitterInterval = 0.03f;
@@ -72,7 +73,8 @@ public class TeslaModule : WeaponModule, IHitter
         Vector2 fromPosition = transform.position;
         Ship next = rangeDetector.GetClosestTarget();
         List<Collider2D> hits;
-        for (int i = 0; i < maxChainTargets; i++)
+        int maxTargets = Mathf.FloorToInt(chainTargets);
+        for (int i = 0; i < maxTargets; i++)
         {
             if (next == null) break;
 
@@ -153,5 +155,6 @@ public class TeslaModule : WeaponModule, IHitter
         stats.Add(shieldDamageMultiplier);
         stats.Add(hpDamageMultiplier);
         stats.Add(backstabMultiplier);
+        stats.Add(chainTargets);
     }
 }

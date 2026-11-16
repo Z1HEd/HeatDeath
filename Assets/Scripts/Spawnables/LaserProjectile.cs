@@ -12,10 +12,11 @@ public class LaserProjectile : Projectile
     private Transform beam;
     private Vector3 fullBeamScale;
 
-    public override void Initialize(Vector2 velocity, ProjectileModule sourceModule)
+    // The beam doesn't move: it points along the shot's direction, whatever the module's projectile speed.
+    public override void Initialize(Vector2 direction, float speed, ProjectileModule sourceModule)
     {
-        base.Initialize(Vector2.zero, sourceModule);
-        transform.up = velocity.normalized;
+        base.Initialize(direction, 0f, sourceModule);
+        transform.up = direction;
         lifeTimeLeft = lifeTime;
         isFired = true;
 

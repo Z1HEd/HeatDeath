@@ -37,6 +37,7 @@ public enum StatType
     ShieldRechargeSpeed = 30,
     HardenedShields = 31,
     DamageTakenMultiplier = 32,
+    ChainTargets = 33,
 }
 
 [Serializable]

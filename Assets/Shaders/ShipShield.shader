@@ -1,8 +1,8 @@
 // Shield overlay: drawn on a slightly enlarged copy of the ship's own sprite. The sprite's
 // alpha is the silhouette: its edge gets a bright rim, its inside a faint fill with soft rings
-// rippling out from the hit point (or a hex grid, for comparison: raise _HexStrength). Additive by default, so
-// the hull stays visible; purple shields switch _DstBlend to alpha blending, so their dark colour covers the hull.
-// SpriteRenderer alpha fades the whole thing.
+// rippling out from the hit point (or a hex grid, for comparison: raise _HexStrength). Light is added, so the
+// hull stays visible. Purple shields set _Cover to 1, so their dark fill also covers the hull, while rim and
+// rings are still added light. SpriteRenderer alpha fades the whole thing.
 Shader "Custom/ShipShield"
 {
     Properties
@@ -24,10 +24,8 @@ Shader "Custom/ShipShield"
         _RippleSize ("Ripple Ring Spacing (texels)", Float) = 18
         _RippleSpeed ("Ripple Speed (rings per second)", Float) = 6
         _RippleHeadStart ("Ripple Head Start (seconds)", Float) = 0.17
-        [HideInInspector] _RippleOrigin ("Ripple Origin (texels)", Vector) = (0, 0, 0, 0)
-        [HideInInspector] _RippleAge ("Ripple Age (seconds)", Float) = 0
-        // 1 = One (additive), 10 = OneMinusSrcAlpha (alpha blending).
-        [HideInInspector] _DstBlend ("Destination Blend", Float) = 1
+        // 0 = everything is added light; 1 = the fill also covers what's below (purple shields).
+        [HideInInspector] _Cover ("Fill Covers Hull", Float) = 0
     }
 
     SubShader
@@ -44,7 +42,8 @@ Shader "Custom/ShipShield"
         Cull Off
         Lighting Off
         ZWrite Off
-        Blend SrcAlpha [_DstBlend]
+        // Premultiplied: rgb is added light, alpha is how much of what's below is covered.
+        Blend One OneMinusSrcAlpha
 
         Pass
         {
@@ -80,14 +79,17 @@ Shader "Custom/ShipShield"
             float _HexSize;
             float _HexLineWidth;
             float _HexStrength;
+            float _Cover;
             float _RippleStrength;
             float _RippleCount;
             float _RippleFalloff;
             float _RippleSize;
             float _RippleSpeed;
             float _RippleHeadStart;
-            float4 _RippleOrigin;
-            float _RippleAge;
+            // Set from ShipCoreModule, one per recent hit (MaxRipples there). Unused slots have a large age.
+            #define MAX_RIPPLES 4
+            float4 _RippleOrigins[MAX_RIPPLES];
+            float4 _RippleAges;
 
             static const float2 Neighbours[8] =
             {
@@ -119,19 +121,27 @@ Shader "Custom/ShipShield"
                 return step((0.5 - fromCentre) * _HexSize, _HexLineWidth);
             }
 
-            // Soft rings spreading from the hit point, set per hit by ShipCoreModule. The leading
-            // wave is the brightest and each one behind it is _RippleFalloff times as bright.
-            // Each wave fades to zero at its own edges, so the steps between them don't show.
-            // p is in texels.
-            float rippleRings(float2 p)
+            // Soft rings spreading from one hit point. The leading wave is the brightest and each one
+            // behind it is _RippleFalloff times as bright. Each wave fades to zero at its own edges,
+            // so the steps between them don't show. p and origin are in texels.
+            float rippleRing(float2 p, float2 origin, float age)
             {
-                float travelled = (_RippleAge + _RippleHeadStart) * _RippleSpeed;
-                float behindFront = travelled - length(p - _RippleOrigin.xy) / _RippleSize;
+                float travelled = (age + _RippleHeadStart) * _RippleSpeed;
+                float behindFront = travelled - length(p - origin) / _RippleSize;
                 if (behindFront < 0 || behindFront >= _RippleCount)
                     return 0;
 
                 float wave = 0.5 - 0.5 * cos(UNITY_TWO_PI * behindFront);
                 return wave * wave * pow(_RippleFalloff, floor(behindFront));
+            }
+
+            // The rings of every recent hit, added up, so overlapping ripples reinforce each other.
+            float rippleRings(float2 p)
+            {
+                float sum = 0;
+                for (int i = 0; i < MAX_RIPPLES; i++)
+                    sum += rippleRing(p, _RippleOrigins[i].xy, _RippleAges[i]);
+                return sum;
             }
 
             // Everything outside the texture counts as empty. Clamped sampling would repeat art
@@ -185,7 +195,10 @@ Shader "Custom/ShipShield"
                 float fade = IN.color.a;
                 float shown = saturate(intensity * fade + rings * saturate(fade * 2));
 
-                return fixed4(rgb * IN.color.rgb, shown * alpha);
+                // Added light, exactly what the old additive blend added. Covering shields also hide
+                // the hull under their fill; rim and rings stay light only, so they read as transparent.
+                float covered = _Cover * saturate(fill * fade) * alpha;
+                return fixed4(rgb * IN.color.rgb * shown * alpha, covered);
             }
             ENDCG
         }

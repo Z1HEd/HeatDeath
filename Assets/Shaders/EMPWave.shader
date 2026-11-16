@@ -43,6 +43,8 @@ Shader "Custom/EMPWave"
             "IgnoreProjector"="True"
             "RenderType"="Transparent"
             "PreviewType"="Plane"
+            // Reads its scale from unity_ObjectToWorld, which batching replaces with identity.
+            "DisableBatching"="True"
         }
 
         Cull Off

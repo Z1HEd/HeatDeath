@@ -105,6 +105,77 @@ Implemented in block C, except core evolution (see ShipCore below).
 - **Evolutions are draft options and cost a level.** Evolution options appear only while a module is ready to evolve. Each names a ready module and one of its paths, picked at random; one draft never shows the same path twice, but can show both of a module's paths. With 3 options, at least one evolution appears in about 74% of drafts.
 - **Rush or balance** is an intended choice. Rushing one module evolves it around level 14 (late sector 1) but leaves the rest bare, and its infinite upgrade then keeps competing for draft options. Balanced builds evolve later and grow evenly. Taking the highest rarity each time evolves around level 19; random picks around level 49. More stacks barely delay the rush (6-stack Commons: level 18). These levels assume evolution on readiness; as a draft option it comes about 1-2 levels later. If sector-1 evolutions should be prevented, add a minimum evolution level.
 
+## Shields and damage types
+
+Shields are a barrier that recharges between fights. Hull is the budget for the whole run.
+
+**Shields** (`ShipCoreModule`):
+- **Recharge:** after `ShieldRegenDelay` seconds without taking damage, shields refill from empty to full in `ShieldRechargeTime` seconds, divided by `ShieldRechargeSpeed`. The rate is a share of max shields, so +max shields keeps the recharge time constant. Any hit that takes shields or hull restarts the delay.
+- **Recharge upgrades** raise `ShieldRechargeSpeed` by +% (linear, like `TimeScale`) and lower `ShieldRegenDelay` by −%. Don't lower `ShieldRechargeTime` with −%: it grows faster than linearly (4 × −20% gives ×5 speed).
+- **Trickle:** the flat `ShieldRegen` always regenerates, even under fire. It's for niche upgrades, ship modules, and Thunder, not for general shield upgrades.
+- Defaults: delay 3 s, recharge 8 s, trickle 0.
+- Bosses release their escorts as their health falls, not their shields, since shields come back.
+
+**Hull regen** (`HPRegen`) is constant, even under fire. Most ships have none or a slow trickle; a ship without shields can have more. At about 300 s per sector, 0.1/s heals about 30 HP per sector and 1/s about 300. Flat regen doesn't grow with enemy scaling, so its value falls in later sectors unless upgrades raise it.
+
+**Player ships** (placeholders; block E sets the ship base values):
+
+| Ship | Health | Shields | Delay | Recharge | Trickle | Hull regen | Why |
+|---|---|---|---|---|---|---|---|
+| Flash | 75 | 40 | 2 s | 5 s | 0 | 0 | Dodge and shields are back |
+| Bulwark | 225 | 0 | — | — | 0 | 1.0 | No shields: the hull is everything |
+| Yamato | 100 | 75 | 3 s | 8 s | 0 | 0.25 | Sturdy flagship |
+| Thunder | 75 | 100 | 2.5 s | 6 s | 2 | 0.1 | High-tech shield ship |
+| Reaper | 75 | 75 | 4 s | 8 s | 0 | 0 | Its ability heals: trickle +500%, recharge speed +100%, no delay |
+
+**Purple (hardened) shields** (`HardenedShields`): while they're up, the ship ignores knockback and every on-hit effect from every source. The hit that breaks them still pushes and applies its effects. Regular shields block nothing.
+- Enemies: elites and bosses only, never swarms. They can't be pushed or stunned until their shields break, which gives bosses a phase and prevents stun-locks. This replaces "knockback resistance by rank".
+- Player: a ship module or upgrade (block E).
+- They look dark purple and ominous: a dark shroud over the hull with a bright violet rim and ripples, and a purple shield bar.
+
+**Damage types** (damage multiplier vs shields / vs hull):
+
+| Type | Weapons | Shields | Hull | Role |
+|---|---|---|---|---|
+| Kinetic | Cannon, Shotgun | 1 | 1 | Reliable damage anywhere |
+| Kinetic | Railgun | 1 | 1.4 | Heavy skill shot |
+| Explosive | Missile, Mines | 0.5 | 1.5 | Area damage and knockback: crowd control against unshielded swarms, poor against shields |
+| Energy | Laser, Tesla | 1.5 | 0.75 | Anti-shield |
+
+- Blue Laser bypasses shields (multiplier −1: its damage goes straight to the hull).
+- Enemy weapons should follow the same table.
+- Sectors can lean one way: Outer Belt mostly unshielded, Storm Verge and other high-tech sectors shield-heavy, so builds that invest only in hull damage struggle there. Kinetic stays neutral, so a bad sector order never ruins a run.
+
+**Debuffs**, applied on hit. Upgrades grant them to weapons through `HitEffectsEffect`, with a chance per shot that stacks raise. The same kind from different weapons doesn't stack: the strongest one applies. Purple shields block all of them.
+
+| Debuff | Effects (tags) |
+|---|---|
+| Exposed | `DamageTakenMultiplier` +X% (ShipCore) |
+| Disruptor | `ShieldRegenDelay` +X s and `ShieldRegen` −X% (ShipCore) |
+| Jammed | weapon `TimeScale` −X% (Weapon) |
+| Slow | `Thrust` and `MaxSpeed` −X% (Movement) |
+| Stun | `TimeScale` −100% (Weapon), `Thrust` and `MaxSpeed` −100% (Movement), 0.3-0.5 s, like Thunder's EMP |
+
+Size a debuff upgrade by the value it gives the whole build, not by its own damage. Support works best as control (Vacuum Cannon, debuffs), not only as stat buffs.
+
+## Weapon base values
+
+Weapons are matched by value for their role, not by equal DPS. Harder weapons (skill shots, close range, placement) may deal more; weapons that bring area control deal less. The Cannon, the reliable generalist, is the reference.
+
+**Scenario:** a typical Outer Belt wave, about 4 enemies alive at 2-8 units from the player, with pools about 40% shields. Effective DPS = raw DPS × hit rate × targets per hit × damage-type factor (1 kinetic, 1.21 Railgun, 0.83 explosive, 0.94 energy for this pool). These are paper estimates from the code; the `[Stats]` log measures them in play, and measured values replace them here.
+
+| Weapon | Role | Target | Damage | Cooldown | Other | Raw DPS | Hit assumption | Est. effective |
+|---|---|---|---|---|---|---|---|---|
+| Cannon | Reliable generalist, auto-aim | 1.0 | 15 | 0.75 | range 8, speed 8 | 20 | 80% hits, in range 95% | 15 |
+| Shotgun | Close range: risk | 1.2 | 5 × 8 | 1.0 | range 5, spread 20° | 40 | 55% of pellets hit, in range 80% | ~18 |
+| Railgun | Straight-ahead skill shot | 1.2-1.3 | 55 | 1.5 | speed 35, hull ×1.4 | 37 | 40% hits (fixed forward) | ~18 |
+| Laser | Straight beam, hits every enemy in line, anti-shield | ~1.15 | 40 | 1.25 | energy | 32 per target | 0.55 targets per beam | ~16.5 |
+| Missile | Homing area damage and knockback | 0.85 | 30 | 1.75 | explosion 2.5 (radius 1.25) | 17 | 75% hits, 1.25 targets | ~13 |
+| Mines | Placement, area damage and knockback | 1.05 | 48 | 2.0 | 3 mines, thrown ~2.7 units, proximity fuse 0.6 | 24 | 60% go off near enemies, 1.3 targets | ~15.5 |
+| Tesla | Never misses, chains, flexible | 0.85 | 18 | 1.75 | chains 3 | 10 per target | 1.7 targets, in range 80% | ~13 |
+
+Evolved Cannon: Minigun 6 damage every 0.18 s (33 raw DPS, ×1.67, range 6) for raw damage; Vacuum Cannon 12 damage every 0.9 s with splash 1.5 and knockback 14 for crowd control.
+
 ## Upgrade power by rarity
 
 Percent of the targeted module's main output. Higher rarities fill a slot in fewer picks and give more per slot, so they carry tradeoffs or conditions. The table is a guideline: rarity sets roughly what a full slot is worth, and each upgrade's stacks follow its module's design. What matters is that rarer upgrades are stronger but more specific, situational, or costly.
@@ -136,12 +207,12 @@ A full pool is about 6 Common, 3 Rare, 2 Epic, and 1 Legendary per module. That 
 - Boss wave: the boss starts with a small escort, and the rest of its wave is released as it takes damage. A boss shouldn't fight alone, and its minions shouldn't overshadow it.
 
 **Modules:**
-- Each weapon at base: about the same DPS as any other weapon.
+- Each weapon at base: about the same value as any other weapon, judged by role rather than equal DPS. Weapons that are harder to use (skill shots, close range, placement) may deal more; weapons that bring control or support deal less. See "Weapon base values" (block D).
 - Each ship module at base, counting its unique bonus: about the defensive value of the bare ShipCore, so one ship module roughly doubles a fresh ship's durability. Grant flat amounts where possible: percents from different modules multiply (+200% and +200% give ×9), while flats add up as the model assumes.
 - Fire-rate bonuses use `TimeScale`, not Cooldown reductions. DPS grows linearly with TimeScale (+36% gives +36%), while Cooldown −36% gives +56% and −100% fires every frame.
 - Effects scaled by a multiplier (a module's or ability's `EffectMultiplier`, enemy scaling) avoid negative percents unless the drawback should grow with it: −75% at ×1.33 is −100%. A percent below −100% counts as −100%.
 
-**Ship modules, first pass** (*tunable*). Sized at about +175 effective HP each, about one fresh ship (today's ships have 115-225). These are placeholders until playtesting: some modules should give up the health or shield part in favour of their role.
+**Ship modules, first pass** (*tunable*). Sized at about +175 effective HP each, about one fresh ship (today's ships have 115-225). These are placeholders until playtesting: some modules should give up the health or shield part in favour of their role. Shield Capacitor's "+4 shield regen" predates the recharge rework and is now an always-on trickle; block E revisits it.
 
 | Module | Passive (ShipCore) | Trigger → buff (duration / cooldown) |
 |---|---|---|
@@ -160,6 +231,9 @@ Ideas from the user for future content. Each says what the current code supports
 - **Level-scaled upgrades:** see "Upgrade power by rarity". Supported (`perLevel` on stat effects).
 - **Support modules:** a weapon or upgrade that is weak alone but strengthens other modules: other weapons' damage or fire rate, the ability, or durability. Size its value as the bonus it gives the rest of the build, not its own DPS.
   - Supported for upgrades: an upgrade's effects may target any tag (`Weapon` covers all 7 weapons; also `ShipCore`, `Ability`, `Thruster`).
-  - Not supported yet: a weapon granting effects just for being installed (ship modules can, through `PassiveEffects`), and "other weapons only" (a tag also matches the module that grants it). Block D adds them when it builds a support weapon.
-- **Knockback resistance by enemy rank:** minibosses resist knockback more than regular enemies, bosses more still. Not supported yet (no resistance stat; every ship has mass 1). Planned for block F.
+  - Supported for control: upgrades can grant weapons on-hit debuffs (`HitEffectsEffect`, see "Shields and damage types").
+  - Not supported yet: a weapon granting stat effects just for being installed (ship modules can, through `PassiveEffects`), and "other weapons only" (a tag also matches the module that grants it). Not planned: the user prefers control over stat auras for support.
+- **Knockback resistance by enemy rank:** replaced by purple shields on elites and bosses (see "Shields and damage types"), which block knockback until they break.
+- **Point-defense weapon:** shoots down enemy missiles (Harbringer, Mites). Not supported yet: projectiles can't be hit. Later.
+- **Run statistics:** `RunStatistics` already counts damage dealt per source, kills, and damage taken per run and per wave (the dev `[Stats]` log). Run statistics and run history add more counters to it.
 - **Evolution paths differ in role, not only in size:** for example Minigun is raw damage (much faster fire, weaker shots) and Vacuum Cannon is crowd control (strong knockback, splash, weaker shots). A utility path can trade damage for control.

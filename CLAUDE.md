@@ -63,6 +63,16 @@ Gameplay can only be checked by running the scene in the editor.
 
 `ShipCoreModule` holds health and shields and is also the `IHitter` used for ramming. All damage goes through `IHitter` → `Ship.Hit` (`IHittable`) → `ShipCoreModule.ApplyDamage`.
 
+### Shields and damage
+
+The rules and numbers are in `Docs/Balance.md` → "Shields and damage types".
+
+- **Damage types** are the hitter's `ShieldDamageMultiplier` and `HPDamageMultiplier`, set per weapon prefab. Shields absorb damage first; a shield multiplier of 0 or less sends all damage to the hull (shield bypass). `DamageTakenMultiplier` on the target's core multiplies all incoming damage (the Exposed debuff).
+- **Shield recharge:** after `ShieldRegenDelay` without damage, shields refill at max ÷ `ShieldRechargeTime` × `ShieldRechargeSpeed` per second. The flat `ShieldRegen` is an always-on trickle. Any hit that takes shields or hull restarts the delay.
+- **Purple shields:** `HardenedShields` on the core. While shields are up, `ShipCoreModule.BlocksControl` makes `Ship.ApplyKnockback` and `Ship.ApplyEffects` do nothing. The core recolours its own shield material, and the shield bars follow.
+- **Shield visuals:** `ShipShield.shader` uses premultiplied blending: its colour is added light, and `_Cover` = 1 (purple shields) lets the fill also cover the hull. Each hit starts a ripple in one of 4 slots (`MaxRipples`, which must match `MAX_RIPPLES` in the shader). The overlay is drawn only while a hit flash lasts, because the shader is too costly to run on every ship.
+- **Damage events:** `ShipCoreModule.OnDamageTaken` per ship and the static `OnAnyDamageTaken` for every ship carry a `DamageTaken`: the attacker, shields and hull taken, shields broken, and `Killed`. Every `IHitter` names its `Source`, the module definition the damage comes from (a projectile or explosion copies it from its weapon).
+
 ### Stats, effects, and upgrades
 
 This pipeline spans most of the code:
@@ -81,6 +91,8 @@ To add a stat:
 - Add the stat to the module's `CollectStats` override. A stat missing from it silently ignores effects.
 
 On-hit effects arrive through `Ship.ApplyEffects`, which gives each target its own copy and uses `EffectManager.AddStatusEffect`: effects in the same slot (`SharesSlotWith`) don't stack, and the stronger or equal one replaces the old one and restarts it. Modules hand out effects through `ModuleBase.EmitEffects`, which scales their durations by the module's `Duration` modifier.
+
+**On-hit effects from upgrades.** A `HitEffectsEffect` gives the modules it targets extra on-hit effects (slow, stun, jam, expose), with a chance per shot. Stacks multiply the chance (up to 1) and the nested effects' strength. `ModuleBase` rebuilds the granted ones on every recalculation, like modifiers, and `EmitHitEffects` hands out the module's own on-hit effects plus each granted set that passes its roll. Every weapon's own on-hit list lives in `WeaponModule` (`GetHitEffects`); the core (ramming) and `ExplosionAbility` use the same helper.
 
 To add an `Effect`, override only the hooks it needs; they all default to doing nothing. Effects are handed out only as copies made with `Effect.Copy(times)`. Its default clones the effect, so override the protected `Stacked` only when strength scales with stacks or a multiplier, and `IsAtLeastAsStrongAs` with it. Definition assets are shared, so effects must not be mutated at runtime.
 
@@ -144,9 +156,11 @@ No player exists at scene start. The ship is picked in a draft, and `GameUIContr
 
 A level costs `round(baseXPPerLevel + xpIncreasePerLevel × (level − 1))` scrap: 20, 21, 22, 24, and so on. `GameController.AddXP` multiplies all scrap by the player's ShipCore `XPGain` stat (base 1).
 
-Enemy scaling follows run progress, not level or XP. `EnemySpawnController.StartWave` computes p = sectors started − 1 + wave index ÷ waves in the sector, once per wave. Each enemy spawned in that wave gets `enemyScalerEffects` stacked by M(p) − 1. They cover health, shields, shield regen, weapon damage, and ramming damage, and must have infinite duration. Its scrap reward is multiplied by `1 + xpRewardGrowthPerSector × p`. `Enemy.XPReward` and `WaveDefinition.TotalXP` stay base values. The formulas and keys are in `Docs/Balance.md`.
+Enemy scaling follows run progress, not level or XP. `EnemySpawnController.StartWave` computes p = sectors started − 1 + wave index ÷ waves in the sector, once per wave. Each enemy spawned in that wave gets `enemyScalerEffects` stacked by M(p) − 1. They cover health, shields, shield regen, weapon damage, and ramming damage, and must have infinite duration. Shield recharge is a share of max shields, so it scales with shields; the shield-regen entry only scales the trickle. Its scrap reward is multiplied by `1 + xpRewardGrowthPerSector × p`. `Enemy.XPReward` and `WaveDefinition.TotalXP` stay base values. The formulas and keys are in `Docs/Balance.md`.
 
 In a wave with an `isBoss` entry, the bosses spawn first, followed by the wave's `bossEscortAtStart` other enemies. The remaining enemies are held back and released in `bossEscortReleaseSteps` even groups as the bosses' health falls (not shields, which recharge), all of them by `releaseAllAtBossFraction`. The boss counts toward `maxConcurrentEnemies`, so leave room for a group. Dead bosses count as 0, so every escort spawns and the wave's scrap stays fixed.
+
+`RunStatistics` (owned by `GameController`, in `Assets/Scripts/Statistics`) counts damage dealt per source (shields, hull, kills) and damage the player took, for the whole run and the current wave. It listens to `ShipCoreModule.OnAnyDamageTaken`; `EnemySpawnController` starts and ends its wave periods, and skipped waves never end. It's the base for run statistics: add counters to `StatisticsPeriod` and feed them from events.
 
 ### Ship modules
 
@@ -174,5 +188,7 @@ New behaviour (an explosion on hit, damage reflection, a bonus that holds only u
 - Player prefabs need an `AbilityModule` on the root, because `Player.Update` reads it without a null check. Space activates it.
 - `WeaponModule` sets its own layer from the owning ship: `DetectEnemy` on the player's weapons, `DetectPlayer` on enemies'. `RangeDetector` targeting depends on these layers.
 - `WeaponModule`, `ProjectileModule`, and `TeslaModule` are `[ExecuteAlways]`, so they run in edit mode. Each class declares the attribute itself; `MissileModule` and `MineModule` don't.
+- Projectiles get direction and speed separately (`Projectile.Initialize(direction, speed, module)`), so a projectile with speed 0, like the laser beam, still points along its shot.
+- A shader that reads sizes from `unity_ObjectToWorld` (`LaserBeam`, `EMPWave`) needs the `"DisableBatching"="True"` tag: batching merges sprites into one world-space mesh with an identity matrix, which made Yamato's two laser beams invisible.
 
 Keep each `.meta` file with its asset when moving or renaming, since prefabs and assets reference each other by the GUID stored there.

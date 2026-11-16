@@ -19,6 +19,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2c382f2690590cb48a53051168322d54, type: 2}
   - {fileID: 11400000, guid: 8457aa4a11e42bc40aa468ef37e131da, type: 2}
   key: weapon.laser
-  description: A weapon that fires a powerful beam of light that travels and pierces
-    infinitely.
+  description: Fires a beam straight ahead that hits every enemy in its line. Strong
+    against shields, weak against hull.
   weaponPrefab: {fileID: 2658622645487082905, guid: b078d9ed0230d5d45a1a33e527388cf6, type: 3}

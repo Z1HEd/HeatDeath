@@ -13,19 +13,19 @@ public class MissileProjectile : Projectile
     private float lockTime;
     private float speed;
 
-    public override void Initialize(Vector2 velocity, ProjectileModule sourceModule)
+    public override void Initialize(Vector2 direction, float speed, ProjectileModule sourceModule)
     {
-        base.Initialize(velocity, sourceModule);
+        base.Initialize(direction, speed, sourceModule);
         EnsureRangeDetector();
         rangeDetector.gameObject.layer = gameObject.layer;
-        
+
 
         lockTime = Time.time + Mathf.Max(0f, lockDelay);
-        speed = Mathf.Max(0.01f, velocity.magnitude);
+        this.speed = Mathf.Max(0.01f, speed);
         target = null;
 
-        if (velocity.sqrMagnitude > 0f)
-            transform.up = velocity.normalized;
+        if (direction.sqrMagnitude > 0f)
+            transform.up = direction;
 
         if (sourceModule is MissileModule){
             explosionRange = (sourceModule as MissileModule).ExplosionRange;

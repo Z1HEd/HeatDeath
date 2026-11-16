@@ -110,7 +110,7 @@ MonoBehaviour:
   firePoint: {fileID: 4762442769049882903}
   fireCooldown:
     currentValue: 0
-    baseValue: 2
+    baseValue: 1.75
     minValue: 0
   timeScale:
     currentValue: 1
@@ -124,12 +124,12 @@ MonoBehaviour:
     currentValue: 1
     baseValue: 1
   damage:
-    currentValue: 15
-    baseValue: 15
+    currentValue: 18
+    baseValue: 18
     minValue: 0
   shieldDamageMultiplier:
-    currentValue: 1.4
-    baseValue: 1.4
+    currentValue: 1.5
+    baseValue: 1.5
     minValue: -1
   hpDamageMultiplier:
     currentValue: 0.75
@@ -140,7 +140,10 @@ MonoBehaviour:
     baseValue: 1
     minValue: 0
   appliesEffects: []
-  maxChainTargets: 3
+  chainTargets:
+    currentValue: 3
+    baseValue: 3
+    minValue: 1
   lightningDuration: 0.2
   jitterInterval: 0.03
   lightningMaterial: {fileID: 2100000, guid: cc2ae67600de477bbaa6aa989854bc50, type: 2}

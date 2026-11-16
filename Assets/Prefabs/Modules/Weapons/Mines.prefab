@@ -126,19 +126,19 @@ MonoBehaviour:
   projectilePrefab: {fileID: 4529807675471374433, guid: 6362a540d7efa7e488c23f6277dad9e6, type: 3}
   projectileSpeed:
     currentValue: 0
-    baseValue: 5
+    baseValue: 8
     minValue: 0
   projectileDamage:
     currentValue: 0
-    baseValue: 35
+    baseValue: 48
     minValue: 0
   ShieldDamageMultiplier:
     currentValue: 0
-    baseValue: 0.75
+    baseValue: 0.5
     minValue: -1
   HPDamageMultiplier:
     currentValue: 0
-    baseValue: 1.4
+    baseValue: 1.5
     minValue: -1
   BackstabMultiplier:
     currentValue: 0

@@ -26,19 +26,19 @@ public readonly struct DamageTaken
 [RequireComponent(typeof(SpriteRenderer))]
 public class ShipCoreModule : ModuleBase, IHitter
 {
-    private static readonly int RippleOriginId = Shader.PropertyToID("_RippleOrigin");
-    private static readonly int RippleAgeId = Shader.PropertyToID("_RippleAge");
+    private static readonly int RippleOriginsId = Shader.PropertyToID("_RippleOrigins");
+    private static readonly int RippleAgesId = Shader.PropertyToID("_RippleAges");
+    // Ripples of recent hits drawn at once, oldest replaced first. Must match MAX_RIPPLES in ShipShield.shader.
+    private const int MaxRipples = 4;
     private static readonly int RimColorId = Shader.PropertyToID("_RimColor");
     private static readonly int FillColorId = Shader.PropertyToID("_FillColor");
-    private static readonly int DstBlendId = Shader.PropertyToID("_DstBlend");
-    private static readonly int RippleStrengthId = Shader.PropertyToID("_RippleStrength");
+    private static readonly int CoverId = Shader.PropertyToID("_Cover");
     // Purple shields: shield bars and the shield's dark fill take this colour.
     public static readonly Color HardenedShieldColor = new Color(0.32f, 0.02f, 0.55f);
-    // Purple shields stand out more than blue ones: a dark shroud over the hull, with a bright rim and ripples
-    // (the ripples take the rim colour), and a stronger flash.
+    // Purple shields stand out more than blue ones: a dark shroud that covers the hull, a stronger flash, and a
+    // bright rim. The ripples take the rim colour and glow like blue ones, transparent.
     private static readonly Color HardenedRimColor = new Color(0.85f, 0.4f, 1f);
     private const float HardenedFillAlpha = 0.7f;
-    private const float HardenedRippleStrength = 1.2f;
     private const float DefaultFlashOpacity = 0.65f, HardenedFlashOpacity = 1f;
 
     [Header("Base Core Stats")]
@@ -74,8 +74,10 @@ public class ShipCoreModule : ModuleBase, IHitter
 
     protected SpriteRenderer shieldRenderer;
     private Color defaultRimColor, defaultFillColor;
-    private float defaultRippleStrength;
-    private float rippleStartTime = float.NegativeInfinity;
+    private readonly Vector4[] rippleOrigins = new Vector4[MaxRipples];
+    private readonly float[] rippleStartTimes = { float.NegativeInfinity, float.NegativeInfinity,
+                                                  float.NegativeInfinity, float.NegativeInfinity };
+    private int nextRipple;
     // Game time of the last hit that took shields or hull. Shields wait shieldRegenDelay after it.
     private float lastDamageTime = float.NegativeInfinity;
 
@@ -126,9 +128,7 @@ public class ShipCoreModule : ModuleBase, IHitter
         // Own copy per ship: with one shared material, shields drew the newest ship's texture.
         shieldRenderer.sharedMaterial = Instantiate(Resources.Load<Material>("ShieldMaterial"));
         defaultRimColor = shieldRenderer.sharedMaterial.GetColor(RimColorId);
-        defaultFillColor = shieldRenderer.sharedMaterial.GetColor(FillColorId);
-        defaultRippleStrength = shieldRenderer.sharedMaterial.GetFloat(RippleStrengthId);
-        shieldRenderer.sortingLayerName = "Shields";
+        defaultFillColor = shieldRenderer.sharedMaterial.GetColor(FillColorId);        shieldRenderer.sortingLayerName = "Shields";
         shieldRenderer.sortingOrder = 0;
         transform.localScale = Vector3.one * shieldScale;
 
@@ -194,15 +194,19 @@ public class ShipCoreModule : ModuleBase, IHitter
     protected IEnumerator FlashShield(Vector3 hitPoint)
     {
         const float SHIELD_FLASH_DURATION = 0.7f;
-        const float MIN_RIPPLE_INTERVAL = 0.35f;
+        // Each hit adds a ripple to the next slot. Rapid fire must not replace ripples that are still young, or
+        // they'd never get to spread: at this interval, a slot is reused only after about one flash.
+        const float MIN_RIPPLE_INTERVAL = SHIELD_FLASH_DURATION / MaxRipples;
         Material shieldMaterial = shieldRenderer.sharedMaterial;
         shieldRenderer.enabled = true;
 
-        // Rapid fire must not restart a young ripple, or it would never get to spread.
-        if (Time.time - rippleStartTime >= MIN_RIPPLE_INTERVAL)
+        float newestRippleStart = rippleStartTimes[(nextRipple + MaxRipples - 1) % MaxRipples];
+        if (Time.time - newestRippleStart >= MIN_RIPPLE_INTERVAL)
         {
-            rippleStartTime = Time.time;
-            shieldMaterial.SetVector(RippleOriginId, WorldToSpriteTexels(hitPoint));
+            rippleStartTimes[nextRipple] = Time.time;
+            rippleOrigins[nextRipple] = WorldToSpriteTexels(hitPoint);
+            nextRipple = (nextRipple + 1) % MaxRipples;
+            shieldMaterial.SetVectorArray(RippleOriginsId, rippleOrigins);
         }
 
         float flashStartTime = Time.time;
@@ -210,11 +214,20 @@ public class ShipCoreModule : ModuleBase, IHitter
         {
             float opacity = hardenedShields ? HardenedFlashOpacity : DefaultFlashOpacity;
             shieldRenderer.color = new Color(1,1,1,opacity * (1f - t / SHIELD_FLASH_DURATION));
-            shieldMaterial.SetFloat(RippleAgeId, Time.time - rippleStartTime);
+            shieldMaterial.SetVector(RippleAgesId, RippleAges());
             yield return null;
         }
 
         shieldRenderer.enabled = false;
+    }
+
+    // Seconds since each ripple started. Unused slots get a large finite age, which the shader draws as nothing.
+    private Vector4 RippleAges()
+    {
+        var ages = new Vector4();
+        for (int i = 0; i < MaxRipples; i++)
+            ages[i] = Mathf.Min(Time.time - rippleStartTimes[i], 1000f);
+        return ages;
     }
 
     // Clamped to the sprite, so distant attackers (Tesla, ramming) ripple from the nearest side.
@@ -253,15 +266,13 @@ public class ShipCoreModule : ModuleBase, IHitter
 
     protected override void OnStatsChanged()
     {
-        // Purple shields blend normally instead of adding light, so the dark fill covers the hull instead of
-        // vanishing, and the bright rim and ripples stand out against it.
+        // Added light alone can't show a dark colour, so purple shields' fill also covers the hull (_Cover).
+        // Rim and ripples stay added light, so they glow over the dark fill.
         Material shieldMaterial = shieldRenderer.sharedMaterial;
-        shieldMaterial.SetFloat(DstBlendId, (float)(hardenedShields
-            ? UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha : UnityEngine.Rendering.BlendMode.One));
+        shieldMaterial.SetFloat(CoverId, hardenedShields ? 1f : 0f);
         shieldMaterial.SetColor(RimColorId, hardenedShields ? WithAlpha(HardenedRimColor, defaultRimColor.a) : defaultRimColor);
         shieldMaterial.SetColor(FillColorId, hardenedShields
             ? WithAlpha(HardenedShieldColor, HardenedFillAlpha) : defaultFillColor);
-        shieldMaterial.SetFloat(RippleStrengthId, hardenedShields ? HardenedRippleStrength : defaultRippleStrength);
 
         OnHPShieldsChanged?.Invoke();
     }
