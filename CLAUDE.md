@@ -162,6 +162,13 @@ In a wave with an `isBoss` entry, the bosses spawn first, followed by the wave's
 
 `RunStatistics` (owned by `GameController`, in `Assets/Scripts/Statistics`) counts damage dealt per source (shields, hull, kills) and damage the player took, for the whole run and the current wave. It listens to `ShipCoreModule.OnAnyDamageTaken`; `EnemySpawnController` starts and ends its wave periods, and skipped waves never end. It's the base for run statistics: add counters to `StatisticsPeriod` and feed them from events.
 
+The game area stays between 9:16 and 9:21 (width:height) on every platform, the editor included. `Pillarbox` (`Assets/Scripts/Visuals`) installs itself and adds black bars at the sides of a wider screen (tablets, desktop windows) or above and below a taller one:
+- It sets `Camera.main.rect` to the area, and a camera behind it clears the bars while there are any.
+- The UI's Panel Settings use the Expand match mode, which scales by the area's width (720 reference) in every case. `GameUIController` lays its root out inside the area with `Pillarbox.FitToArea`; a new UI document must do the same.
+- Convert screen positions through the camera (`ScreenToWorldPoint`), and take the visible world size from `cam.aspect` and `orthographicSize`, not from `Screen.width`/`Screen.height`. The orthographic size fixes the visible height, so a taller screen shows a narrower slice of the world.
+
+Desktop builds (Windows, macOS, Linux) are for testing the mobile game. Player Settings start them windowed at 540×960 with Resizable Window on, and Unity reopens the window at its last size. The window can take any shape; `Pillarbox` keeps the game area in range.
+
 ### Ship modules
 
 Drafted modules for defense, mobility, and economy (`Assets/Scripts/Modules/Ship`). They aren't weapons, though a module may deal incidental damage. `ModuleManager.AddShipModule` instantiates a `ShipModuleDefinition`'s prefab on the ship root, with no mount and no HUD button.

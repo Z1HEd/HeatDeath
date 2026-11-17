@@ -28,9 +28,8 @@ public class FollowCursorBehaviour : ControlBehaviour
             return;
 
         var mousePosition = Event.current.mousePosition;
-        mousePosition.y = -mousePosition.y;
+        mousePosition.y = Screen.height - mousePosition.y; // GUI y runs top-down, screen y bottom-up
         var worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-        worldPosition.y += Camera.main.orthographicSize * 2;
         var clampedPosition = ClampPositionToCameraBounds(worldPosition);
         ship.SetTargetPosition(clampedPosition);
     }

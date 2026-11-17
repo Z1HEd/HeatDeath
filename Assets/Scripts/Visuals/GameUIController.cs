@@ -52,6 +52,8 @@ public class GameUIController : MonoBehaviour
     private void Awake()
     {
         BindRefferences();
+        FitToPillarbox();
+        Pillarbox.AreaChanged += FitToPillarbox;
         optionHandlers = new Action[optionButtons.Length];
         for (int i = 0; i < optionButtons.Length; i++)
         {
@@ -80,6 +82,14 @@ public class GameUIController : MonoBehaviour
         pendingWeaponDrafts = 1;
         ShowNextDraftOrResume();
     }
+
+    private void OnDestroy()
+    {
+        Pillarbox.AreaChanged -= FitToPillarbox;
+    }
+
+    // Keeps the UI inside the game area, off the bars.
+    private void FitToPillarbox() => Pillarbox.FitToArea(uiDocument.rootVisualElement);
 
     private void BindRefferences()
     {
