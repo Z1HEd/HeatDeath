@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76beddaea2d54064c8b194d74f03c422, type: 3}
+  m_Name: RapidLaunch
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeDefinition
+  displayName: Rapid Launch
+  key: upgrade.missile.rapidlaunch
+  description: +9% fire rate
+  boundModule: {fileID: 11400000, guid: e5a9fd2dd18115740b0829833104fcfc, type: 2}
+  role: 1
+  evolutionPath: {fileID: 11400000, guid: 78b52366bc3d40e888fff1d63a8b8b53, type: 2}
+  rarity: 0
+  maxStacks: 4
+  mutuallyExclusiveWith: []
+  effects:
+  - rid: 7560140318346840481
+  references:
+    version: 2
+    RefIds:
+    - rid: 7560140318346840481
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: Infinity
+          baseValue: Infinity
+          minValue: 0
+        stat: 22
+        statModifier:
+          Flat: 0
+          Percent: 9
+        perLevel:
+          Flat: 0
+          Percent: 0
+        targetTags:
+        - {fileID: 11400000, guid: 4cdf19654488b534c884978c57188286, type: 2}

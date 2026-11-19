@@ -85,62 +85,49 @@ public class Ship : MonoBehaviour, IHittable
         }
     }
 
-    public void Hit(IHitter hitter)
+    // One hit, always in this order: damage; death; flash; on-hit effects; knockback. Purple shields are checked
+    // after the damage, so the hit that breaks them still applies its effects and pushes.
+    public DamageTaken TakeHit(in Hit hit)
     {
-        if (dead || hitter == null)
-            return;
+        if (dead || coreModule == null)
+            return default;
 
-        ShipCoreModule core = coreModule;
-        if (core == null)
-            return;
-
-        bool tookDamage = core.ApplyDamage(hitter);
-        bool died = core.CurrentHealth<=0.0;
-
-        if (died){
-            Die();
-            return;
-        }
-        if (tookDamage)
+        DamageTaken taken = coreModule.ApplyDamage(hit);
+        if (coreModule.CurrentHealth <= 0f)
         {
-            StartCoroutine(DamageFlash());
+            Die();
+            return taken;
         }
-        ApplyEffects(hitter.GetEffects());
+
+        if (taken.Hull > 0f || taken.ShieldsBroken)
+            StartCoroutine(DamageFlash());
+        ApplyHitEffects(hit.Effects);
+        ApplyKnockback(hit.Push, hit.Payload.Knockback);
+        return taken;
     }
 
-    public void ApplyKnockback(IHitter hitter, Vector3 direction)
+    private void ApplyKnockback(Vector2 push, float power)
     {
-        if (dead || IgnoresKnockback || BlocksControl)
+        if (dead || IgnoresKnockback || BlocksControl || shipRigidbody == null || power <= 0f)
             return;
 
-        if (shipRigidbody == null || hitter.KnockbackPower <= 0f)
-            return;
+        // A hit without a direction pushes down, as before.
+        if (push.sqrMagnitude <= 0f)
+            push = Vector2.down;
 
-        if (direction.sqrMagnitude <= 0f)
-        {
-            direction = Vector2.up;
-        }
-
-        shipRigidbody.AddForce(-direction * hitter.KnockbackPower, ForceMode2D.Impulse);
+        shipRigidbody.AddForce(push * power, ForceMode2D.Impulse);
         knockbackTimeRemaining = Mathf.Max(knockbackTimeRemaining, knockbackFreezeDuration);
     }
 
-    public void ApplyKnockback(IHitter hitter, Collision2D collision)
-    {
-        ContactPoint2D contact = collision.GetContact(0);
-        Vector3 direction = contact.normal;
-
-        ApplyKnockback(hitter,direction);
-    }
-    // On-hit effects. Each ship gets its own copies: one explosion can hit several ships with the same list.
-    public void ApplyEffects(List<Effect> effects)
+    // Each ship gets its own copies: one explosion can hit several ships with the same list.
+    private void ApplyHitEffects(List<Effect> effects)
     {
         if (effects == null || BlocksControl)
             return;
 
         foreach (var effect in effects)
             if (effect != null)
-                effectManager.AddStatusEffect(effect.Copy());
+                effectManager.AddHitEffect(effect.Copy());
     }
 
     public virtual void Die()
@@ -199,12 +186,10 @@ public class Ship : MonoBehaviour, IHittable
         if (core == null)
             return;
 
+        // Pushes the other ship away from the contact.
         var hittable = collision.gameObject.GetComponent<IHittable>();
         if (hittable != null)
-        {
-            hittable.Hit(core);
-            hittable.ApplyKnockback(core, collision);
-        }
+            hittable.TakeHit(core.RamHit(-collision.GetContact(0).normal));
     }
 
 

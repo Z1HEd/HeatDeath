@@ -18,6 +18,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
   - {fileID: 11400000, guid: 65c2c2d09c4c8984097657f3721a900c, type: 2}
   - {fileID: 11400000, guid: 69e6dfaa9f2c4564198e1eb8d225a1ce, type: 2}
+  evolutionPaths:
+  - {fileID: 11400000, guid: 4a8d3af9bb874cb4bfb374abc70f45c2, type: 2}
+  - {fileID: 11400000, guid: 7ede957986f64961b2ef379a12f84f01, type: 2}
+  baseDefinition: {fileID: 0}
   key: weapon.mines
   description: Throws mines that explode when enemies come close, pushing them back.
     Strong against hull, weak against shields.

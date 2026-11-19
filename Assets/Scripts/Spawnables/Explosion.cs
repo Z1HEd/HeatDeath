@@ -1,21 +1,25 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class Explosion : MonoBehaviour, IHitter
+public class Explosion : MonoBehaviour
 {
+    [Tooltip("Screen shake for a base missile's blast (radius 1.25). Bigger blasts shake harder and longer, in proportion.")]
     [SerializeField]
     public float shakeScreenDuration = 0.25f;
-    public float Damage { get; private set; }
-    public float KnockbackPower { get; private set; }
-    public float HPDamageMultiplier { get; private set; }
-    public float ShieldDamageMultiplier { get; private set; }
-    public float BackstabMultiplier { get; private set; }
-    public ModuleDefinition Source { get; private set; }
-
-    public List<Effect> appliesEffects { get; private set; }
-    public List<Effect> GetEffects() => appliesEffects;
+    [Tooltip("Screen shake for a base missile's blast (radius 1.25). Bigger blasts shake harder and longer, in proportion.")]
+    [SerializeField] private float shakeStrength = 0.1f;
+    private const float ShakeReferenceRadius = 1.25f;
+    // From whatever exploded (a missile, a mine, an ability), with where it was fired from, so distance counts from
+    // there.
+    private HitPayload payload;
+    private Vector2 firedFrom;
+    private List<Effect> appliesEffects;
+    // Share of the payload's damage: a Tesla pulse after the first is weaker.
+    private float damageScale;
 
     public const float EXPANSION_DURATION = 0.2f;
+    // Knockback falls from full at the centre to this share at the edge of the blast.
+    private const float EDGE_PUSH = 0.5f;
     [SerializeField] private float fadeDuration = 0.3f;
 
     private float timer;
@@ -29,15 +33,13 @@ public class Explosion : MonoBehaviour, IHitter
 
     private readonly HashSet<Ship> hitShips = new();
 
-    public void Initialize(IHitter hitter, float radius, int detectLayer)
+    public void Initialize(in HitPayload payload, Vector2 firedFrom, List<Effect> effects, float radius, int detectLayer,
+        float damageScale = 1f)
     {
-        Damage = hitter.Damage;
-        KnockbackPower = hitter.KnockbackPower;
-        HPDamageMultiplier = hitter.HPDamageMultiplier;
-        ShieldDamageMultiplier = hitter.ShieldDamageMultiplier;
-        BackstabMultiplier = hitter.BackstabMultiplier;
-        Source = hitter.Source;
-        appliesEffects = hitter.GetEffects();
+        this.payload = payload;
+        this.firedFrom = firedFrom;
+        appliesEffects = effects;
+        this.damageScale = damageScale;
 
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         circleCollider = GetComponent<CircleCollider2D>();
@@ -53,7 +55,10 @@ public class Explosion : MonoBehaviour, IHitter
         expanding = true;
 
         circleCollider.enabled = true;
-        ScreenShaker.Instance.Shake(shakeScreenDuration,.1f);
+        // A blast without shake (the EMP, Shock Field) mustn't strengthen a shake that's already running.
+        float shakeScale = BlastRadius / ShakeReferenceRadius;
+        if (shakeScreenDuration > 0f)
+            ScreenShaker.Instance.Shake(shakeScreenDuration * shakeScale, shakeStrength * shakeScale);
     }
 
     private void Update()
@@ -106,9 +111,21 @@ public class Explosion : MonoBehaviour, IHitter
         if (ship == null || ship.IsDead || !hitShips.Add(ship))
             return;
 
-        ship.Hit(this);
+        // hitShips already holds this ship, so it caught one fewer before.
+        DamageTaken taken = ship.TakeHit(new Hit(payload, firedFrom, transform.position, PushOn(ship),
+            hitShips.Count - 1, appliesEffects, damageScale));
+        payload.ReportHit(ship.CoreModule, taken);
+    }
 
-        if (KnockbackPower > 0f)
-            ship.ApplyKnockback(this, transform.position - ship.transform.position);
+    // The blast's full radius in world units, once Initialize has run.
+    public float BlastRadius => circleCollider.radius * targetRadius;
+
+    // Away from the centre: full knockback at the centre, EDGE_PUSH of it at the blast's full radius.
+    private Vector2 PushOn(Ship ship)
+    {
+        Vector2 offset = ship.transform.position - transform.position;
+        float blastRadius = BlastRadius;
+        float towardEdge = blastRadius > 0f ? Mathf.Clamp01(offset.magnitude / blastRadius) : 1f;
+        return offset.normalized * Mathf.Lerp(1f, EDGE_PUSH, towardEdge);
     }
 }

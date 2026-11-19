@@ -15,6 +15,10 @@ public class ShipAppearance
 
     private Color tint;
     private bool isGhost;
+    // One instance per distinct visual prefab the active effects reference.
+    private readonly HashSet<StatusVisual> wantedVisuals = new HashSet<StatusVisual>();
+    private readonly Dictionary<StatusVisual, StatusVisual> shownVisuals = new Dictionary<StatusVisual, StatusVisual>();
+    private readonly List<StatusVisual> endedVisuals = new List<StatusVisual>();
 
     // The effect whose thruster colour wins, and the one whose colour is showing.
     private object thrusterSource, shownThrusterSource;
@@ -42,8 +46,14 @@ public class ShipAppearance
         tint = Color.white;
         isGhost = false;
         thrusterSource = null;
+        wantedVisuals.Clear();
         foreach (var effect in effects)
+        {
             effect.ApplyToAppearance(this);
+            if (effect.Visual != null)
+                wantedVisuals.Add(effect.Visual);
+        }
+        ShowVisuals();
 
         ship.gameObject.layer = isGhost ? ghostLayer : baseLayer;
         Tint(ship.GetComponent<SpriteRenderer>());
@@ -96,6 +106,25 @@ public class ShipAppearance
             clone.Play();
             thrusterClones.Add(clone);
         }
+    }
+
+    // A visual no effect references any more fades out and removes itself; a new one is added and fades in.
+    private void ShowVisuals()
+    {
+        endedVisuals.Clear();
+        foreach (var shown in shownVisuals)
+            if (!wantedVisuals.Contains(shown.Key))
+                endedVisuals.Add(shown.Key);
+        foreach (var prefab in endedVisuals)
+        {
+            if (shownVisuals[prefab] != null)
+                shownVisuals[prefab].End();
+            shownVisuals.Remove(prefab);
+        }
+
+        foreach (var prefab in wantedVisuals)
+            if (!shownVisuals.ContainsKey(prefab))
+                shownVisuals[prefab] = Object.Instantiate(prefab, ship.transform);
     }
 
     private void Tint(SpriteRenderer spriteRenderer)

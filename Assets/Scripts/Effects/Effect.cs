@@ -8,11 +8,16 @@ public abstract class Effect
 {
     [SerializeField]
     protected ResourceStat duration = new ResourceStat(StatType.Duration,float.PositiveInfinity,0f);
+    [Tooltip("Shown on the ship while this effect is on it (a stun's sparks, a slow's sputter). Effects with the " +
+             "same prefab share one visual. For a debuff made of several effects, set it on one of them.")]
+    [SerializeField] private StatusVisual visual;
     [NonSerialized] private float elapsed;
-    // The asset effect this is a copy of, so EffectManager.Apply can match copies of the same effect.
+    // The asset effect this is a copy of, so EffectManager.SetEffects can match copies of the same effect.
     [NonSerialized] private Effect template;
 
     public float Duration => duration.BaseValue;
+    public float TimeLeft => duration.BaseValue - elapsed;
+    public StatusVisual Visual => visual;
     public Effect Template => template ?? this;
 
     public virtual bool Update(float delta)
@@ -51,12 +56,15 @@ public abstract class Effect
     // Looks and ghosting: rebuilt from every active effect on each recalculation, like stats.
     public virtual void ApplyToAppearance(ShipAppearance appearance) {}
 
-    // On-hit effects in the same slot don't stack: see EffectManager.AddStatusEffect.
+    // On-hit effects in the same slot don't stack: see EffectManager.AddHitEffect.
     public virtual bool SharesSlotWith(Effect other) => other != null && other.GetType() == GetType();
 
-    // Compared between effects that share a slot, and between copies of one effect in EffectManager.Apply.
+    // Compared between effects that share a slot, and between copies of one effect in EffectManager.SetEffects.
     // Equal strength counts as true, so a repeat hit restarts.
     public virtual bool IsAtLeastAsStrongAs(Effect other) => true;
+
+    // Called on each copy a module hands out (ModuleBase.EmitEffects), so an effect that deals damage can credit it.
+    public virtual void OnEmittedBy(ModuleBase module) {}
 
     // Only for fresh copies. Permanent effects stay permanent.
     public void ModifyDuration(StatModifier modifier)

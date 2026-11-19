@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76beddaea2d54064c8b194d74f03c422, type: 3}
+  m_Name: Disruptor
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeDefinition
+  displayName: Disruptor
+  key: upgrade.laser.disruptor
+  description: Hits have a 20% chance to knock the target's shields offline for 2.5 s. Offline shields absorb nothing and don't recharge
+  boundModule: {fileID: 11400000, guid: eac5fc4af100cc34b8ee896e3cf22781, type: 2}
+  role: 0
+  evolutionPath: {fileID: 0}
+  rarity: 2
+  maxStacks: 2
+  mutuallyExclusiveWith: []
+  effects:
+  - rid: 7560140318346840731
+  references:
+    version: 2
+    RefIds:
+    - rid: 7560140318346840731
+      type: {class: HitEffectsEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: Infinity
+          baseValue: Infinity
+          minValue: 0
+        targetTags:
+        - {fileID: 11400000, guid: 8457aa4a11e42bc40aa468ef37e131da, type: 2}
+        chance: 0.2
+        effects:
+        - rid: 7560140318346840732
+        stacksRaiseStrength: 0
+        stacksRaiseDuration: 0
+    - rid: 7560140318346840732
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        visual: {fileID: 6110000000000000003, guid: c7d9e75125e647f29dfdc32060209108, type: 3}
+        duration:
+          currentValue: 2.5
+          baseValue: 2.5
+          minValue: 0
+        stat: 51
+        statModifier:
+          Flat: 1
+          Percent: 0
+        perLevel:
+          Flat: 0
+          Percent: 0
+        targetTags:
+        - {fileID: 11400000, guid: 4399c2d425fb6724586a890c6479eac0, type: 2}

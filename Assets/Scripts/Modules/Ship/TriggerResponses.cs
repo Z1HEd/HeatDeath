@@ -11,7 +11,8 @@ public abstract class TriggerResponse
     public virtual void OnDestroy(ShipModule module) {}
 }
 
-// A timed buff. Running it again while it lasts restarts it instead of stacking: see EffectManager.Apply.
+// A timed buff. Running it again while it lasts restarts it instead of stacking: see EffectManager.SetEffects.
+// The class keeps its name: assets store it.
 [Serializable]
 public class ApplyEffects : TriggerResponse
 {
@@ -24,15 +25,15 @@ public class ApplyEffects : TriggerResponse
             if (effect != null && float.IsPositiveInfinity(effect.Duration))
                 Debug.LogWarning($"{module.ModuleDefinition.DisplayName}: a triggered effect has no duration, so it never ends", module);
 
-        module.Ship.effectManager.Apply(this, module.Emit(effects));
+        module.Ship.effectManager.SetEffects(this, module.Emit(effects));
     }
 
     // Brings a running buff to the new strength, which also restarts it.
     public override void OnMultiplierChanged(ShipModule module)
     {
-        if (module.Ship.effectManager.IsActive(this))
+        if (module.Ship.effectManager.HasEffects(this))
             Run(module);
     }
 
-    public override void OnDestroy(ShipModule module) => module.Ship.effectManager.Remove(this);
+    public override void OnDestroy(ShipModule module) => module.Ship.effectManager.ClearEffects(this);
 }

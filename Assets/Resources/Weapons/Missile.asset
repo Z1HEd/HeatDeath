@@ -18,6 +18,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
   - {fileID: 11400000, guid: 65c2c2d09c4c8984097657f3721a900c, type: 2}
   - {fileID: 11400000, guid: 4cdf19654488b534c884978c57188286, type: 2}
+  evolutionPaths:
+  - {fileID: 11400000, guid: 78b52366bc3d40e888fff1d63a8b8b53, type: 2}
+  - {fileID: 11400000, guid: 04bcb0b028564818bc9e347c70b7f3b8, type: 2}
+  baseDefinition: {fileID: 0}
   key: weapon.missile
   description: Homing missiles that explode, pushing back enemies around them. Strong
     against hull, weak against shields.

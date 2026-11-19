@@ -27,9 +27,10 @@ public class ScreenShaker : MonoBehaviour
         originalPosition = cameraTransform.localPosition;
     }
 
+    // Overlapping shakes don't add up: a volley of small blasts shakes as long as one of them, at the strongest one.
     public void Shake(float duration, float magnitude)
     {
-        remainingTime += duration;
+        remainingTime = Mathf.Max(remainingTime, duration);
         currentMagnitude = Mathf.Max(currentMagnitude, magnitude);
     }
 

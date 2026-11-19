@@ -18,7 +18,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 65c0da86c909fd34d9e0f9b5856da51d, type: 2}
   - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
   - {fileID: 11400000, guid: e7f46ea9b622afa45bbdae890f8c5508, type: 2}
+  evolutionPaths:
+  - {fileID: 11400000, guid: ac9b7ec52caa4cbfa2e18bae7c49e41a, type: 2}
+  - {fileID: 11400000, guid: 005800c513b54a84a1af9379ab07f5e1, type: 2}
+  baseDefinition: {fileID: 0}
   key: weapon.railgun
-  description: Long - ranged weapon with high damage and slow fire rate. Can only
-    fire forward.
+  description: Fires heavy, fast shots straight ahead. Line them up yourself. Strong
+    against hull.
   weaponPrefab: {fileID: 2658622645487082905, guid: 26634ea0e8e58b5428035f4f1f4af67f, type: 3}

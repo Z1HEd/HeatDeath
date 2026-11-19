@@ -6,15 +6,18 @@ using System.Collections;
 // What one hit took from a ship.
 public readonly struct DamageTaken
 {
-    public readonly IHitter Attacker;
+    // The module the damage came from, and the ship that fired (may be destroyed by now).
+    public readonly ModuleDefinition Source;
+    public readonly Ship Attacker;
     public readonly float Shields;
     public readonly float Hull;
     public readonly bool ShieldsBroken;
     // This hit took the hull to 0.
     public readonly bool Killed;
 
-    public DamageTaken(IHitter attacker, float shields, float hull, bool shieldsBroken, bool killed)
+    public DamageTaken(ModuleDefinition source, Ship attacker, float shields, float hull, bool shieldsBroken, bool killed)
     {
+        Source = source;
         Attacker = attacker;
         Shields = shields;
         Hull = hull;
@@ -24,7 +27,7 @@ public readonly struct DamageTaken
 }
 
 [RequireComponent(typeof(SpriteRenderer))]
-public class ShipCoreModule : ModuleBase, IHitter
+public class ShipCoreModule : ModuleBase
 {
     private static readonly int RippleOriginsId = Shader.PropertyToID("_RippleOrigins");
     private static readonly int RippleAgesId = Shader.PropertyToID("_RippleAges");
@@ -55,6 +58,8 @@ public class ShipCoreModule : ModuleBase, IHitter
     [Tooltip("Purple shields: while shields are up, knockback and on-hit effects don't apply. Elites, bosses, " +
              "and player modules only, never swarms.")]
     [SerializeField] private BoolStat hardenedShields = new BoolStat(StatType.HardenedShields, false);
+    [Tooltip("Disrupted: the shields that are left absorb nothing (all damage goes to the hull) and don't recharge.")]
+    [SerializeField] private BoolStat shieldsOffline = new BoolStat(StatType.ShieldsOffline, false);
     [SerializeField] private ScalarStat hpRegen = new ScalarStat(StatType.HPRegen, 0f, 0f);
     [SerializeField] private BoolStat invincibility = new BoolStat(StatType.Invincibility,false);
     [Tooltip("Multiplies all damage this ship takes. Exposed debuffs raise it.")]
@@ -89,18 +94,26 @@ public class ShipCoreModule : ModuleBase, IHitter
 
     public float CurrentHealth => health.CurrentValue;
     public float CurrentShields => shields.CurrentValue;
+    // The shields that count right now: none while they're offline (Disrupted), however many are left.
+    // Anything that depends on shields being up reads this, not CurrentShields.
+    public float ActiveShields => shieldsOffline ? 0f : shields.CurrentValue;
     public int CurrentMaxHealth => Mathf.RoundToInt(health.MaxValue);
     public int CurrentMaxShields => Mathf.RoundToInt(shields.MaxValue);
     public float HealthFraction => health.Fraction;
+    public float MaxHealth => health.MaxValue;
+    // Carries any on-hit debuff, for damage bonuses against debuffed targets.
+    public bool IsDebuffed => ship.effectManager.HasHitEffects;
     public float ShieldFraction => shields.Fraction;
     public bool HasHardenedShields => hardenedShields;
     // Purple shields that are up: Ship ignores knockback and on-hit effects.
-    public bool BlocksControl => hardenedShields && shields.CurrentValue > 0f;
+    public bool BlocksControl => hardenedShields && ActiveShields > 0f;
     // Shields per second right now: the flat regen always, plus the recharge once the delay has passed.
     public float CurrentShieldRegen
     {
         get
         {
+            if (shieldsOffline)
+                return 0f;
             float rate = shieldRegen;
             if (Time.time - lastDamageTime >= shieldRegenDelay)
                 rate += shields.MaxValue / shieldRechargeTime * shieldRechargeSpeed;
@@ -110,13 +123,11 @@ public class ShipCoreModule : ModuleBase, IHitter
     public float CurrentHPRegen => hpRegen.CurrentValue;
     public float XPGain => xpGain;
     public bool IsFull => health.CurrentValue >= health.MaxValue && shields.CurrentValue >= shields.MaxValue;
-    public float Damage => damage;
-    public float KnockbackPower => knockbackPower;
-    public float ShieldDamageMultiplier => 1f;
-    public float HPDamageMultiplier => 1f;
-    public float BackstabMultiplier => backstabMultiplier;
-    public ModuleDefinition Source => ModuleDefinition;
-    public List<Effect> GetEffects() => EmitHitEffects(appliesEffects);
+
+    // Ramming: this core hits whatever its ship runs into. No damage types, no bonuses, no weapon.
+    public Hit RamHit(Vector2 push) => new Hit(
+        new HitPayload(damage, 1f, 1f, backstabMultiplier, knockbackPower, default, ModuleDefinition, ship, null),
+        transform.position, transform.position, push, 0, EmitHitEffects(appliesEffects));
 
     protected override void Awake()
     {
@@ -150,29 +161,33 @@ public class ShipCoreModule : ModuleBase, IHitter
         
     }
 
-    public bool ApplyDamage(IHitter hitter)
+    // Takes the hit's damage from shields, then hull. Returns what it took (nothing while invincible).
+    public DamageTaken ApplyDamage(in Hit hit)
     {
-        float damage = hitter.Damage * damageTakenMultiplier;
-        if (invincibility) return false;
-        if (hitter.transform.position.y>transform.position.y) 
-            damage *= hitter.BackstabMultiplier;
-        
+        if (invincibility) return default;
+
+        HitPayload payload = hit.Payload;
+        float amount = payload.Bonuses.Apply(hit, this) * damageTakenMultiplier;
+        if (hit.From.y > transform.position.y)
+            amount *= payload.BackstabMultiplier;
+
         float shieldsBefore = shields.CurrentValue, healthBefore = health.CurrentValue;
         bool hadShields = shieldsBefore > 0f;
-        damage = shields.Consume(damage,hitter.ShieldDamageMultiplier);
-        if (damage > 0f)
-            health.Consume(damage,hitter.HPDamageMultiplier);
+        if (!shieldsOffline)
+            amount = shields.Consume(amount, payload.ShieldMultiplier);
+        if (amount > 0f)
+            health.Consume(amount, payload.HullMultiplier);
 
         bool shieldsGone = shields.CurrentValue <= 0f;
         if (shieldsGone)
             HideShield();
-        else if (damage <= 0f)
+        else if (amount <= 0f)
         {
             StopAllCoroutines();
-            StartCoroutine(FlashShield(hitter.transform.position));
+            StartCoroutine(FlashShield(hit.From));
         }
 
-        var taken = new DamageTaken(hitter, shieldsBefore - shields.CurrentValue,
+        var taken = new DamageTaken(payload.Source, payload.Attacker, shieldsBefore - shields.CurrentValue,
             healthBefore - health.CurrentValue, hadShields && shieldsGone,
             healthBefore > 0f && health.CurrentValue <= 0f);
         if (taken.Shields > 0f || taken.Hull > 0f)
@@ -182,7 +197,7 @@ public class ShipCoreModule : ModuleBase, IHitter
             OnAnyDamageTaken?.Invoke(ship, taken);
         }
         OnHPShieldsChanged?.Invoke();
-        return damage>0 || (hadShields && shieldsGone);
+        return taken;
     }
 
     private void HideShield()
@@ -255,6 +270,7 @@ public class ShipCoreModule : ModuleBase, IHitter
         stats.Add(shieldRechargeTime);
         stats.Add(shieldRechargeSpeed);
         stats.Add(hardenedShields);
+        stats.Add(shieldsOffline);
         stats.Add(hpRegen);
         stats.Add(invincibility);
         stats.Add(damageTakenMultiplier);

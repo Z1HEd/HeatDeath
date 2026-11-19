@@ -30,7 +30,7 @@ public class StatisticsPeriod
     // Damage the player's side dealt. Hits without a source aren't attributed.
     public void RecordDealt(DamageTaken damage)
     {
-        ModuleDefinition source = damage.Attacker.Source;
+        ModuleDefinition source = damage.Source;
         if (source == null)
             return;
 

@@ -1,32 +1,37 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Lightning that never misses: a bolt to the closest enemy that jumps on to the closest ship not yet hit. Evolutions
+// that strike differently (ShockFieldModule, ThunderSpearModule) override PickTarget and Strike.
 [ExecuteAlways]
-public class TeslaModule : WeaponModule, IHitter
+public class TeslaModule : WeaponModule
 {
-    [SerializeField] protected ScalarStat damage = new ScalarStat(StatType.Damage, 15f, 0f);
-    [SerializeField] protected ScalarStat shieldDamageMultiplier = new ScalarStat(StatType.ShieldDamageMultiplier, 1f, -1f);
-    [SerializeField] protected ScalarStat hpDamageMultiplier = new ScalarStat(StatType.HPDamageMultiplier, 1f, -1f);
-    [SerializeField] protected ScalarStat backstabMultiplier = new ScalarStat(StatType.BackstabMultiplier, 1f, 0f);
-
-    public float KnockbackPower => 0f;
-    public float Damage =>damage;
-    public float ShieldDamageMultiplier => shieldDamageMultiplier;
-    public float HPDamageMultiplier => hpDamageMultiplier;
-    public float BackstabMultiplier => backstabMultiplier;
-    public ModuleDefinition Source => ModuleDefinition;
-    public List<Effect> GetEffects() => GetHitEffects();
-    [Tooltip("Ships one bolt hits, the first included. Rounded down.")]
+    // Damage, the multipliers, and knockback (0: the bolt doesn't push) come from WeaponModule.
+    [Header("Lightning")]
+    [Tooltip("Ships one bolt hits, the first included. Evolutions repeat the strike instead. Rounded down.")]
     [SerializeField] protected ScalarStat chainTargets = new ScalarStat(StatType.ChainTargets, 3f, 1f);
+    [Tooltip("The first jump reaches this share of the weapon's range, each further jump this share of the one " +
+             "before.")]
+    [SerializeField] protected ScalarStat chainJumpRange = new ScalarStat(StatType.ChainJumpRange, 0.6f, 0f);
+    [Tooltip("Each jump, or each repeated strike, deals this share of the damage of the hit before it.")]
+    [SerializeField] protected ScalarStat chainJumpDamage = new ScalarStat(StatType.ChainJumpDamage, 1f, 0f);
+    [Tooltip("Percent of the Tesla's damage that an enemy it kills releases as bolts to the closest enemies around " +
+             "it, without on-hit effects. Their deaths discharge again. 0: off.")]
+    [SerializeField] protected ScalarStat dischargeDamage = new ScalarStat(StatType.DischargeDamage, 0f, 0f);
+    [Tooltip("Enemies one discharge strikes, within the first jump's reach. Rounded down.")]
+    [SerializeField] protected ScalarStat dischargeTargets = new ScalarStat(StatType.DischargeTargets, 2f, 0f);
+
+    [Header("Visuals")]
     [SerializeField] private float lightningDuration = 0.2f;
     [Tooltip("Seconds between re-rolls of the bolt shape.")]
     [SerializeField] private float jitterInterval = 0.03f;
     [SerializeField] private Material lightningMaterial;
     [Tooltip("Lightning drawn over the hull of each ship hit. Leave empty to turn it off.")]
     [SerializeField] private Material shipLightningMaterial;
-
-
-    private const float CHAIN_RANGE_FALLOFF = 0.6f;
+    [Tooltip("Lightning for Discharge bolts, so they stand apart from the chain. Empty: the normal lightning.")]
+    [SerializeField] private Material dischargeLightningMaterial;
 
     protected override void Awake()
     {
@@ -40,72 +45,141 @@ public class TeslaModule : WeaponModule, IHitter
 
         if (rangeDetector == null)
             return;
-        var currentTarget = rangeDetector.GetClosestTarget();
-        if (firePoint != null && currentTarget != null && !IsStunned)
+        Ship target = PickTarget();
+        if (target == null)
+            return;
+
+        if (firePoint != null && !IsStunned)
         {
-            Vector3 towardsTarget = currentTarget.transform.position - transform.position;
+            Vector3 towardsTarget = target.transform.position - transform.position;
             Vector3 currentAim = firePoint.position - transform.position;
 
             float angle = Vector2.SignedAngle(currentAim, towardsTarget);
             transform.Rotate(0f, 0f, angle);
         }
 
-        if (rangeDetector.GetClosestTarget(transform) != null && CanFire)
+        if (CanFire)
+        {
             Fire();
+            // One payload for the whole strike, repeats included: a strike doesn't change once fired.
+            Strike(target, CreatePayload());
+        }
     }
 
-    protected override void Fire()
+    protected virtual Ship PickTarget() => rangeDetector.GetClosestTarget();
+
+    protected virtual void Strike(Ship target, in HitPayload payload)
     {
-        base.Fire();
-
-        List<Ship> chain = BuildChain();
-        if (chain.Count == 0)
-            return;
-
-        ApplyChainDamage(chain);
+        List<Ship> chain = BuildChain(target);
+        ApplyChainDamage(chain, payload, 1f, true);
         ShowLightning(chain);
     }
 
-    private List<Ship> BuildChain()
+    // For evolutions that repeat their strike: Chain Targets strikes, the interval apart, each weaker by Chain Jump
+    // Damage. The strike gets its index and damage share, and returns false to stop early.
+    protected IEnumerator RepeatStrikes(float interval, Func<int, float, bool> strike)
     {
-        var chain = new List<Ship>();
-        float curRange = range;
-        Vector2 fromPosition = transform.position;
-        Ship next = rangeDetector.GetClosestTarget();
-        List<Collider2D> hits;
-        int maxTargets = Mathf.FloorToInt(chainTargets);
-        for (int i = 0; i < maxTargets; i++)
+        int strikes = Mathf.FloorToInt(chainTargets);
+        float damageScale = 1f;
+        for (int i = 0; i < strikes; i++)
         {
-            if (next == null) break;
+            if (i > 0)
+                yield return new WaitForSeconds(interval);
+            if (!strike(i, damageScale))
+                yield break;
+            damageScale *= chainJumpDamage;
+        }
+    }
 
-            hits =new List<Collider2D>(Physics2D.OverlapCircleAll(next.transform.position, curRange, 1<<(DetectLayer-2)));
-            hits.RemoveAll(col => col.GetComponent<Ship>() == null || chain.Contains(col.GetComponent<Ship>()));
-            if (hits.Count<1) break;
-            next = GetClosest(hits,next.transform.position).gameObject.GetComponent<Ship>();
-            chain.Add(next);
-            fromPosition = next.transform.position;
-            curRange *= CHAIN_RANGE_FALLOFF;
+    // Every hit the Tesla lands comes back here: bolts, blasts, and discharges alike.
+    public override void OnHitLanded(ShipCoreModule target, in DamageTaken taken)
+    {
+        base.OnHitLanded(target, taken);
+        if (taken.Killed && dischargeDamage > 0f && target != null)
+            Discharge(target.Ship);
+    }
+
+    private void Discharge(Ship killed)
+    {
+        Vector2 at = killed.transform.position;
+        var targets = new List<Ship>();
+        foreach (Collider2D col in Physics2D.OverlapCircleAll(at, range * chainJumpRange, 1 << (DetectLayer - 2)))
+        {
+            Ship ship = col.GetComponent<Ship>();
+            if (ship != null && !ship.IsDead && !targets.Contains(ship))
+                targets.Add(ship);
+        }
+        targets.Sort((a, b) => ((Vector2)a.transform.position - at).sqrMagnitude
+            .CompareTo(((Vector2)b.transform.position - at).sqrMagnitude));
+
+        HitPayload payload = CreatePayload();
+        int count = Mathf.Min(targets.Count, Mathf.FloorToInt(dischargeTargets));
+        for (int i = 0; i < count; i++)
+        {
+            Ship target = targets[i];
+            if (target.IsDead)
+                continue;
+
+            var bolt = new List<Ship> { target };
+            ShowLightning(bolt, killed.transform, dischargeLightningMaterial);
+            DamageTaken taken = target.TakeHit(new Hit(payload, at, at, Vector2.zero, 0, null, dischargeDamage / 100f));
+            OnHitLanded(target.CoreModule, taken);
+        }
+    }
+
+    // From the first target, each jump goes to the closest living ship not yet hit, within a range that shrinks per
+    // jump.
+    private List<Ship> BuildChain(Ship first)
+    {
+        var chain = new List<Ship> { first };
+        float curRange = range * chainJumpRange;
+        int maxTargets = Mathf.FloorToInt(chainTargets);
+        while (chain.Count < maxTargets)
+        {
+            Vector3 lastPosition = chain[chain.Count - 1].transform.position;
+            var hits = new List<Collider2D>(Physics2D.OverlapCircleAll(lastPosition, curRange, 1 << (DetectLayer - 2)));
+            hits.RemoveAll(col =>
+            {
+                Ship ship = col.GetComponent<Ship>();
+                return ship == null || ship.IsDead || chain.Contains(ship);
+            });
+            if (hits.Count < 1)
+                break;
+
+            chain.Add(GetClosest(hits, lastPosition).GetComponent<Ship>());
+            curRange *= chainJumpRange;
         }
 
         return chain;
     }
 
-    private void ApplyChainDamage(List<Ship> chain)
+    // Each ship is hit from the previous link of the chain (the fire point for the first), which sets backstab and
+    // the shield ripple. Each jump deals Chain Jump Damage of the hit before it.
+    protected void ApplyChainDamage(List<Ship> chain, in HitPayload payload, float damageScale, bool withEffects)
     {
-        for (int i = 0; i < chain.Count; i++)
+        Vector2 firedFrom = firePoint.position;
+        Vector2 from = firedFrom;
+        int enemiesHit = 0;
+        foreach (Ship target in chain)
         {
-            Ship target = chain[i];
             if (target == null || target.IsDead)
                 continue;
 
-            target.Hit(this);
+            DamageTaken taken = target.TakeHit(new Hit(payload, firedFrom, from, Vector2.zero, enemiesHit,
+                withEffects ? GetHitEffects() : null, damageScale));
+            OnHitLanded(target.CoreModule, taken);
+            enemiesHit++;
+            from = target.transform.position;
+            damageScale *= chainJumpDamage;
         }
     }
 
-    // One bolt per hop: fire point -> chain[0] -> chain[1] -> ...
-    private void ShowLightning(List<Ship> chain)
+    // One bolt per hop: start (the fire point by default) -> chain[0] -> chain[1] -> ..., in the given material or
+    // the normal lightning.
+    protected void ShowLightning(List<Ship> chain, Transform start = null, Material material = null)
     {
-        if (lightningMaterial == null)
+        Material boltMaterial = material != null ? material : lightningMaterial;
+        if (boltMaterial == null)
             return;
 
         // Draw above ships, on the weapon's own sorting layer.
@@ -113,14 +187,14 @@ public class TeslaModule : WeaponModule, IHitter
         int sortingLayerID = sprite != null ? sprite.sortingLayerID : 0;
         int sortingOrder = (sprite != null ? sprite.sortingOrder : 0) + 10;
 
-        Transform from = firePoint != null ? firePoint : transform;
+        Transform from = start != null ? start : firePoint != null ? firePoint : transform;
         foreach (Ship target in chain)
         {
             if (target == null)
                 continue;
 
             LightningBolt.Spawn(from, from.position, target.transform, lightningDuration, jitterInterval,
-                lightningMaterial, sortingLayerID, sortingOrder);
+                boltMaterial, sortingLayerID, sortingOrder);
 
             if (shipLightningMaterial != null && !target.IsDead)
                 ShipLightningOverlay.Spawn(target, lightningDuration, jitterInterval,
@@ -151,10 +225,10 @@ public class TeslaModule : WeaponModule, IHitter
     {
         base.CollectStats(stats);
 
-        stats.Add(damage);
-        stats.Add(shieldDamageMultiplier);
-        stats.Add(hpDamageMultiplier);
-        stats.Add(backstabMultiplier);
         stats.Add(chainTargets);
+        stats.Add(chainJumpRange);
+        stats.Add(chainJumpDamage);
+        stats.Add(dischargeDamage);
+        stats.Add(dischargeTargets);
     }
 }

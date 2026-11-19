@@ -148,6 +148,7 @@ MonoBehaviour:
   jitterInterval: 0.03
   lightningMaterial: {fileID: 2100000, guid: cc2ae67600de477bbaa6aa989854bc50, type: 2}
   shipLightningMaterial: {fileID: 2100000, guid: 6cdbfdf397c44c73bb03cdd4cf23a101, type: 2}
+  dischargeLightningMaterial: {fileID: 2100000, guid: f0240bfe0439404ca1033e09f50f23c8, type: 2}
   references:
     version: 2
     RefIds: []

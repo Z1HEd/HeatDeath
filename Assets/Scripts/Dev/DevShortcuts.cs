@@ -112,9 +112,9 @@ public class DevShortcuts : MonoBehaviour
             return;
         }
 
-        if (player.effectManager.IsActive(this))
+        if (player.effectManager.HasEffects(this))
         {
-            player.effectManager.Remove(this);
+            player.effectManager.ClearEffects(this);
             player.IgnoresKnockback = false;
             Debug.Log("[Dev] Invincibility off");
             return;
@@ -123,7 +123,7 @@ public class DevShortcuts : MonoBehaviour
         var tags = new List<TagDefinition> { Resources.Load<TagDefinition>("ModuleTags/ShipCore") };
         var permanent = new ResourceStat(StatType.Duration, float.PositiveInfinity, 0f);
         var invincibility = new StatModifierEffect(StatType.Invincibility, new StatModifier(1f, 0f), tags, permanent);
-        player.effectManager.Apply(this, new Effect[] { invincibility });
+        player.effectManager.SetEffects(this, new Effect[] { invincibility });
         player.IgnoresKnockback = true;
         Debug.Log("[Dev] Invincibility on");
     }

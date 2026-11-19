@@ -83,7 +83,7 @@ public class UpgradeManager : MonoBehaviour
     public void ClearAll()
     {
         foreach (var upgrade in stackCounts.Keys)
-            ship.effectManager.Remove(upgrade);
+            ship.effectManager.ClearEffects(upgrade);
 
         stackCounts.Clear();
         groups.Clear();
@@ -96,7 +96,7 @@ public class UpgradeManager : MonoBehaviour
         var copies = new List<Effect>();
         foreach (var effect in upgrade.Effects)
             copies.Add(effect.Copy(stacks));
-        ship.effectManager.Apply(upgrade, copies);
+        ship.effectManager.SetEffects(upgrade, copies);
     }
 
     public int GetStackCount(UpgradeDefinition upgrade)

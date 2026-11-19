@@ -4,16 +4,16 @@ using System.Collections.Generic;
 [ExecuteAlways]
 public class ProjectileModule : WeaponModule
 {
+    [Header("Projectiles")]
     [SerializeField] public Projectile projectilePrefab;
     [SerializeField] public ScalarStat projectileSpeed = new ScalarStat(StatType.ProjectileSpeed, 20f, 0f);
-    [SerializeField] public ScalarStat projectileDamage = new ScalarStat(StatType.Damage, 10f, 0f);
-    [SerializeField] public ScalarStat ShieldDamageMultiplier = new ScalarStat(StatType.ShieldDamageMultiplier, 1f, -1f);
-    [SerializeField] public ScalarStat HPDamageMultiplier = new ScalarStat(StatType.HPDamageMultiplier, 1f, -1f);
-    [SerializeField] public ScalarStat BackstabMultiplier = new ScalarStat(StatType.BackstabMultiplier, 1f, 0f);
-    [SerializeField] public ScalarStat projectileKnockback = new ScalarStat(StatType.ProjectileKnockback, 0f, 0f);
     [SerializeField] public ScalarStat projectilePiercing = new ScalarStat(StatType.ProjectilePiercing, 0f, -1f);
     [SerializeField] public ScalarStat projectileCount = new ScalarStat(StatType.ProjectileCount, 1f, 1f);
     [SerializeField] public ScalarStat projectileSpread = new ScalarStat(StatType.ProjectileSpread, 0f, 0f);
+    [Tooltip("The whole volley fires this many times, in evenly spaced directions from the aim. Rounded down.")]
+    [SerializeField] public ScalarStat projectileDirections = new ScalarStat(StatType.ProjectileDirections, 1f, 1f);
+    [Tooltip("Degrees the directions spread over: 360 or more goes around the circle, less is a fan centred on the aim.")]
+    [SerializeField] public ScalarStat directionArc = new ScalarStat(StatType.DirectionArc, 360f, 0f);
 
     private Ship currentTarget;
 
@@ -33,7 +33,7 @@ public class ProjectileModule : WeaponModule
 
         if (currentTarget == null)
             currentTarget = rangeDetector.GetClosestTarget(transform);
-        
+
         if (currentTarget == null)
             return;
 
@@ -75,20 +75,40 @@ public class ProjectileModule : WeaponModule
         }
 
         int count = Mathf.Max(1, Mathf.FloorToInt(projectileCount));
+        int directions = Mathf.Max(1, Mathf.FloorToInt(projectileDirections));
         float spreadDegrees = Mathf.Max(0f, projectileSpread);
-        for (int i = 0; i < count; i++)
+        for (int d = 0; d < directions; d++)
         {
-            float angleOffset = GetSpreadAngleOffset(spreadDegrees);
-            Vector3 shotDirection = Quaternion.AngleAxis(angleOffset, Vector3.forward) * aimDirection;
+            Vector3 volleyDirection = Quaternion.AngleAxis(DirectionAngle(d, directions), Vector3.forward) * aimDirection;
+            for (int i = 0; i < count; i++)
+            {
+                float angleOffset = GetSpreadAngleOffset(spreadDegrees);
+                Vector3 shotDirection = Quaternion.AngleAxis(angleOffset, Vector3.forward) * volleyDirection;
 
-            Projectile projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
-            projectile.gameObject.layer = DetectLayer;
-            projectile.Initialize(shotDirection, projectileSpeed, this);
-            OnProjectileSpawned(projectile);
+                Projectile projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
+                projectile.gameObject.layer = DetectLayer;
+                projectile.Initialize(shotDirection, projectileSpeed, this);
+                OnProjectileSpawned(projectile, d, directions);
+            }
         }
     }
 
-    protected virtual void OnProjectileSpawned(Projectile projectile) { }
+    // Evenly spaced: around the whole circle at 360° or more (8 directions: every 45°), otherwise a fan centred on the
+    // aim whose outer directions sit on the arc's edges (3 over 45°: -22.5°, 0°, 22.5°).
+    private float DirectionAngle(int index, int directions)
+    {
+        if (directions <= 1)
+            return 0f;
+
+        float arc = Mathf.Max(0f, directionArc);
+        if (arc >= 360f)
+            return 360f / directions * index;
+        return -arc / 2f + arc / (directions - 1) * index;
+    }
+
+    // After Initialize, with which of the volley's directions it flies in (ProjectileDirections; 0 is the rightmost of
+    // a fan).
+    protected virtual void OnProjectileSpawned(Projectile projectile, int direction, int directions) { }
 
     protected static float GetSpreadAngleOffset(float spreadDegrees)
     {
@@ -104,14 +124,11 @@ public class ProjectileModule : WeaponModule
         base.CollectStats(stats);
 
         stats.Add(projectileSpeed);
-        stats.Add(projectileDamage);
-        stats.Add(HPDamageMultiplier);
-        stats.Add(ShieldDamageMultiplier);
-        stats.Add(BackstabMultiplier);
-        stats.Add(projectileKnockback);
         stats.Add(projectilePiercing);
         stats.Add(projectileCount);
         stats.Add(projectileSpread);
+        stats.Add(projectileDirections);
+        stats.Add(directionArc);
     }
 
 }

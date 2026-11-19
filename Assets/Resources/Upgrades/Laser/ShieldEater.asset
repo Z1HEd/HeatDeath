@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76beddaea2d54064c8b194d74f03c422, type: 3}
+  m_Name: ShieldEater
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeDefinition
+  displayName: Shield Eater
+  key: upgrade.laser.shieldeater
+  description: Hits deal +20% of the target's current shields, -25% damage
+  boundModule: {fileID: 11400000, guid: eac5fc4af100cc34b8ee896e3cf22781, type: 2}
+  role: 0
+  evolutionPath: {fileID: 0}
+  rarity: 3
+  maxStacks: 1
+  mutuallyExclusiveWith: []
+  effects:
+  - rid: 7560140318346840761
+  - rid: 7560140318346840762
+  references:
+    version: 2
+    RefIds:
+    - rid: 7560140318346840761
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: Infinity
+          baseValue: Infinity
+          minValue: 0
+        stat: 45
+        statModifier:
+          Flat: 20
+          Percent: 0
+        perLevel:
+          Flat: 0
+          Percent: 0
+        targetTags:
+        - {fileID: 11400000, guid: 8457aa4a11e42bc40aa468ef37e131da, type: 2}
+    - rid: 7560140318346840762
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: Infinity
+          baseValue: Infinity
+          minValue: 0
+        stat: 6
+        statModifier:
+          Flat: 0
+          Percent: -25
+        perLevel:
+          Flat: 0
+          Percent: 0
+        targetTags:
+        - {fileID: 11400000, guid: 8457aa4a11e42bc40aa468ef37e131da, type: 2}

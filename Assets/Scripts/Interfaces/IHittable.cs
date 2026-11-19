@@ -1,12 +1,7 @@
-using UnityEngine;
-using System.Collections.Generic;
 public interface IHittable
 {
     bool IsDead {get;}
 
-    void Hit(IHitter hitter);
-    void ApplyKnockback(IHitter hitter, Collision2D collision);
-    void ApplyKnockback(IHitter hitter, Vector3 direction);
-    void ApplyEffects(List<Effect> effects);
+    // Damage, on-hit effects, and knockback, in that order. Returns what the hit took.
+    DamageTaken TakeHit(in Hit hit);
 }
-

@@ -5182,8 +5182,6 @@ MonoBehaviour:
   - rid: 7560140350874189896
   - rid: 7560140350874189898
   - rid: 7560140350874189897
-  - rid: 7560140350874189899
-  - rid: 7560140350874189900
   explosionLayer: 9
   references:
     version: 2
@@ -5191,6 +5189,7 @@ MonoBehaviour:
     - rid: 7560140350874189893
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        visual: {fileID: 6110000000000000003, guid: bbd89c7433974020b59ec6a190c9b301, type: 3}
         duration:
           currentValue: 0
           baseValue: 4
@@ -5235,27 +5234,6 @@ MonoBehaviour:
           baseValue: Infinity
           minValue: 0
         multiplier: 0.1
-    - rid: 7560140350874189899
-      type: {class: ChangeSpriteColorEffect, ns: , asm: Assembly-CSharp}
-      data:
-        duration:
-          currentValue: 0
-          baseValue: 4
-          minValue: 0
-        color: {r: 0.55, g: 0.55, b: 0.58, a: 1}
-    - rid: 7560140350874189900
-      type: {class: ElectricShockEffect, ns: , asm: Assembly-CSharp}
-      data:
-        duration:
-          currentValue: 0
-          baseValue: 4
-          minValue: 0
-        material: {fileID: 2100000, guid: 4a4dfea1ce4a47f484c8599ff735a227, type: 2}
-        regionRadius: 0.28
-        minInterval: 0.08
-        maxInterval: 0.3
-        flickerLength: 0.09
-        maxFlickers: 3
 --- !u!1 &6853425191156878356
 GameObject:
   m_ObjectHideFlags: 0

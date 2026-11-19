@@ -1,6 +1,6 @@
 # Balance targets
 
-Source of truth for run pacing, enemy scaling, and power budgets. Values marked *tunable* are inspector fields; change them in playtesting and update this file. Current enemy stats and upgrade values in the assets are placeholders and are **not** a reference.
+Source of truth for run pacing, enemy scaling, and power budgets. Values marked *tunable* are inspector fields; change them in playtesting and update this file. Current enemy stats and core upgrades in the assets are placeholders and are **not** a reference. Weapon values and upgrades are a first pass sized on paper, until block F's playtests measure them.
 
 ## Difficulty goals
 
@@ -143,6 +143,7 @@ Shields are a barrier that recharges between fights. Hull is the budget for the 
 | Energy | Laser, Tesla | 1.5 | 0.75 | Anti-shield |
 
 - Blue Laser bypasses shields (multiplier −1: its damage goes straight to the hull).
+- Evolutions keep their weapon's multipliers (user decision); only a defining mechanic changes one, like the Blue Laser's bypass.
 - Enemy weapons should follow the same table.
 - Sectors can lean one way: Outer Belt mostly unshielded, Storm Verge and other high-tech sectors shield-heavy, so builds that invest only in hull damage struggle there. Kinetic stays neutral, so a bad sector order never ruins a run.
 
@@ -151,12 +152,14 @@ Shields are a barrier that recharges between fights. Hull is the budget for the 
 | Debuff | Effects (tags) |
 |---|---|
 | Exposed | `DamageTakenMultiplier` +X% (ShipCore) |
-| Disruptor | `ShieldRegenDelay` +X s and `ShieldRegen` −X% (ShipCore) |
+| Disruptor | `ShieldsOffline` (ShipCore): the shields that are left absorb nothing, so all damage hits the hull, and they don't recharge. Strong against shield-heavy enemies, so it's rare and short: the Laser's Disruptor is an Epic, 20% per stack (2 stacks), 2.5 s. It costs an energy build its own damage (1.5× vs shields, 0.75× vs hull) and pays off kinetic and explosive weapons |
 | Jammed | weapon `TimeScale` −X% (Weapon) |
 | Slow | `Thrust` and `MaxSpeed` −X% (Movement) |
 | Stun | `TimeScale` −100% (Weapon), `Thrust` and `MaxSpeed` −100% (Movement), 0.3-0.5 s, like Thunder's EMP |
 
 Size a debuff upgrade by the value it gives the whole build, not by its own damage. Support works best as control (Vacuum Cannon, debuffs), not only as stat buffs.
+
+A debuff must be noticeable when it lands (user): about 50% slow or jam, or a full shutdown, not 10%. Upgrades scale it with a chance per stack (Impact Shock, Flashbang) rather than a weak effect on every hit.
 
 ## Weapon base values
 
@@ -174,7 +177,23 @@ Weapons are matched by value for their role, not by equal DPS. Harder weapons (s
 | Mines | Placement, area damage and knockback | 1.05 | 48 | 2.0 | 3 mines, thrown ~2.7 units, proximity fuse 0.6 | 24 | 60% go off near enemies, 1.3 targets | ~15.5 |
 | Tesla | Never misses, chains, flexible | 0.85 | 18 | 1.75 | chains 3 | 10 per target | 1.7 targets, in range 80% | ~13 |
 
-Evolved Cannon: Minigun 6 damage every 0.18 s (33 raw DPS, ×1.67, range 6) for raw damage; Vacuum Cannon 12 damage every 0.9 s with splash 1.5 and knockback 14 for crowd control.
+Evolved Cannon: Minigun 6 damage every 0.18 s (33 raw DPS, ×1.67, range 6) for raw damage; Vacuum Cannon 12 damage every 0.9 s with splash 1.5 and knockback 10 for crowd control.
+
+Evolved Shotgun: Eradicator 6 × 6 every 0.55 s (65 raw, ×1.6) for raw damage; Octuple Shotgun is eight weaker shotguns, one every 45° from its aim (`ProjectileDirections` 8), each 4 × 5 every 1.2 s with the Shotgun's 20° spread, for coverage; shotgun upgrades apply to every barrel. Evolved Railgun: Particle Accelerator pierces 5 enemies (6 hits, in practice a whole line), with shots at speed 70 (Railgun 35) and the same damage; Behemoth Rifle 160 every 2.5 s, knockback 12, plus 3% of the target's max hull.
+
+Evolved Missile: Rocket Swarm 4 small fast rockets × 11 every 1.5 s (29 raw, ×1.7), blast radius 0.75; Nuke 120 every 5 s, blast radius 3.5, leaving a toxic zone of the same size that deals 3% of max hull per second to enemies inside for 5 s. Evolved Mines: Multicharge mines explode every time an enemy comes close, rearming 0.5 s after each blast (user decision, against stun-locks with Flashbang), 35 per blast every 2.5 s, until replaced; Nanite Bombs 40 per blast, radius 2, no knockback, and every blast stuns 0.4 s and leaves nanites dealing 2% of max hull per second for 4 s. Damage over time and the toxic zone are typeless and scale with the target's max hull (user decision), so they're weak early and keep up with enemy scaling.
+
+Evolved Laser: Prism fires 3 beams in a fixed 45° fan, 22 damage each every 1.0 s (×1.55); Blue Laser 45 every 1.25 s, bypasses shields, and adds 15% of the target's current shields to each hit (×1.1 against unshielded enemies, ×1.65 against a 40%-shield pool). Evolved Tesla: Shock Field releases an EMP-like blast around the ship that reaches range 5, 20 damage every 2.5 s, stunning 0.5 s; each chain-target upgrade adds a pulse 0.3 s later at half the previous damage, without stun (user decisions). Thunder Spear locks onto the enemy in range 6 with the highest max shields, 12 damage every 0.5 s, and each hit jams its weapons for 0.3 s without stopping it (user decision: stun-locking it was too strong); each chain-target upgrade adds a bolt on it 0.1 s later at half the previous damage. With 3 chain upgrades, either deals at most ×1.9 per cooldown.
+
+Stun durations are tuned per weapon to avoid stun-locks (user decision): Impact Shock 0.2 s and Flashbang 0.25 s per stack, and Multicharge mines rearm.
+
+A bonus against debuffed enemies should pay off other weapons' debuffs, not the weapon's own (user). Exploit (+100% against debuffed enemies) is therefore the Cannon's Legendary and can't be taken with Suppressive Fire. The Tesla's Legendary is Discharge instead: enemies it kills release bolts at the 2 closest enemies for 50% damage, and their deaths discharge again. It's strong against swarms and weak against bosses. A weapon may have more than one Legendary (user): the Cannon also has Finisher (up to +100% damage the less hull the target has left) and Focus Fire (+15% per hit in a row on the same enemy, up to 5).
+
+Evolved prefabs must survive the base weapon's upgrades, which carry over, and should keep them useful (user). Particle Accelerator pierces 5, not −1 (infinite), so Piercing Rounds still adds targets; a pierce of −1 would also turn into 0 with its +1.
+
+Explosions push with full knockback at their centre, falling to half at their edge (user decision). Missile 2.5, Mines 3, and Vacuum Cannon 10 are stopgaps until the knockback rework in block F.
+
+The Laser never gets knockback, from its base values or from upgrades: it's not that kind of weapon (user decision).
 
 ## Upgrade power by rarity
 
@@ -190,6 +209,31 @@ Percent of the targeted module's main output. Higher rarities fill a slot in few
 Draft weights: Common 70, Rare 20, Epic 8, Legendary 2.
 
 **Level scaling as a tradeoff.** An Epic or Legendary effect can grow with the player's level through a stat effect's `perLevel` modifier, which is added once per level on top of its base value. It's weak when taken early, strong late, and it keeps growing in endless mode. Size it so it reaches the table's full-slot value around the level where such upgrades are usually taken, and stays below it before then.
+
+**Percent max hull damage as late scaling.** `PercentMaxHullDamage` adds a percent of the target's max hull to each hit (max hull, the same against bosses). It's nearly worthless early (2% of a 30-hull enemy is 0.6) and grows exactly with enemy scaling. Size it per hit, so fast or multi-projectile weapons get less per hit.
+
+**Every weapon gets at least one late-scaling upgrade**, level-scaled or percent max hull damage, usually an Epic or Legendary that's weak early (user decision). Without one, a weapon whose upgrades are all flat stats falls behind enemy scaling. Control (stun, slow, jam, knockback) doesn't need scaling: it works the same on a ×40 enemy.
+
+**Damage that depends on how you hit** (user direction: more of these). Every weapon has these stats, in percent, so upgrades use them without code. They start at 0, so upgrades raise them with a flat value (Flat 20 = +20%); a percent modifier does nothing. The factors multiply each other and the whole hit, percent max hull included (user decision).
+
+| Stat | Bonus | Fits |
+|---|---|---|
+| `PercentMaxHullDamage` | of the target's max hull, added to the hit before the other bonuses multiply it | late scaling, Behemoth |
+| `PercentShieldsDamage` | of the target's current shields, added like percent max hull. With a shield bypass the whole hit goes to the hull, so it punishes shielded targets | Blue Laser |
+| `DistanceDamage` | per unit from where the shot was fired to the target; negative values fall off | Railgun (Long Shot), a close-range Shotgun |
+| `MultiHitDamage` | per enemy the shot hit before this one: pierced, caught earlier in the blast, or earlier in the Tesla chain, the same rule for every weapon (user decision). A laser beam's hits count the same way, in no set order. Counts at most `MultiHitMaxStacks` enemies (base 5, user decision), so area weapons in dense waves don't multiply their damage without limit | Tesla, piercing Railgun, Laser, explosives |
+| `ExecuteDamage` | at 0 hull, less the more hull the target has left | finishers: Cannon, Minigun |
+| `DebuffedTargetDamage` | against targets carrying any on-hit debuff | combos with support weapons |
+| `FocusDamage` | per hit in a row on the same target, up to `FocusMaxStacks` (base 5). Counted when the shot is fired, and only if the shot hits that target; switching targets restarts at 1. Every landed projectile counts, so multi-projectile weapons ramp fastest, and a Tesla chain ends focused on its last target | Minigun, Thunder Spear, Laser |
+| `MomentumFireRate` | fire rate for `MomentumDuration` seconds (base 3) after this weapon kills; each kill restarts it, no stacking | Minigun, Eradicator |
+
+A shot carries what it was fired with: nothing changes while it flies (user decision). Focus fire is therefore decided when the shot is fired, and fast weapons ramp with a slight lag.
+
+**Legendaries deepen their weapon's identity** and compose with both of its evolutions (user decision). A Legendary that rewrites how a weapon works (a shotgun that fires one slug, a railgun that aims) erases what makes the weapon distinct and breaks its evolved prefabs; that belongs in an evolution path instead.
+
+Different weapons may have similar upgrades (the same debuff, the same bonus), as long as each fits its weapon (user).
+
+Base upgrades should stay useful after either evolution (user). When a path changes what a stat means, it keeps the stat working in a new way: on Shock Field and Thunder Spear, chain-target upgrades repeat the strike (another, weaker blast or bolt) instead of jumping to new enemies (user decisions).
 
 A full pool is about 6 Common, 3 Rare, 2 Epic, and 1 Legendary per module. That mix is a guideline, and pools may differ per module. Every upgrade follows the table above, so adding upgrades later widens choice without shifting the balance.
 

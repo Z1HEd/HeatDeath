@@ -6,7 +6,7 @@ public class MineModule : ProjectileModule
     [SerializeField] public ScalarStat ExplosionRange = new ScalarStat(StatType.ExplosionRange,1f,0f);
     [SerializeField]private readonly List<MineProjectile> activeMines = new List<MineProjectile>();
 
-    protected override void OnProjectileSpawned(Projectile projectile)
+    protected override void OnProjectileSpawned(Projectile projectile, int direction, int directions)
     {
         
         activeMines.RemoveAll(m => m == null);
@@ -38,7 +38,7 @@ public class MineModule : ProjectileModule
         Projectile projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
         projectile.gameObject.layer = DetectLayer;
         projectile.Initialize(shotDirection, projectileSpeed, this);
-        OnProjectileSpawned(projectile);
+        OnProjectileSpawned(projectile, 0, 1);
     }
     protected override void CollectStats(List<IStat> stats)
     {

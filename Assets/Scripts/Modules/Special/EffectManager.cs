@@ -1,17 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// A ship's effects come in two ways: effects an owner holds (SetEffects: upgrades, abilities, ship-module features,
+// enemy scaling, dev shortcuts), and effects attackers put on the ship (AddHitEffect).
 [RequireComponent(typeof(Ship))]
 public class EffectManager : MonoBehaviour
 {
     [SerializeReference] [SubclassSelector] private List<Effect> activeEffects = new List<Effect>();
     // The on-hit subset of activeEffects, which follows the one-per-slot rule.
-    private readonly List<Effect> statusEffects = new List<Effect>();
-    // Effects added with Apply, by source (an upgrade, a module, a buff), and the source of each.
+    private readonly List<Effect> hitEffects = new List<Effect>();
+    // Effects set with SetEffects, by owner (an upgrade, a module, a buff), and the owner of each.
     private readonly Dictionary<object, List<Effect>> sourcedEffects = new Dictionary<object, List<Effect>>();
     private readonly Dictionary<Effect, object> effectSources = new Dictionary<Effect, object>();
     private Ship ship;
     private bool shouldRecalculate = false;
+
+    // Carries any on-hit effect (from an attacker): a slow, stun, jam, and so on.
+    public bool HasHitEffects => hitEffects.Count > 0;
 
     protected void Awake()
     {
@@ -47,36 +52,41 @@ public class EffectManager : MonoBehaviour
         shouldRecalculate = true;
     }
 
-    public void AddEffect(Effect effect)
+    private void AddEffect(Effect effect)
     {
         activeEffects.Add(effect);
         effect.ApplyToShip(ship);
         shouldRecalculate = true;
     }
-    // On-hit effects: one per slot. A stronger or equal one replaces the old one and restarts
-    // the timer; a weaker one is ignored. Effects from other sources stack: see Apply and AddEffect.
-    public void AddStatusEffect(Effect effect)
+
+    // On-hit effects: one per slot. A stronger one replaces the old one; an equal one replaces it only if it lasts
+    // longer, so a short stun never cuts a longer one short; a weaker one is ignored. Effects that owners hold
+    // stack: see SetEffects.
+    public void AddHitEffect(Effect effect)
     {
-        foreach (var current in statusEffects)
+        foreach (var current in hitEffects)
         {
             if (!effect.SharesSlotWith(current))
                 continue;
 
             if (!effect.IsAtLeastAsStrongAs(current))
                 return;
+            if (current.IsAtLeastAsStrongAs(effect) && current.TimeLeft >= effect.TimeLeft)
+                return;
 
             RemoveEffect(current);
             break;
         }
 
-        statusEffects.Add(effect);
+        hitEffects.Add(effect);
         AddEffect(effect);
     }
 
-    // Makes the source's effects exactly these copies. A copy equal to one the source already has
-    // (same asset effect, strength, and duration) restarts the existing one, so nothing is reapplied.
-    // A changed copy replaces the old one, and the source's effects missing from the list are removed.
-    public void Apply(object source, IReadOnlyList<Effect> effects)
+    // Makes the owner's effects exactly these copies, so calling it again replaces them instead of adding more.
+    // A copy equal to one the owner already has (same asset effect, strength, and duration) restarts the existing
+    // one, so nothing is reapplied. A changed copy replaces the old one, and the owner's effects missing from the
+    // list are removed.
+    public void SetEffects(object source, IReadOnlyList<Effect> effects)
     {
         var previous = sourcedEffects.TryGetValue(source, out List<Effect> current)
             ? new List<Effect>(current)
@@ -108,22 +118,22 @@ public class EffectManager : MonoBehaviour
             RemoveEffect(leftover);
     }
 
-    public void Remove(object source)
+    public void ClearEffects(object source)
     {
         if (sourcedEffects.TryGetValue(source, out List<Effect> effects))
             foreach (var effect in new List<Effect>(effects))
                 RemoveEffect(effect);
     }
 
-    // Whether any effect the source applied is still running.
-    public bool IsActive(object source) => sourcedEffects.ContainsKey(source);
+    // Whether any effect the owner set is still running.
+    public bool HasEffects(object source) => sourcedEffects.ContainsKey(source);
 
     private static bool IsSameCopy(Effect a, Effect b) =>
         a.Duration == b.Duration && a.IsAtLeastAsStrongAs(b) && b.IsAtLeastAsStrongAs(a);
 
-    public void RemoveEffect(Effect effect)
+    private void RemoveEffect(Effect effect)
     {
-        statusEffects.Remove(effect);
+        hitEffects.Remove(effect);
         if (effectSources.Remove(effect, out object source))
         {
             List<Effect> list = sourcedEffects[source];

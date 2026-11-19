@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76beddaea2d54064c8b194d74f03c422, type: 3}
+  m_Name: TightPattern
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeDefinition
+  displayName: Tight Pattern
+  key: upgrade.shotgun.tightpattern
+  description: -20% spread, +12% range
+  boundModule: {fileID: 11400000, guid: 250a7571d34a251468762ef99fd40cad, type: 2}
+  role: 0
+  evolutionPath: {fileID: 0}
+  rarity: 1
+  maxStacks: 3
+  mutuallyExclusiveWith: []
+  effects:
+  - rid: 7560140318346840211
+  - rid: 7560140318346840212
+  references:
+    version: 2
+    RefIds:
+    - rid: 7560140318346840211
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: Infinity
+          baseValue: Infinity
+          minValue: 0
+        stat: 14
+        statModifier:
+          Flat: 0
+          Percent: -20
+        perLevel:
+          Flat: 0
+          Percent: 0
+        targetTags:
+        - {fileID: 11400000, guid: ab8bc2c2ea4af464784ba49640668476, type: 2}
+    - rid: 7560140318346840212
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: Infinity
+          baseValue: Infinity
+          minValue: 0
+        stat: 13
+        statModifier:
+          Flat: 0
+          Percent: 12
+        perLevel:
+          Flat: 0
+          Percent: 0
+        targetTags:
+        - {fileID: 11400000, guid: ab8bc2c2ea4af464784ba49640668476, type: 2}

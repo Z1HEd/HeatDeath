@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76beddaea2d54064c8b194d74f03c422, type: 3}
+  m_Name: Flashbang
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeDefinition
+  displayName: Flashbang
+  key: upgrade.mines.flashbang
+  description: Blasts have a 34% chance to stun for 0.25 s
+  boundModule: {fileID: 11400000, guid: 56eed34eb1876394db226823338d1c74, type: 2}
+  role: 0
+  evolutionPath: {fileID: 0}
+  rarity: 1
+  maxStacks: 3
+  mutuallyExclusiveWith: []
+  effects:
+  - rid: 7560140318346840541
+  references:
+    version: 2
+    RefIds:
+    - rid: 7560140318346840541
+      type: {class: HitEffectsEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: Infinity
+          baseValue: Infinity
+          minValue: 0
+        targetTags:
+        - {fileID: 11400000, guid: 69e6dfaa9f2c4564198e1eb8d225a1ce, type: 2}
+        chance: 0.34
+        effects:
+        - rid: 7560140318346840542
+        - rid: 7560140318346840543
+        - rid: 7560140318346840544
+        stacksRaiseStrength: 0
+        stacksRaiseDuration: 1
+    - rid: 7560140318346840542
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        visual: {fileID: 6110000000000000003, guid: bbd89c7433974020b59ec6a190c9b301, type: 3}
+        duration:
+          currentValue: 0.25
+          baseValue: 0.25
+          minValue: 0
+        stat: 22
+        statModifier:
+          Flat: 0
+          Percent: -100
+        perLevel:
+          Flat: 0
+          Percent: 0
+        targetTags:
+        - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
+    - rid: 7560140318346840543
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: 0.25
+          baseValue: 0.25
+          minValue: 0
+        stat: 4
+        statModifier:
+          Flat: 0
+          Percent: -100
+        perLevel:
+          Flat: 0
+          Percent: 0
+        targetTags:
+        - {fileID: 11400000, guid: df54a4c9aee35f5478056d725b32b0c6, type: 2}
+    - rid: 7560140318346840544
+      type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: 0.25
+          baseValue: 0.25
+          minValue: 0
+        stat: 5
+        statModifier:
+          Flat: 0
+          Percent: -100
+        perLevel:
+          Flat: 0
+          Percent: 0
+        targetTags:
+        - {fileID: 11400000, guid: df54a4c9aee35f5478056d725b32b0c6, type: 2}

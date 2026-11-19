@@ -10,8 +10,13 @@ public class HitEffectsEffect : Effect
     [SerializeField] public List<TagDefinition> targetTags = new List<TagDefinition>();
     [Tooltip("Chance per shot (per target for Tesla) that the effects apply. Stacks multiply it, up to 1.")]
     [SerializeField, Range(0f, 1f)] private float chance = 1f;
-    [Tooltip("Applied to the ship that's hit. Stacks multiply their strength.")]
+    [Tooltip("Applied to the ship that's hit.")]
     [SerializeReference, SubclassSelector] private List<Effect> effects = new List<Effect>();
+    [Tooltip("Stacks also multiply the effects' strength. Off: a debuff keeps the strength it's sized for, and stacks " +
+             "only raise its chance.")]
+    [SerializeField] private bool stacksRaiseStrength;
+    [Tooltip("Stacks also multiply the effects' durations: for stuns, which are always at full strength.")]
+    [SerializeField] private bool stacksRaiseDuration;
 
     public float Chance => chance;
     public IReadOnlyList<Effect> Effects => effects;
@@ -21,7 +26,8 @@ public class HitEffectsEffect : Effect
 
     public override void ApplyToModule(ModuleBase module) => module.GrantHitEffects(this);
 
-    // Chance first, then each effect, so EffectManager.Apply replaces the copy when stacks change.
+    // Chance first, then each effect's duration and strength, so EffectManager.SetEffects replaces the copy when
+    // stacks change.
     public override bool IsAtLeastAsStrongAs(Effect other)
     {
         if (other is not HitEffectsEffect o || o.effects.Count != effects.Count)
@@ -30,8 +36,14 @@ public class HitEffectsEffect : Effect
             return chance > o.chance;
 
         for (int i = 0; i < effects.Count; i++)
-            if (effects[i] != null && o.effects[i] != null && !effects[i].IsAtLeastAsStrongAs(o.effects[i]))
+        {
+            if (effects[i] == null || o.effects[i] == null)
+                continue;
+            if (effects[i].Duration != o.effects[i].Duration)
+                return effects[i].Duration > o.effects[i].Duration;
+            if (!effects[i].IsAtLeastAsStrongAs(o.effects[i]))
                 return false;
+        }
         return true;
     }
 
@@ -39,7 +51,14 @@ public class HitEffectsEffect : Effect
     {
         var copy = (HitEffectsEffect)base.Stacked(times);
         copy.chance = Mathf.Min(1f, chance * times);
-        copy.effects = effects.Where(e => e != null).Select(e => e.Copy(times)).ToList();
+        float strength = stacksRaiseStrength ? times : 1f;
+        copy.effects = effects.Where(e => e != null).Select(e =>
+        {
+            Effect stacked = e.Copy(strength);
+            if (stacksRaiseDuration)
+                stacked.ModifyDuration(new StatModifier(0f, (times - 1f) * 100f));
+            return stacked;
+        }).ToList();
         return copy;
     }
 }

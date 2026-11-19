@@ -4,22 +4,21 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
-public class Projectile : MonoBehaviour, IHitter
+public class Projectile : MonoBehaviour
 {
     [SerializeField]
     public GameObject sparksPrefab;
+    [Tooltip("Explosive shots only: left where the shot explodes, sized by its blast. Leave empty for none.")]
+    [SerializeField] private HazardZone hazardPrefab;
 
     [SerializeField, Range(0f, 1f)]
     [Tooltip("How much the spark direction leans toward the surface normal vs. continuing along the bullet's travel direction. 0 = pure travel direction, 1 = pure normal.")]
     private float sparkNormalBias = 0.3f;
 
-    [field: SerializeField]
-    public float Damage { get; protected set; } = 10f;
-    public float ShieldDamageMultiplier { get; protected set; } = 1f;
-    public float HPDamageMultiplier { get; protected set; } = 1f;
-    public float BackstabMultiplier { get; protected set; } = 1f;
-    public float KnockbackPower { get; protected set; } = 0f;
-    public ModuleDefinition Source { get; private set; }
+    // What the shot carries, fixed when fired, where it was fired from, and the enemies it has hit (pierce).
+    public HitPayload Payload { get; private set; }
+    public Vector2 FiredFrom { get; private set; }
+    private int enemiesHit;
     public List<Effect> appliesEffects = new();
     public List<Effect> GetEffects() { return appliesEffects; }
     protected Rigidbody2D rb;
@@ -40,12 +39,9 @@ public class Projectile : MonoBehaviour, IHitter
         if (rb != null)
             rb.linearVelocity = direction * speed;
 
-        Damage = sourceModule.projectileDamage;
-        KnockbackPower = sourceModule.projectileKnockback;
-        ShieldDamageMultiplier = sourceModule.ShieldDamageMultiplier;
-        HPDamageMultiplier = sourceModule.HPDamageMultiplier;
-        BackstabMultiplier = sourceModule.BackstabMultiplier;
-        Source = sourceModule.ModuleDefinition;
+        Payload = sourceModule.CreatePayload();
+        FiredFrom = transform.position;
+        enemiesHit = 0;
         appliesEffects = sourceModule.GetHitEffects();
         ConfigurePiercing(sourceModule.projectilePiercing);
     }
@@ -87,14 +83,25 @@ public class Projectile : MonoBehaviour, IHitter
         var hittable = collision.GetComponent<IHittable>();
         if (hittable == null || hittable.IsDead)
             return false;
-        hittable.Hit(this);
-        
+        // Pushes along the shot. A laser has no velocity, and no knockback either.
+        DamageTaken taken = hittable.TakeHit(new Hit(Payload, FiredFrom, transform.position,
+            rb.linearVelocity.normalized, enemiesHit, appliesEffects));
+        if (hittable is Ship ship)
+            Payload.ReportHit(ship.CoreModule, taken);
+        enemiesHit++;
+
         SpawnSparks(collision);
-        if (collision.GetComponent<Rigidbody2D>() != null)
-            hittable.ApplyKnockback(this, -rb.linearVelocity.normalized);
 
         TryConsumeCharge();
         return true;
+    }
+
+    // After an explosion: leaves the shot's hazard zone, if it has one, over the blast.
+    protected void LeaveHazard(Explosion explosion)
+    {
+        if (hazardPrefab != null)
+            Instantiate(hazardPrefab, explosion.transform.position, Quaternion.identity)
+                .Initialize(Payload, explosion.BlastRadius, gameObject.layer);
     }
 
     // Returns true if a charge was available. Kills self when last charge is consumed.

@@ -18,6 +18,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
   - {fileID: 11400000, guid: 2c382f2690590cb48a53051168322d54, type: 2}
   - {fileID: 11400000, guid: b03028a4aa56fc64a8afacd5404ea678, type: 2}
+  evolutionPaths:
+  - {fileID: 11400000, guid: 1d40999549514c8f83da0d88072de658, type: 2}
+  - {fileID: 11400000, guid: 49b7f145072d4160a64f9a026a58262e, type: 2}
+  baseDefinition: {fileID: 0}
   key: weapon.tesla
   description: Lightning that never misses and jumps between up to 3 enemies. Strong
     against shields, weak against hull.

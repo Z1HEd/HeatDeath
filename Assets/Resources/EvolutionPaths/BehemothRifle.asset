@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22437e67ea2c4ba8aa83d263cd0b8fb9, type: 3}
+  m_Name: BehemothRifle
+  m_EditorClassIdentifier: Assembly-CSharp::EvolutionPathDefinition
+  displayName: Behemoth Rifle
+  description: Huge, slow slugs that hit hard, knock back far, and deal 3% of the target's max hull.
+  evolvedPrefab: {fileID: 2658622645487082905, guid: 73d302464eda4546ae14133b04908df2, type: 3}

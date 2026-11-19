@@ -9,8 +9,8 @@ public class PassiveEffects : ShipModuleFeature
     [SerializeReference, SubclassSelector] private List<Effect> effects = new();
 
     public override void OnMultiplierChanged(ShipModule module) =>
-        module.Ship.effectManager.Apply(this, module.Emit(effects));
+        module.Ship.effectManager.SetEffects(this, module.Emit(effects));
 
     public override void OnDestroy(ShipModule module) =>
-        module.Ship.effectManager.Remove(this);
+        module.Ship.effectManager.ClearEffects(this);
 }

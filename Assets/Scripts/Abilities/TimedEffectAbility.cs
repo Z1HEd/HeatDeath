@@ -36,7 +36,7 @@ public class TimedEffectAbility : AbilityModule
         if (!IsActivatable) return;
         isActive = true;
         duration.ResetToMax();
-        ship.effectManager.Apply(this, EmitEffects(baseEffects, effectMultiplier));
+        ship.effectManager.SetEffects(this, EmitEffects(baseEffects, effectMultiplier));
         InvokeUpdateActivatable();
     }
 
@@ -46,7 +46,7 @@ public class TimedEffectAbility : AbilityModule
         isActive = false;
         cooldown.ResetToMax();
         InvokeUpdateActivatable();
-        ship.effectManager.Remove(this);
+        ship.effectManager.ClearEffects(this);
     }
 
     protected override void CollectStats(List<IStat> stats)

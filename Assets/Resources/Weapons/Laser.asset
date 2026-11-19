@@ -18,6 +18,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4563716c07c7ae24ab6f01d7b284ff5b, type: 2}
   - {fileID: 11400000, guid: 2c382f2690590cb48a53051168322d54, type: 2}
   - {fileID: 11400000, guid: 8457aa4a11e42bc40aa468ef37e131da, type: 2}
+  evolutionPaths:
+  - {fileID: 11400000, guid: d34cdffb70ca4f4095ea226c37a505f8, type: 2}
+  - {fileID: 11400000, guid: d01c51005d654461ba4e48864929d051, type: 2}
+  baseDefinition: {fileID: 0}
   key: weapon.laser
   description: Fires a beam straight ahead that hits every enemy in its line. Strong
     against shields, weak against hull.

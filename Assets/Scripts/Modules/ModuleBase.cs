@@ -6,6 +6,7 @@ public abstract class ModuleBase: MonoBehaviour
     [SerializeField] private ModuleDefinition moduleDefinition;
 
     protected Ship ship;
+    public Ship Ship => ship;
     public ModuleDefinition ModuleDefinition => moduleDefinition;
     public Dictionary<StatType, StatModifier> currentModifiers = new Dictionary<StatType, StatModifier>();
     // On-hit effects that effects (upgrades) give this module, rebuilt on every recalculation like the modifiers.
@@ -66,6 +67,7 @@ public abstract class ModuleBase: MonoBehaviour
 
             Effect copy = template.Copy(times);
             copy.ModifyDuration(durationModifier);
+            copy.OnEmittedBy(this);
             result.Add(copy);
         }
         return result;

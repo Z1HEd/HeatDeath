@@ -69,6 +69,16 @@ public class RangeDetector : MonoBehaviour
         return closest;
     }
 
+    // Every ship in range, destroyed ones dropped. Copy it before hitting them: a kill can change it.
+    public IReadOnlyList<Ship> Targets
+    {
+        get
+        {
+            CleanupTargets();
+            return trackedShips;
+        }
+    }
+
     private void CleanupTargets()
     {
         trackedShips.RemoveAll(ship => ship == null);

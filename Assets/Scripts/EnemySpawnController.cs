@@ -383,9 +383,12 @@ public class EnemySpawnController : MonoBehaviour
         Vector2 spawnPosition = GetRandomSpawnPosition();
         Enemy enemy = Instantiate(prefab, spawnPosition, Quaternion.identity);
 
+        // The spawner owns each enemy's scaling.
         float scalingFraction = waveEnemyMultiplier - 1f;
+        var scaling = new List<Effect>(enemyScalerEffects.Count);
         foreach (var effect in enemyScalerEffects)
-            enemy.effectManager.AddEffect(effect.Copy(scalingFraction));
+            scaling.Add(effect.Copy(scalingFraction));
+        enemy.effectManager.SetEffects(this, scaling);
 
         enemy.SetXPMultiplier(waveXPMultiplier);
 

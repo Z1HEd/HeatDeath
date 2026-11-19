@@ -14,8 +14,6 @@ public class ShipModule : ModuleBase
     // NaN, so the first recalculation counts as a change.
     private float lastMultiplier = float.NaN;
 
-    public Ship Ship => ship;
-
     // Copies at the module's EffectMultiplier, with durations scaled by its Duration modifier.
     public List<Effect> Emit(IReadOnlyList<Effect> templates) => EmitEffects(templates, effectMultiplier);
 

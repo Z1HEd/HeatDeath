@@ -9,6 +9,9 @@ Shader "Custom/LaserBeam"
         _SideFalloff ("Side Falloff (higher = thinner core)", Float) = 1.5
         _CapLength ("Parabolic Start Length (world units)", Float) = 0.5
         _PixelsPerUnit ("Pixels Per Unit (0 = smooth)", Float) = 50
+        _Rainbow ("Rainbow (1 = hue from _HueStart to _HueEnd across the beam)", Float) = 0
+        [PerRendererData] _HueStart ("Hue at the left edge", Float) = 0
+        [PerRendererData] _HueEnd ("Hue at the right edge", Float) = 0.8
     }
 
     SubShader
@@ -53,6 +56,9 @@ Shader "Custom/LaserBeam"
             float _SideFalloff;
             float _CapLength;
             float _PixelsPerUnit;
+            float _Rainbow;
+            float _HueStart;
+            float _HueEnd;
 
             v2f vert(appdata_t IN)
             {
@@ -78,7 +84,15 @@ Shader "Custom/LaserBeam"
                 float distance = abs(p.x) / max(localHalfWidth, 1e-4);
 
                 float intensity = pow(saturate(1 - distance), _SideFalloff);
-                return fixed4(IN.color.rgb, intensity * IN.color.a);
+                float3 rgb = IN.color.rgb;
+                if (_Rainbow > 0.5)
+                {
+                    // Left edge to right edge of the beam, at full saturation and brightness.
+                    float across = saturate(p.x / max(localHalfWidth, 1e-4) * 0.5 + 0.5);
+                    float hue = lerp(_HueStart, _HueEnd, across);
+                    rgb = saturate(abs(frac(hue + float3(1.0, 2.0 / 3.0, 1.0 / 3.0)) * 6.0 - 3.0) - 1.0);
+                }
+                return fixed4(rgb, intensity * IN.color.a);
             }
             ENDCG
         }

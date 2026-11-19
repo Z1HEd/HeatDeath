@@ -1,7 +1,8 @@
 using System;
 using UnityEngine;
 
-// Multiplies the ship's velocity once, when added.
+// Multiplies the ship's velocity once, when added, and then ends, whatever its duration. A lingering on-hit copy
+// would keep the target debuffed for damage bonuses.
 [Serializable]
 public class MultiplyRigidbodyVelocityEffect : Effect
 {
@@ -12,6 +13,8 @@ public class MultiplyRigidbodyVelocityEffect : Effect
     {
         ship.GetComponent<Rigidbody2D>().linearVelocity *= multiplier;
     }
+
+    public override bool Update(float delta) => false;
 
     protected override Effect Stacked(float times)
     {

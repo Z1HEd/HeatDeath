@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-public class ExplosionAbility : AbilityModule, IHitter
+public class ExplosionAbility : AbilityModule
 {
     [SerializeField] protected ScalarStat damage = new ScalarStat(StatType.Damage,0f,0f);
     [SerializeField] protected ScalarStat shieldDamageMultiplier = new ScalarStat(StatType.ShieldDamageMultiplier, 1f, -1f);
@@ -25,14 +25,12 @@ public class ExplosionAbility : AbilityModule, IHitter
     public override bool IsActive => false;
     public override float CooldownFraction => cooldown.Fraction;
     public override float DurationFraction => 0f;
-    public float Damage => damage;
-    public float ShieldDamageMultiplier => shieldDamageMultiplier;
-    public float HPDamageMultiplier => hpDamageMultiplier;
-    public float BackstabMultiplier => backstabMultiplier;
-    public float KnockbackPower => knockback;
-    public ModuleDefinition Source => ModuleDefinition;
 
-    public List<Effect> GetEffects() => EmitHitEffects(baseEffects, effectMultiplier);
+    private List<Effect> GetEffects() => EmitHitEffects(baseEffects, effectMultiplier);
+
+    // The blast's damage and types. Abilities have no damage bonuses and no weapon.
+    private HitPayload CreatePayload() => new HitPayload(damage, shieldDamageMultiplier, hpDamageMultiplier,
+        backstabMultiplier, knockback, default, ModuleDefinition, ship, null);
     public void Update()
     {
         if (cooldown.Tick(Time.deltaTime)) InvokeUpdateActivatable();
@@ -46,7 +44,7 @@ public class ExplosionAbility : AbilityModule, IHitter
         InvokeUpdateActivatable();
 
         var instance = Instantiate(explosionPrefab,transform.position,transform.rotation) as Explosion;
-        instance.Initialize(this,range,explosionLayer);
+        instance.Initialize(CreatePayload(), transform.position, GetEffects(), range, explosionLayer);
     }
 
     public override void Deactivate(){}
