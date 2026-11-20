@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 // Shock Field: a blast around the ship that reaches the weapon's range and hits everything in it. Chain targets
@@ -24,7 +23,7 @@ public class ShockFieldModule : TeslaModule
     }
 
     // Around the ship wherever it is by then, sized so the blast's edge reaches the weapon's range.
-    private void Blast(in HitPayload payload, List<Effect> effects, float damageScale)
+    private void Blast(in HitPayload payload, HitEffects effects, float damageScale)
     {
         float prefabRadius = blastPrefab.GetComponent<CircleCollider2D>().radius;
         Explosion blast = Instantiate(blastPrefab, transform.position, Quaternion.identity);

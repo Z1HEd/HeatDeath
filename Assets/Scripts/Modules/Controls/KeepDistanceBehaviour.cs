@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 public class KeepDistanceBehaviour : ControlBehaviour
 {
-    [SerializeField]
-    public float distanceMin = 4;
-    public float distanceMax = 6;
-    public void FixedUpdate()
+    [SerializeField] private float distanceMin = 4;
+    [SerializeField] private float distanceMax = 6;
+
+    private void FixedUpdate()
     {
         Player player = (ship as Enemy).Player;
         if (player == null || player.gameObject.layer != LayerMask.NameToLayer("Player")) return;

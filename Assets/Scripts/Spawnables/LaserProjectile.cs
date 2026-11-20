@@ -1,13 +1,12 @@
-using System.Collections;
 using UnityEngine;
 
+// A beam that hits every enemy in its line while it lasts: its weapon pierces without limit (-1).
 public class LaserProjectile : Projectile
 {
     [SerializeField] private float lifeTime = 0.12f;
     [Tooltip("Part of the beam's life spent expanding to full width. The rest narrows and fades.")]
     [SerializeField, Range(0.01f, 0.99f)] private float expandFraction = 0.25f;
     private float lifeTimeLeft = 0f;
-    private bool isFired = false;
     [SerializeField] private Color baseColor = new Color(1f,1f,1f);
     private Transform beam;
     private Vector3 fullBeamScale;
@@ -18,25 +17,20 @@ public class LaserProjectile : Projectile
         base.Initialize(direction, 0f, sourceModule);
         transform.up = direction;
         lifeTimeLeft = lifeTime;
-        isFired = true;
 
         beam = spriteRenderer.transform;
         fullBeamScale = beam.localScale;
         UpdateBeam(0f);
     }
 
-    public override IEnumerator Kill()
+    private void Update()
     {
-        yield break;
-    }
-    public void Update()
-    {
-        if (isDead || !isFired) return;
+        if (IsDead) return;
 
         lifeTimeLeft -= Time.deltaTime;
         if (lifeTimeLeft < 0)
         {
-            isDead = true;
+            IsDead = true;
             Destroy(gameObject);
             return;
         }

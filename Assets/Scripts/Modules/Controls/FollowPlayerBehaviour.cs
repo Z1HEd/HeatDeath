@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 public class FollowPlayerBehaviour : ControlBehaviour
 {
-    public void FixedUpdate()
+    private void FixedUpdate()
     {
         Player player = (ship as Enemy).Player;
         if (player == null || player.gameObject.layer != LayerMask.NameToLayer("Player")) return;

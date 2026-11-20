@@ -15,24 +15,22 @@ public class Ship : MonoBehaviour, IHittable
 
     private static readonly int FlashAmountID =
         Shader.PropertyToID("_FlashAmount");
-    public Action OnDeath;
-    public ModuleManager moduleManager;
+    public event Action OnDeath;
 
-    public UpgradeManager upgradeManager; 
-    public EffectManager effectManager;
-    [SerializeField]
-    private float knockbackFreezeDuration = 0.15f;
-    [SerializeField]
-    public List<ParticleSystem> deathParticles = new List<ParticleSystem>();
+    [SerializeField] private float knockbackFreezeDuration = 0.15f;
+    [SerializeField] private List<ParticleSystem> deathParticles = new List<ParticleSystem>();
 
-    protected Rigidbody2D shipRigidbody;
+    private Rigidbody2D shipRigidbody;
     private ShipCoreModule coreModule;
     private float knockbackTimeRemaining;
-    protected bool dead;
-    protected Material _material;
-    protected SpriteRenderer spriteRenderer;
+    private bool dead;
+    // The hull's own copy of its material; the guns' copies are made from it.
+    private Material hullMaterial;
     // One copy per renderer: sprites with different textures must not share a material.
     private readonly List<Material> flashMaterials = new List<Material>();
+    // The running damage flash: a new hit restarts it rather than running a second one alongside.
+    private Coroutine flashRoutine;
+    private static readonly WaitForSeconds FlashWhiteTime = new WaitForSeconds(0.03f);
 
     // Set by dev shortcuts only.
     public bool IgnoresKnockback { get; set; }
@@ -42,20 +40,23 @@ public class Ship : MonoBehaviour, IHittable
     public bool IsDead => dead;
     public ShipCoreModule CoreModule => coreModule;
     public ShipAppearance Appearance { get; private set; }
+    public ModuleManager ModuleManager { get; private set; }
+    public EffectManager EffectManager { get; private set; }
+    public UpgradeManager UpgradeManager { get; private set; }
 
     protected virtual void Awake()
     {
-        moduleManager = GetComponent<ModuleManager>();
-        effectManager = GetComponent<EffectManager>();
-        upgradeManager = GetComponent<UpgradeManager>();
+        ModuleManager = GetComponent<ModuleManager>();
+        EffectManager = GetComponent<EffectManager>();
+        UpgradeManager = GetComponent<UpgradeManager>();
         shipRigidbody = GetComponent<Rigidbody2D>();
         coreModule = GetComponentInChildren<ShipCoreModule>();
 
         // In Awake so it exists before any weapon's Start.
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        _material = Instantiate(spriteRenderer.sharedMaterial);
-        spriteRenderer.sharedMaterial = _material;
-        flashMaterials.Add(_material);
+        var spriteRenderer = GetComponent<SpriteRenderer>();
+        hullMaterial = Instantiate(spriteRenderer.sharedMaterial);
+        spriteRenderer.sharedMaterial = hullMaterial;
+        flashMaterials.Add(hullMaterial);
 
         Appearance = new ShipAppearance(this);
     }
@@ -69,10 +70,10 @@ public class Ship : MonoBehaviour, IHittable
     // Makes a renderer on this ship (a gun) take part in the damage flash.
     public void AddFlashRenderer(SpriteRenderer flashRenderer)
     {
-        if (_material == null)
+        if (hullMaterial == null)
             return;
 
-        Material copy = Instantiate(_material);
+        Material copy = Instantiate(hullMaterial);
         flashRenderer.sharedMaterial = copy;
         flashMaterials.Add(copy);
     }
@@ -100,7 +101,11 @@ public class Ship : MonoBehaviour, IHittable
         }
 
         if (taken.Hull > 0f || taken.ShieldsBroken)
-            StartCoroutine(DamageFlash());
+        {
+            if (flashRoutine != null)
+                StopCoroutine(flashRoutine);
+            flashRoutine = StartCoroutine(DamageFlash());
+        }
         ApplyHitEffects(hit.Effects);
         ApplyKnockback(hit.Push, hit.Payload.Knockback);
         return taken;
@@ -108,7 +113,7 @@ public class Ship : MonoBehaviour, IHittable
 
     private void ApplyKnockback(Vector2 push, float power)
     {
-        if (dead || IgnoresKnockback || BlocksControl || shipRigidbody == null || power <= 0f)
+        if (IgnoresKnockback || BlocksControl || power <= 0f)
             return;
 
         // A hit without a direction pushes down, as before.
@@ -119,15 +124,14 @@ public class Ship : MonoBehaviour, IHittable
         knockbackTimeRemaining = Mathf.Max(knockbackTimeRemaining, knockbackFreezeDuration);
     }
 
-    // Each ship gets its own copies: one explosion can hit several ships with the same list.
-    private void ApplyHitEffects(List<Effect> effects)
+    // Rolled for this hit, and each ship gets its own copies: one explosion can hit several ships with the same effects.
+    private void ApplyHitEffects(HitEffects effects)
     {
         if (effects == null || BlocksControl)
             return;
 
-        foreach (var effect in effects)
-            if (effect != null)
-                effectManager.AddHitEffect(effect.Copy());
+        foreach (var effect in effects.Roll())
+            EffectManager.AddHitEffect(effect.Copy());
     }
 
     public virtual void Die()
@@ -143,11 +147,12 @@ public class Ship : MonoBehaviour, IHittable
         }
         Destroy(gameObject);
     }
-    public virtual IEnumerator DamageFlash()
+    // White, then a red fade.
+    private IEnumerator DamageFlash()
     {
         SetFlash(Color.white, 1f);
 
-        yield return new WaitForSeconds(0.03f);
+        yield return FlashWhiteTime;
 
         // red damage fade
         Color red = new Color(1f, 0.2f, 0.2f);
@@ -179,25 +184,19 @@ public class Ship : MonoBehaviour, IHittable
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject == null || collision.gameObject.layer == gameObject.layer)
-            return;
-
-        ShipCoreModule core = coreModule;
-        if (core == null)
+        if (collision.gameObject.layer == gameObject.layer || coreModule == null)
             return;
 
         // Pushes the other ship away from the contact.
         var hittable = collision.gameObject.GetComponent<IHittable>();
         if (hittable != null)
-            hittable.TakeHit(core.RamHit(-collision.GetContact(0).normal));
+            hittable.TakeHit(coreModule.RamHit(-collision.GetContact(0).normal));
     }
 
 
-    public void SetTargetPosition(Vector3 targetPosition)
+    public void SetTargetPosition(Vector2 targetPosition)
     {
-        foreach (var module in moduleManager.MovementModules)
-        {
-            module.targetPosition = targetPosition;
-        }
+        foreach (var module in ModuleManager.MovementModules)
+            module.SetTargetPosition(targetPosition);
     }
 }

@@ -30,15 +30,17 @@ public class UICooldownDurationOverlay
         } 
     }
 
-    public void SetCooldownFill(float progress)
+    // The share of the cooldown left: the overlay covers that much of the button.
+    public void SetCooldownFill(float cooldownLeft)
     {
-        _cooldownProgress = Mathf.Clamp01(1f-progress);
-        _cooldownOverlay.MarkDirtyRepaint(); 
+        _cooldownProgress = Mathf.Clamp01(cooldownLeft);
+        _cooldownOverlay.MarkDirtyRepaint();
     }
-    public void SetDurationFill(float progress)
+    // The share of the duration left.
+    public void SetDurationFill(float durationLeft)
     {
-        _durationProgress = Mathf.Clamp01(1f-progress);
-        _durationOverlay.MarkDirtyRepaint(); 
+        _durationProgress = Mathf.Clamp01(durationLeft);
+        _durationOverlay.MarkDirtyRepaint();
     }
     public void SetIcon(Texture2D texture)
     {
@@ -94,22 +96,24 @@ public class UICooldownDurationOverlay
         painter.Fill();
     }
 
+    // A clock: the covered part shrinks as its hand sweeps clockwise from 12 o'clock, uncovering the button.
+    // The element clips the pie to its square.
     private void DrawRadialFill(Painter2D painter, Rect rect, float progress)
     {
-        if (progress == 1.0f || progress == 0.0f) return;
+        if (progress >= 1f)
+        {
+            DrawVerticalFill(painter, rect, 1f);
+            return;
+        }
+
         Vector2 center = rect.center;
-        
-        // Ensure the radius cleanly matches the longest dimension to reach corners
-        float radius = Mathf.Max(rect.width, rect.height) * 1.5f; 
+        // Past the corners, so the pie reaches the square's edges.
+        float radius = Mathf.Max(rect.width, rect.height);
+        float hand = -90f + 360f * (1f - progress);
 
         painter.BeginPath();
         painter.MoveTo(center);
-
-        float startAngle = -90f;
-        float endAngle = startAngle + (360f * progress);
-
-        painter.Arc(center, radius, startAngle, endAngle, ArcDirection.CounterClockwise);
-        painter.LineTo(center);
+        painter.Arc(center, radius, hand, 270f, ArcDirection.Clockwise);
         painter.ClosePath();
         painter.Fill();
     }

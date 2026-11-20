@@ -5180,7 +5180,7 @@ MonoBehaviour:
   baseEffects:
   - rid: 7560140350874189893
   - rid: 7560140350874189896
-  - rid: 7560140350874189898
+  - rid: 7560140350874189899
   - rid: 7560140350874189897
   explosionLayer: 9
   references:
@@ -5189,7 +5189,6 @@ MonoBehaviour:
     - rid: 7560140350874189893
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
-        visual: {fileID: 6110000000000000003, guid: bbd89c7433974020b59ec6a190c9b301, type: 3}
         duration:
           currentValue: 0
           baseValue: 4
@@ -5203,6 +5202,7 @@ MonoBehaviour:
     - rid: 7560140350874189896
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        visual: {fileID: 6110000000000000003, guid: bbd89c7433974020b59ec6a190c9b301, type: 3}
         duration:
           currentValue: 0
           baseValue: 4
@@ -5213,19 +5213,19 @@ MonoBehaviour:
           Percent: -100
         targetTags:
         - {fileID: 11400000, guid: df54a4c9aee35f5478056d725b32b0c6, type: 2}
-    - rid: 7560140350874189898
+    - rid: 7560140350874189899
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
         duration:
           currentValue: 0
           baseValue: 4
           minValue: 0
-        stat: 5
+        stat: 52
         statModifier:
-          Flat: 0
-          Percent: -100
+          Flat: 1
+          Percent: 0
         targetTags:
-        - {fileID: 11400000, guid: 37908810bbf1486fbf700a9dca30ed6f, type: 2}
+        - {fileID: 11400000, guid: df54a4c9aee35f5478056d725b32b0c6, type: 2}
     - rid: 7560140350874189897
       type: {class: MultiplyRigidbodyVelocityEffect, ns: , asm: Assembly-CSharp}
       data:

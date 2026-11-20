@@ -3,8 +3,8 @@ using UnityEngine;
 
 // On a StatusVisual prefab: while it's on a ship, its thrusters pour out plain grey smoke instead of fire: clouds
 // that billow out, darken, and thin away over their longer life. Copies ShipAppearance makes for thruster colours
-// ("(Clone)") take their size and life from their original, so nothing is changed twice, and everything returns to
-// normal when it's removed.
+// take their size and life from their original, so nothing is changed twice, and everything returns to normal when
+// it's removed.
 public class ThrusterSmoke : MonoBehaviour
 {
     [Tooltip("The smoke's colour as it leaves the engine; alpha is how see-through it starts.")]
@@ -17,7 +17,8 @@ public class ThrusterSmoke : MonoBehaviour
     [SerializeField] private float growth = 2.5f;
     [SerializeField] private float lifetimeMultiplier = 2f;
 
-    private struct Original
+    // A thruster's settings before the smoke, to put back.
+    private struct Saved
     {
         public ParticleSystem.MinMaxGradient StartColor;
         public ParticleSystem.MinMaxGradient ColorOverLifetime;
@@ -30,17 +31,17 @@ public class ThrusterSmoke : MonoBehaviour
     }
 
     private Ship ship;
-    private readonly Dictionary<ParticleSystem, Original> originals = new Dictionary<ParticleSystem, Original>();
+    private readonly Dictionary<ParticleSystem, Saved> saved = new Dictionary<ParticleSystem, Saved>();
 
     private void Start() => ship = GetComponentInParent<Ship>();
 
+    // Every frame: a new thruster colour can add copies at any time.
     private void Update()
     {
         if (ship == null)
             return;
-        foreach (var movement in ship.moduleManager.MovementModules)
-        foreach (var thruster in movement.GetComponentsInChildren<ParticleSystem>())
-            if (!originals.ContainsKey(thruster))
+        foreach (var thruster in ship.Appearance.Thrusters)
+            if (!saved.ContainsKey(thruster))
                 Apply(thruster);
     }
 
@@ -49,7 +50,7 @@ public class ThrusterSmoke : MonoBehaviour
         var main = thruster.main;
         var overLifetime = thruster.colorOverLifetime;
         var sizeOverLifetime = thruster.sizeOverLifetime;
-        var original = new Original
+        var original = new Saved
         {
             StartColor = main.startColor,
             ColorOverLifetime = overLifetime.color,
@@ -60,19 +61,19 @@ public class ThrusterSmoke : MonoBehaviour
             Size = main.startSizeMultiplier,
             Lifetime = main.startLifetimeMultiplier,
         };
-        // A clone was copied from an original already turned to smoke: take its size and life from the original.
-        // Its colour over lifetime is its own (ShipAppearance just set it).
-        if (CloneSource(thruster, out var source))
+        // A colour copy of a thruster already turned to smoke: take its size and life from that thruster's saved
+        // settings. Its colour over lifetime is its own (ShipAppearance just set it).
+        ParticleSystem source = ship.Appearance.OriginalOf(thruster);
+        if (source != thruster && saved.TryGetValue(source, out Saved sourceSaved))
         {
-            var sourceOriginal = originals[source];
-            original.StartColor = sourceOriginal.StartColor;
-            original.SizeOverLifetime = sourceOriginal.SizeOverLifetime;
-            original.SizeOverLifetimeEnabled = sourceOriginal.SizeOverLifetimeEnabled;
-            original.SizeSeparateAxes = sourceOriginal.SizeSeparateAxes;
-            original.Size = sourceOriginal.Size;
-            original.Lifetime = sourceOriginal.Lifetime;
+            original.StartColor = sourceSaved.StartColor;
+            original.SizeOverLifetime = sourceSaved.SizeOverLifetime;
+            original.SizeOverLifetimeEnabled = sourceSaved.SizeOverLifetimeEnabled;
+            original.SizeSeparateAxes = sourceSaved.SizeSeparateAxes;
+            original.Size = sourceSaved.Size;
+            original.Lifetime = sourceSaved.Lifetime;
         }
-        originals[thruster] = original;
+        saved[thruster] = original;
 
         main.startColor = new ParticleSystem.MinMaxGradient(Color.white);
         main.startSizeMultiplier = original.Size * sizeMultiplier;
@@ -95,24 +96,9 @@ public class ThrusterSmoke : MonoBehaviour
         return gradient;
     }
 
-    private bool CloneSource(ParticleSystem thruster, out ParticleSystem source)
-    {
-        source = null;
-        if (!thruster.name.EndsWith("(Clone)"))
-            return false;
-        string originalName = thruster.name.Substring(0, thruster.name.Length - "(Clone)".Length);
-        foreach (var known in originals.Keys)
-            if (known != null && known.name == originalName && known.transform.parent == thruster.transform.parent)
-            {
-                source = known;
-                return true;
-            }
-        return false;
-    }
-
     private void OnDestroy()
     {
-        foreach (var pair in originals)
+        foreach (var pair in saved)
         {
             if (pair.Key == null)
                 continue;

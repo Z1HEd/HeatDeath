@@ -1,13 +1,11 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
 public class Projectile : MonoBehaviour
 {
-    [SerializeField]
-    public GameObject sparksPrefab;
+    [SerializeField] private GameObject sparksPrefab;
     [Tooltip("Explosive shots only: left where the shot explodes, sized by its blast. Leave empty for none.")]
     [SerializeField] private HazardZone hazardPrefab;
 
@@ -19,11 +17,11 @@ public class Projectile : MonoBehaviour
     public HitPayload Payload { get; private set; }
     public Vector2 FiredFrom { get; private set; }
     private int enemiesHit;
-    public List<Effect> appliesEffects = new();
-    public List<Effect> GetEffects() { return appliesEffects; }
+    // Rolled again on every hit, so each ship it pierces and each blast it sets off rolls.
+    protected HitEffects HitEffects { get; private set; }
     protected Rigidbody2D rb;
     protected SpriteRenderer spriteRenderer;
-    public bool isDead { get; protected set; }
+    public bool IsDead { get; protected set; }
     private int remainingPierceHits;
     private bool hasInfinitePierce;
 
@@ -42,8 +40,8 @@ public class Projectile : MonoBehaviour
         Payload = sourceModule.CreatePayload();
         FiredFrom = transform.position;
         enemiesHit = 0;
-        appliesEffects = sourceModule.GetHitEffects();
-        ConfigurePiercing(sourceModule.projectilePiercing);
+        HitEffects = sourceModule.GetHitEffects();
+        ConfigurePiercing(sourceModule.Piercing);
     }
 
     private void ConfigurePiercing(float piercing)
@@ -59,41 +57,35 @@ public class Projectile : MonoBehaviour
         remainingPierceHits = Mathf.Max(0, Mathf.FloorToInt(piercing));
     }
 
-    public virtual IEnumerator Kill()
+    // Stops and hides the shot, and removes it once its trail and effects have faded.
+    public void Kill()
     {
-        if (isDead)
-            yield break;
+        if (IsDead)
+            return;
 
-        isDead = true;
+        IsDead = true;
         rb.linearVelocity = Vector3.zero;
         spriteRenderer.enabled = false;
+        StartCoroutine(DestroyAfterFade());
+    }
 
-        yield return new WaitForSeconds(0.2f); // Let trails and effects clear themselfes
+    private IEnumerator DestroyAfterFade()
+    {
+        yield return new WaitForSeconds(0.2f);
         Destroy(gameObject);
     }
 
-    protected virtual bool TryApplyHit(Collider2D collision)
+    // What the shot does to what it runs into: damage here, a blast for an explosive shot.
+    protected virtual void Strike(IHittable hittable, Collider2D collision)
     {
-        if (isDead)
-            return false;
-
-        if (collision.gameObject == null)
-            return false;
-
-        var hittable = collision.GetComponent<IHittable>();
-        if (hittable == null || hittable.IsDead)
-            return false;
         // Pushes along the shot. A laser has no velocity, and no knockback either.
         DamageTaken taken = hittable.TakeHit(new Hit(Payload, FiredFrom, transform.position,
-            rb.linearVelocity.normalized, enemiesHit, appliesEffects));
+            rb.linearVelocity.normalized, enemiesHit, HitEffects));
         if (hittable is Ship ship)
             Payload.ReportHit(ship.CoreModule, taken);
         enemiesHit++;
 
         SpawnSparks(collision);
-
-        TryConsumeCharge();
-        return true;
     }
 
     // After an explosion: leaves the shot's hazard zone, if it has one, over the blast.
@@ -104,25 +96,21 @@ public class Projectile : MonoBehaviour
                 .Initialize(Payload, explosion.BlastRadius, gameObject.layer);
     }
 
-    // Returns true if a charge was available. Kills self when last charge is consumed.
-    protected bool TryConsumeCharge()
+    // Each hit spends a pierce charge; the hit after the last one ends the shot.
+    protected void ConsumeCharge()
     {
-        if (isDead) return false;
-        if (hasInfinitePierce) return true;
+        if (IsDead || hasInfinitePierce)
+            return;
 
         if (remainingPierceHits > 0)
-        {
             remainingPierceHits--;
-            return true;
-        }
-
-        StartCoroutine(Kill());
-        return true;
+        else
+            Kill();
     }
 
-    protected virtual void SpawnSparks(Collider2D hitCollider)
+    private void SpawnSparks(Collider2D hitCollider)
     {
-        if (sparksPrefab == null || hitCollider == null)
+        if (sparksPrefab == null)
             return;
 
         Vector2 incomingDir = rb.linearVelocity.sqrMagnitude > 0.0001f
@@ -147,8 +135,14 @@ public class Projectile : MonoBehaviour
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
-        if (isDead) return;
+        if (IsDead)
+            return;
 
-        TryApplyHit(collision);
+        var hittable = collision.GetComponent<IHittable>();
+        if (hittable == null || hittable.IsDead)
+            return;
+
+        Strike(hittable, collision);
+        ConsumeCharge();
     }
 }

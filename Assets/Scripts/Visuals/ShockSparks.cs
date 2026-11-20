@@ -18,8 +18,13 @@ public class ShockSparks : MonoBehaviour
 
     private Ship ship;
     private float timeToNextShock;
+    private int sortingLayerID;
 
-    private void Start() => ship = GetComponentInParent<Ship>();
+    private void Start()
+    {
+        ship = GetComponentInParent<Ship>();
+        sortingLayerID = SortingLayer.NameToID("Turrets");
+    }
 
     private void Update()
     {
@@ -29,6 +34,6 @@ public class ShockSparks : MonoBehaviour
 
         timeToNextShock = Random.Range(minInterval, maxInterval);
         ShipLightningOverlay.SpawnRegional(ship, regionRadius, Random.Range(1, maxFlickers + 1), flickerLength,
-            material, SortingLayer.NameToID("Turrets"), 10);
+            material, sortingLayerID, 10);
     }
 }

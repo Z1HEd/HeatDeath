@@ -7,8 +7,9 @@ using UnityEngine;
 [Serializable]
 public class HitEffectsEffect : Effect
 {
-    [SerializeField] public List<TagDefinition> targetTags = new List<TagDefinition>();
-    [Tooltip("Chance per shot (per target for Tesla) that the effects apply. Stacks multiply it, up to 1.")]
+    [SerializeField] private List<TagDefinition> targetTags = new List<TagDefinition>();
+    [Tooltip("Chance per hit that the effects apply: each ship a shot hits, and each blast, rolls on its own. Stacks " +
+             "multiply it, up to 1.")]
     [SerializeField, Range(0f, 1f)] private float chance = 1f;
     [Tooltip("Applied to the ship that's hit.")]
     [SerializeReference, SubclassSelector] private List<Effect> effects = new List<Effect>();

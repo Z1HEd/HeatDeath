@@ -33,7 +33,7 @@ public class ThunderSpearModule : TeslaModule
                 return false;
 
             var bolt = new List<Ship> { target };
-            ApplyChainDamage(bolt, shot, damageScale, true);
+            ApplyChainDamage(bolt, shot, damageScale);
             ShowLightning(bolt);
             return true;
         }));

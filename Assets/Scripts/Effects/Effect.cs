@@ -8,22 +8,29 @@ public abstract class Effect
 {
     [SerializeField]
     protected ResourceStat duration = new ResourceStat(StatType.Duration,float.PositiveInfinity,0f);
-    [Tooltip("Shown on the ship while this effect is on it (a stun's sparks, a slow's sputter). Effects with the " +
-             "same prefab share one visual. For a debuff made of several effects, set it on one of them.")]
+    [Tooltip("Shown on the ship while this effect applies (a stun's sparks, a slow's smoke). Effects with the same " +
+             "prefab share one visual. For a debuff made of several effects, set it on the part that defines it: a " +
+             "stun's Thrust, since a full jam can match its weapon part and keep it waiting.")]
     [SerializeField] private StatusVisual visual;
+    // Time since it started, so an effect that wasn't copied (one saved in a prefab, or built in code) starts at its
+    // full duration.
     [NonSerialized] private float elapsed;
-    // The asset effect this is a copy of, so EffectManager.SetEffects can match copies of the same effect.
+    // The asset effect this is a copy of, so EffectManager can match copies of the same effect.
     [NonSerialized] private Effect template;
 
     public float Duration => duration.BaseValue;
-    public float TimeLeft => duration.BaseValue - elapsed;
+    public float TimeLeft => Duration - elapsed;
     public StatusVisual Visual => visual;
     public Effect Template => template ?? this;
 
-    public virtual bool Update(float delta)
+    // Runs while the effect applies. Returns false once it has run out.
+    public virtual bool Update(float delta) => Elapse(delta);
+
+    // Only the time passes: for an on-hit effect waiting behind a stronger one in its slot.
+    public bool Elapse(float delta)
     {
         elapsed += delta;
-        return elapsed < duration.BaseValue;
+        return elapsed < Duration;
     }
 
     // The only way to hand out an effect: definition assets are shared and must not change at runtime.
@@ -38,6 +45,14 @@ public abstract class Effect
 
     // Restarts the duration without reapplying the effect.
     public void Restart() => elapsed = 0f;
+
+    // A repeat of this effect lasts as long as the longer of the two, and changes nothing else (a DOT keeps its ticks).
+    // A repeat that lasts longer than this copy's whole duration moves its start ahead of now.
+    public void ExtendTo(float time)
+    {
+        if (time > TimeLeft)
+            elapsed = Duration - time;
+    }
 
     // A copy at times the strength, for stacks and multipliers. The default clones the effect, which fits
     // effects with nothing to scale. Override it to scale strength, and IsAtLeastAsStrongAs with it.
@@ -56,11 +71,11 @@ public abstract class Effect
     // Looks and ghosting: rebuilt from every active effect on each recalculation, like stats.
     public virtual void ApplyToAppearance(ShipAppearance appearance) {}
 
-    // On-hit effects in the same slot don't stack: see EffectManager.AddHitEffect.
+    // On-hit effects in the same slot don't stack: the strongest applies. See EffectManager.AddHitEffect.
     public virtual bool SharesSlotWith(Effect other) => other != null && other.GetType() == GetType();
 
-    // Compared between effects that share a slot, and between copies of one effect in EffectManager.SetEffects.
-    // Equal strength counts as true, so a repeat hit restarts.
+    // Compared between effects that share a slot, and between copies of one effect in EffectManager. Equal strength
+    // counts as true, so a repeat hit extends the effect.
     public virtual bool IsAtLeastAsStrongAs(Effect other) => true;
 
     // Called on each copy a module hands out (ModuleBase.EmitEffects), so an effect that deals damage can credit it.

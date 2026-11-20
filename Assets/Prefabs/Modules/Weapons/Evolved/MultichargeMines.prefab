@@ -160,7 +160,7 @@ MonoBehaviour:
     currentValue: 0
     baseValue: 0
     minValue: 0
-  ExplosionRange:
+  blastDiameter:
     currentValue: 0
     baseValue: 3
     minValue: 0

@@ -5,13 +5,11 @@ using UnityEngine;
 [Serializable]
 public class StatModifierEffect : Effect
 {
-    [SerializeField] public StatType stat;
-    [SerializeField] public StatModifier statModifier;
+    [SerializeField] private StatType stat;
+    [SerializeField] private StatModifier statModifier;
     [Tooltip("Added once per player level on top of statModifier: weak early, strong late.")]
-    [SerializeField] public StatModifier perLevel;
-    [SerializeField] public List<TagDefinition> targetTags = new List<TagDefinition>();
-
-    public bool HasTargetTags => targetTags != null && targetTags.Count > 0;
+    [SerializeField] private StatModifier perLevel;
+    [SerializeField] private List<TagDefinition> targetTags = new List<TagDefinition>();
 
     // The modifier at the player's current level. The player's effects are recalculated on each level-up.
     public StatModifier CurrentModifier
@@ -38,12 +36,8 @@ public class StatModifierEffect : Effect
         return moduleDefinition.MatchesAnyTag(targetTags);
     }
 
-    public override void ApplyToModule(ModuleBase module)
-    {
-        var map = module.currentModifiers;
-        map.TryGetValue(stat, out StatModifier currentModifier);
-        map[stat] = StatModifier.Combine(currentModifier, CurrentModifier);
-    }
+    public override void ApplyToModule(ModuleBase module) => module.AddModifier(stat, CurrentModifier);
+
     // Same stat, same targets, same direction: a slow and a speed-up never share a slot.
     public override bool SharesSlotWith(Effect other)
     {
@@ -59,14 +53,14 @@ public class StatModifierEffect : Effect
         if (other is not StatModifierEffect o)
             return true;
 
-        float[] mine = { statModifier.Percent, statModifier.Flat, perLevel.Percent, perLevel.Flat };
-        float[] theirs = { o.statModifier.Percent, o.statModifier.Flat, o.perLevel.Percent, o.perLevel.Flat };
-        for (int i = 0; i < mine.Length; i++)
-            if (Mathf.Abs(mine[i]) != Mathf.Abs(theirs[i]))
-                return Mathf.Abs(mine[i]) > Mathf.Abs(theirs[i]);
-
-        return true;
+        int order = CompareSize(statModifier.Percent, o.statModifier.Percent);
+        if (order == 0) order = CompareSize(statModifier.Flat, o.statModifier.Flat);
+        if (order == 0) order = CompareSize(perLevel.Percent, o.perLevel.Percent);
+        if (order == 0) order = CompareSize(perLevel.Flat, o.perLevel.Flat);
+        return order >= 0;
     }
+
+    private static int CompareSize(float a, float b) => Mathf.Abs(a).CompareTo(Mathf.Abs(b));
 
     private float Direction
     {

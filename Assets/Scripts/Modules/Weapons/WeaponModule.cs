@@ -1,32 +1,26 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 using System;
 using System.Collections.Generic;
 
-[ExecuteAlways]
 public abstract class WeaponModule : ModuleBase
 {
-    [SerializeField] public Transform firePoint;
+    // The weapon's first child: where its shots start.
+    protected Transform firePoint;
     [SerializeField] protected ResourceStat fireCooldown = new ResourceStat(StatType.Cooldown, 1f, 0f);
     [SerializeField] protected ScalarStat timeScale = new ScalarStat(StatType.TimeScale, 1f, 0f);
     [SerializeField] protected ScalarStat range = new ScalarStat(StatType.Range, 15f, 0f);
     
-    [SerializeField] public BoolStat canAim = new BoolStat(StatType.CanAim, true);
+    [SerializeField] protected BoolStat canAim = new BoolStat(StatType.CanAim, true);
     [Tooltip("Applied to each ship this weapon hits.")]
     [SerializeReference, SubclassSelector] private List<Effect> appliesEffects = new();
 
-    // Every weapon's hit. The old names are ProjectileModule's; Tesla's fields already had these names.
+    // Every weapon's hit.
     [Header("Damage")]
-    [SerializeField, FormerlySerializedAs("projectileDamage")]
-    protected ScalarStat damage = new ScalarStat(StatType.Damage, 10f, 0f);
-    [SerializeField, FormerlySerializedAs("ShieldDamageMultiplier")]
-    protected ScalarStat shieldDamageMultiplier = new ScalarStat(StatType.ShieldDamageMultiplier, 1f, -1f);
-    [SerializeField, FormerlySerializedAs("HPDamageMultiplier")]
-    protected ScalarStat hpDamageMultiplier = new ScalarStat(StatType.HPDamageMultiplier, 1f, -1f);
-    [SerializeField, FormerlySerializedAs("BackstabMultiplier")]
-    protected ScalarStat backstabMultiplier = new ScalarStat(StatType.BackstabMultiplier, 1f, 0f);
-    [SerializeField, FormerlySerializedAs("projectileKnockback")]
-    protected ScalarStat knockback = new ScalarStat(StatType.ProjectileKnockback, 0f, 0f);
+    [SerializeField] protected ScalarStat damage = new ScalarStat(StatType.Damage, 10f, 0f);
+    [SerializeField] protected ScalarStat shieldDamageMultiplier = new ScalarStat(StatType.ShieldDamageMultiplier, 1f, -1f);
+    [SerializeField] protected ScalarStat hpDamageMultiplier = new ScalarStat(StatType.HPDamageMultiplier, 1f, -1f);
+    [SerializeField] protected ScalarStat backstabMultiplier = new ScalarStat(StatType.BackstabMultiplier, 1f, 0f);
+    [SerializeField] protected ScalarStat knockback = new ScalarStat(StatType.ProjectileKnockback, 0f, 0f);
 
     [Header("Damage bonuses (percent)")]
     [Tooltip("Of the target's max hull, added to each hit. Worthless early, grows with enemy scaling.")]
@@ -90,26 +84,27 @@ public abstract class WeaponModule : ModuleBase
             momentumLeft = momentumDuration;
     }
 
-    // Fresh copies of the on-hit effects, own and granted by upgrades, for one shot (one target for Tesla).
-    public List<Effect> GetHitEffects() => EmitHitEffects(appliesEffects);
+    // Fresh copies of the on-hit effects, own and granted by upgrades, for one shot. Each hit rolls the chances.
+    public HitEffects GetHitEffects() => EmitHitEffects(appliesEffects);
 
     protected RangeDetector rangeDetector;
-    public event Action<float> updateCooldownOverlay;
+    // Every frame, with CooldownLeft: the HUD button follows it.
+    public event Action<float> OnCooldownChanged;
 
     protected int DetectLayer { get; private set; }
 
     protected override void Awake()
     {
         base.Awake();
-        
-        DetermineWeaponLayer();
+        firePoint = transform.GetChild(0);
+
+        // Player weapons detect enemies, enemy weapons the player.
+        DetectLayer = LayerMask.NameToLayer(ship is Player ? "DetectEnemy" : "DetectPlayer");
         gameObject.layer = DetectLayer;
 
-        EnsureRangeDetector();
+        rangeDetector = RangeDetector.FindOrCreate(transform);
         rangeDetector.gameObject.layer = DetectLayer;
-
         rangeDetector.Initialize(range);
-        firePoint = transform.GetChild(0);
     }
 
     protected override void Start()
@@ -122,8 +117,9 @@ public abstract class WeaponModule : ModuleBase
     }
 
     protected bool IsStunned => timeScale <= 0f;
-    public virtual bool CanFire => !IsStunned && fireCooldown == fireCooldown.MinValue;
-    public virtual float CooldownFraction => Mathf.Clamp01(1f - fireCooldown.Fraction);
+    public virtual bool CanFire => !IsStunned && fireCooldown.CurrentValue <= 0f;
+    // The share of the cooldown left: 1 just after firing, 0 when ready.
+    public float CooldownLeft => fireCooldown.Fraction;
 
     protected virtual void Update()
     {
@@ -131,49 +127,33 @@ public abstract class WeaponModule : ModuleBase
         momentumLeft = Mathf.Max(0f, momentumLeft - Time.deltaTime);
         float momentum = momentumLeft > 0f ? 1f + momentumFireRate / 100f : 1f;
         fireCooldown.Consume(Time.deltaTime, timeScale * momentum);
-        updateCooldownOverlay?.Invoke(CooldownFraction);
+        OnCooldownChanged?.Invoke(CooldownLeft);
     }
 
     protected virtual void Fire() { fireCooldown.ResetToMax(); }
 
-    protected void OnValidate()
+    // Turns the weapon so its fire point faces the target, unless it can't aim or is stunned.
+    protected void AimAt(Ship target)
     {
-        UpdateRange();
+        if (!canAim || IsStunned)
+            return;
+
+        Vector2 currentAim = firePoint.position - transform.position;
+        Vector2 towardsTarget = target.transform.position - transform.position;
+        transform.Rotate(0f, 0f, Vector2.SignedAngle(currentAim, towardsTarget));
     }
 
-    private void DetermineWeaponLayer()
+#if UNITY_EDITOR
+    // The range in the scene view while the weapon or its ship is selected: the base range, or the current one in play.
+    private void OnDrawGizmosSelected()
     {
-        DetectLayer = GetLayerForShip("DetectPlayer", "DetectEnemy");
+        UnityEditor.Handles.color = Color.yellow;
+        UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.forward,
+            Application.isPlaying ? range : range.BaseValue);
     }
+#endif
 
-    private int GetLayerForShip(string playerLayerName, string enemyLayerName)
-    {
-        if (ship is Player)
-            return LayerMask.NameToLayer(enemyLayerName);
 
-        if (ship is Enemy)
-            return LayerMask.NameToLayer(playerLayerName);
-
-        return 0;
-    }
-
-    protected void EnsureRangeDetector()
-    {
-        if (rangeDetector == null)
-            rangeDetector = GetComponentInChildren<RangeDetector>(true);
-        if (rangeDetector == null)
-        {
-            GameObject detectorObject = new GameObject("RangeDetector");
-            detectorObject.transform.SetParent(transform, false);
-            rangeDetector = detectorObject.AddComponent<RangeDetector>();
-        }
-    }
-
-    private void UpdateRange()
-    {
-        if (!rangeDetector) return;
-        rangeDetector.SetRadius(range);
-    }
     protected override void CollectStats(List<IStat> stats)
     {
         base.CollectStats(stats);
@@ -200,9 +180,6 @@ public abstract class WeaponModule : ModuleBase
         stats.Add(momentumDuration);
     }
 
-    protected override void OnStatsChanged()
-    {
-        UpdateRange();
-    }
+    protected override void OnStatsChanged() => rangeDetector.SetRadius(range);
 }
 

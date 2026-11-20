@@ -24,7 +24,7 @@ public class SpeedParticlesScaler : MonoBehaviour
         var mainModule = particles.main;
         var emission = particles.emission;
         // Against the unmodified max speed, so a speed boost doesn't thin out the particles.
-        var multiplier = Mathf.Clamp(movementModule.body.linearVelocity.magnitude / movementModule.maxSpeed.BaseValue,0.5f,1f);
+        var multiplier = Mathf.Clamp(movementModule.Speed / movementModule.BaseMaxSpeed, 0.5f, 1f);
         mainModule.startSpeed = startSpeed *multiplier;
         emission.rateOverTime = emissionRate *multiplier;
     }

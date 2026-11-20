@@ -24,8 +24,8 @@ public enum StatType
 	Lifetime = 17,
 	ShieldDamageMultiplier = 18,
 	HPDamageMultiplier = 19,
-	ExplosionRange = 20,
-	ProjectileRange = 21,
+	BlastDiameter = 20,
+	SeekingRange = 21,
 	TimeScale = 22,
 	HPRegen = 23,
     Duration = 24,
@@ -56,6 +56,7 @@ public enum StatType
     DischargeDamage = 49,
     DischargeTargets = 50,
     ShieldsOffline = 51,
+    Drag = 52,
 }
 
 [Serializable]

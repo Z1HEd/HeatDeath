@@ -1,15 +1,15 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Ship))]
 public class ModuleManager : MonoBehaviour
 {
-    protected Ship ship;
-    private List<ModuleBase> modules = new List<ModuleBase>();
-    private List<WeaponDefinition> weaponDefinitions = new List<WeaponDefinition>();
+    private readonly List<ModuleBase> modules = new List<ModuleBase>();
+    private readonly List<WeaponDefinition> weaponDefinitions = new List<WeaponDefinition>();
 
+    // Every installed module, for code that runs each frame: no list is made.
+    public IReadOnlyList<ModuleBase> Modules => modules;
     public List<MovementModule> MovementModules => GetModules<MovementModule>();
     public List<WeaponModule> WeaponModules => GetModules<WeaponModule>();
     [SerializeField]
@@ -18,9 +18,8 @@ public class ModuleManager : MonoBehaviour
     // The old module and its replacement, raised before the old one is destroyed.
     public event Action<ModuleBase, ModuleBase> OnModuleReplaced;
 
-    public void Start()
+    private void Start()
     {
-        ship = GetComponent<Ship>();
         if (turretMounts == null)
             turretMounts = transform.Find("TurretMounts");
     }
@@ -48,15 +47,6 @@ public class ModuleManager : MonoBehaviour
         return result;
     }
 
-    public T GetFirstModule<T>() where T : ModuleBase
-    {
-        foreach (var module in modules)
-        {
-            if (module is T typedModule)
-                return typedModule;
-        }
-        return null;
-    }
 
     public bool HasModule(ModuleDefinition definition)
     {

@@ -45,7 +45,6 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::StatusVisual
   material: {fileID: 2100000, guid: 338c026ef8fc45b8bc00896d5ed1c1b5, type: 2}
-  placement: 2
-  aroundSize: 1.6
+  placement: 1
   fadeTime: 0.15
   sortingOffset: 5

@@ -1,71 +1,52 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// The ships inside a trigger circle, centred on its parent (a weapon, a missile). Its layer decides which ships count.
 [RequireComponent(typeof(CircleCollider2D))]
 public class RangeDetector : MonoBehaviour
 {
-    [SerializeField] private float range = 15f;
     private CircleCollider2D circleCollider;
-    [SerializeField]
-    private List<Ship> trackedShips = new List<Ship>();
+    // Serialized to show in the inspector.
+    [SerializeField] private List<Ship> trackedShips = new List<Ship>();
 
-    public System.Action<Ship> OnShipExitedRange;
+    public event System.Action<Ship> OnShipExitedRange;
 
-    private void OnValidate()
+    // The detector under parent, made if it has none.
+    public static RangeDetector FindOrCreate(Transform parent)
     {
-        var col = GetComponent<CircleCollider2D>();
-        if (col != null)
-            col.radius = range;
+        var detector = parent.GetComponentInChildren<RangeDetector>(true);
+        if (detector == null)
+        {
+            detector = new GameObject("RangeDetector").AddComponent<RangeDetector>();
+            detector.transform.SetParent(parent, false);
+        }
+        return detector;
     }
 
-    public void Initialize(float range)
+    public void Initialize(float radius)
     {
         trackedShips.Clear();
         circleCollider = GetComponent<CircleCollider2D>();
         circleCollider.isTrigger = true;
         circleCollider.offset = Vector2.zero;
-        SetRadius(range);
+        SetRadius(radius);
     }
 
-    public void SetRadius(float newRange)
-    {
-        range = newRange;
-        if (circleCollider != null)
-            circleCollider.radius = newRange;
-    }
+    public void SetRadius(float radius) => circleCollider.radius = radius;
+
     public Ship GetClosestTarget()
     {
-        return GetClosestTargetTo(transform.position, null);
-    }
-
-    public Ship GetClosestTarget(Transform origin)
-    {
-        return GetClosestTargetTo(origin.position, null);
-    }
-
-    public Ship GetClosestTargetTo(Vector2 position, ICollection<Ship> exclude)
-    {
-        CleanupTargets();
-
         Ship closest = null;
         float closestSqr = float.MaxValue;
-
-        foreach (var ship in trackedShips)
+        foreach (var ship in Targets)
         {
-            if (ship == null)
-                continue;
-
-            if (exclude != null && exclude.Contains(ship))
-                continue;
-
-            float sqr = ((Vector2)ship.transform.position - position).sqrMagnitude;
+            float sqr = (ship.transform.position - transform.position).sqrMagnitude;
             if (sqr < closestSqr)
             {
                 closestSqr = sqr;
                 closest = ship;
             }
         }
-
         return closest;
     }
 
@@ -86,22 +67,13 @@ public class RangeDetector : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject == null)
-            return;
-
         var ship = other.GetComponent<Ship>();
-        if (ship == null)
-            return;
-
-        if (!trackedShips.Contains(ship))
+        if (ship != null && !trackedShips.Contains(ship))
             trackedShips.Add(ship);
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject == null)
-            return;
-
         var ship = other.GetComponent<Ship>();
         if (ship == null)
             return;

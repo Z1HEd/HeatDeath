@@ -388,7 +388,7 @@ public class EnemySpawnController : MonoBehaviour
         var scaling = new List<Effect>(enemyScalerEffects.Count);
         foreach (var effect in enemyScalerEffects)
             scaling.Add(effect.Copy(scalingFraction));
-        enemy.effectManager.SetEffects(this, scaling);
+        enemy.EffectManager.SetEffects(this, scaling);
 
         enemy.SetXPMultiplier(waveXPMultiplier);
 

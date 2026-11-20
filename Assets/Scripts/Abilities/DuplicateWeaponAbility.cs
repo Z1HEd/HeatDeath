@@ -4,17 +4,17 @@ using System;
 public class DuplicateWeaponAbility : AbilityModule
 {
     private WeaponModule spawnedWeapon;
-    public override float CooldownFraction {get {return spawnedWeapon != null ? spawnedWeapon.CooldownFraction : 0f;}}
+    public override float CooldownLeft => spawnedWeapon != null ? spawnedWeapon.CooldownLeft : 0f;
     protected override void Awake()
     {
         base.Awake();
-        ship.moduleManager.OnWeaponAdded += DuplicateWeapon;
-        ship.moduleManager.OnModuleReplaced += FollowReplacement;
+        ship.ModuleManager.OnWeaponAdded += DuplicateWeapon;
+        ship.ModuleManager.OnModuleReplaced += FollowReplacement;
     }
     protected void DuplicateWeapon(WeaponDefinition definition)
     {
-        ship.moduleManager.OnWeaponAdded -= DuplicateWeapon;
-        SetCopy(ship.moduleManager.AddWeapon(definition));
+        ship.ModuleManager.OnWeaponAdded -= DuplicateWeapon;
+        SetCopy(ship.ModuleManager.AddWeapon(definition));
     }
     // The copy evolves along with the weapon it copies.
     private void FollowReplacement(ModuleBase old, ModuleBase replacement)
@@ -26,11 +26,11 @@ public class DuplicateWeaponAbility : AbilityModule
     {
         spawnedWeapon = weapon;
         icon = spawnedWeapon.GetComponent<SpriteRenderer>().sprite.texture;
-        InvokeUpdateIcon();
+        RaiseIconChanged();
     }
-    public void Update()
+    private void Update()
     {
         if (spawnedWeapon)
-            InvokeUpdateCooldown();
+            RaiseCooldownChanged();
     }
 }

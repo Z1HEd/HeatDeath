@@ -21,14 +21,14 @@ public class UpgradeManager : MonoBehaviour
     // Keyed by the installed module's definition; for the core, the ship's own core.
     private readonly Dictionary<ModuleDefinition, SlotGroup> groups = new Dictionary<ModuleDefinition, SlotGroup>();
 
-    public void Awake()
+    private void Awake()
     {
         ship = GetComponent<Ship>();
     }
 
     // The installed module whose slots the upgrade fills: its bound module, or the ship's core when the upgrade
     // is bound to the shared core. Null while neither is installed.
-    public ModuleDefinition GroupOf(UpgradeDefinition upgrade) => ship.moduleManager.FindInstalled(upgrade.BoundModule);
+    public ModuleDefinition GroupOf(UpgradeDefinition upgrade) => ship.ModuleManager.FindInstalled(upgrade.BoundModule);
 
     // Whether the upgrade can be taken now. The single rule for what drafts may offer.
     public bool CanTake(UpgradeDefinition upgrade)
@@ -83,7 +83,7 @@ public class UpgradeManager : MonoBehaviour
     public void ClearAll()
     {
         foreach (var upgrade in stackCounts.Keys)
-            ship.effectManager.ClearEffects(upgrade);
+            ship.EffectManager.ClearEffects(upgrade);
 
         stackCounts.Clear();
         groups.Clear();
@@ -96,7 +96,7 @@ public class UpgradeManager : MonoBehaviour
         var copies = new List<Effect>();
         foreach (var effect in upgrade.Effects)
             copies.Add(effect.Copy(stacks));
-        ship.effectManager.SetEffects(upgrade, copies);
+        ship.EffectManager.SetEffects(upgrade, copies);
     }
 
     public int GetStackCount(UpgradeDefinition upgrade)
@@ -144,7 +144,7 @@ public class UpgradeManager : MonoBehaviour
 
         GetSlots(group).path = path;
         if (path.EvolvedPrefab != null)
-            ship.moduleManager.ReplaceModule(group, path.EvolvedPrefab);
+            ship.ModuleManager.ReplaceModule(group, path.EvolvedPrefab);
     }
 
     private bool IsCore(ModuleDefinition group) => ship.CoreModule != null && group == ship.CoreModule.ModuleDefinition;

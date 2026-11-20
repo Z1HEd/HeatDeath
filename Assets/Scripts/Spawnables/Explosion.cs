@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 public class Explosion : MonoBehaviour
 {
-    [Tooltip("Screen shake for a base missile's blast (radius 1.25). Bigger blasts shake harder and longer, in proportion.")]
-    [SerializeField]
-    public float shakeScreenDuration = 0.25f;
+    [Tooltip("Screen shake for a base missile's blast (radius 1.25). Bigger blasts shake harder and longer, in " +
+             "proportion. 0: no shake.")]
+    [SerializeField] private float shakeScreenDuration = 0.25f;
     [Tooltip("Screen shake for a base missile's blast (radius 1.25). Bigger blasts shake harder and longer, in proportion.")]
     [SerializeField] private float shakeStrength = 0.1f;
     private const float ShakeReferenceRadius = 1.25f;
@@ -13,17 +13,18 @@ public class Explosion : MonoBehaviour
     // there.
     private HitPayload payload;
     private Vector2 firedFrom;
-    private List<Effect> appliesEffects;
+    private HitEffects appliesEffects;
     // Share of the payload's damage: a Tesla pulse after the first is weaker.
     private float damageScale;
 
-    public const float EXPANSION_DURATION = 0.2f;
+    // The blast grows for this long and hits what it reaches meanwhile, then fades.
+    private const float ExpansionDuration = 0.2f;
     // Knockback falls from full at the centre to this share at the edge of the blast.
-    private const float EDGE_PUSH = 0.5f;
+    private const float EdgePush = 0.5f;
     [SerializeField] private float fadeDuration = 0.3f;
 
     private float timer;
-    private float targetRadius;
+    private float targetScale;
     private int detectLayer;
 
     private bool expanding = true;
@@ -33,7 +34,8 @@ public class Explosion : MonoBehaviour
 
     private readonly HashSet<Ship> hitShips = new();
 
-    public void Initialize(in HitPayload payload, Vector2 firedFrom, List<Effect> effects, float radius, int detectLayer,
+    // scale: the prefab's size when fully grown. Blast prefabs have a collider radius of 0.5, so it's the diameter.
+    public void Initialize(in HitPayload payload, Vector2 firedFrom, HitEffects effects, float scale, int detectLayer,
         float damageScale = 1f)
     {
         this.payload = payload;
@@ -44,7 +46,7 @@ public class Explosion : MonoBehaviour
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         circleCollider = GetComponent<CircleCollider2D>();
 
-        this.targetRadius = radius;
+        targetScale = scale;
         this.detectLayer = detectLayer;
 
         hitShips.Clear();
@@ -67,9 +69,9 @@ public class Explosion : MonoBehaviour
 
         if (expanding)
         {
-            float t = Mathf.Clamp01(timer / EXPANSION_DURATION);
+            float t = Mathf.Clamp01(timer / ExpansionDuration);
 
-            transform.localScale = Vector3.one * Mathf.Lerp(0f, targetRadius, t);
+            transform.localScale = Vector3.one * Mathf.Lerp(0f, targetScale, t);
 
             // Fully visible during damage phase
             var c = spriteRenderer.color;
@@ -88,7 +90,7 @@ public class Explosion : MonoBehaviour
         {
             float t = Mathf.Clamp01(timer / fadeDuration);
 
-            transform.localScale = Vector3.one * targetRadius;
+            transform.localScale = Vector3.one * targetScale;
 
             var c = spriteRenderer.color;
             spriteRenderer.color = new Color(c.r, c.g, c.b, 1f - t);
@@ -118,14 +120,14 @@ public class Explosion : MonoBehaviour
     }
 
     // The blast's full radius in world units, once Initialize has run.
-    public float BlastRadius => circleCollider.radius * targetRadius;
+    public float BlastRadius => circleCollider.radius * targetScale;
 
-    // Away from the centre: full knockback at the centre, EDGE_PUSH of it at the blast's full radius.
+    // Away from the centre: full knockback at the centre, EdgePush of it at the blast's full radius.
     private Vector2 PushOn(Ship ship)
     {
         Vector2 offset = ship.transform.position - transform.position;
         float blastRadius = BlastRadius;
         float towardEdge = blastRadius > 0f ? Mathf.Clamp01(offset.magnitude / blastRadius) : 1f;
-        return offset.normalized * Mathf.Lerp(1f, EDGE_PUSH, towardEdge);
+        return offset.normalized * Mathf.Lerp(1f, EdgePush, towardEdge);
     }
 }

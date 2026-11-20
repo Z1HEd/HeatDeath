@@ -15,19 +15,19 @@ public class TimedEffectAbility : AbilityModule
     private bool isActive = false;
     public override bool IsActivatable => !isActive && cooldown.CurrentValue == 0f;
     public override bool IsActive => isActive;
-    public override float CooldownFraction => cooldown.Fraction;
-    public override float DurationFraction => duration.Fraction;
-    public void Update()
+    public override float CooldownLeft => cooldown.Fraction;
+    public override float DurationLeft => duration.Fraction;
+    private void Update()
     {
         if (isActive)
         {
             duration.Consume(Time.deltaTime);
             if (duration <=0) Deactivate();
-            InvokeUpdateDuration();
+            RaiseDurationChanged();
         }
         else{
-            if (cooldown.Tick(Time.deltaTime)) InvokeUpdateActivatable();
-            InvokeUpdateCooldown();
+            if (cooldown.Tick(Time.deltaTime)) RaiseActivatableChanged();
+            RaiseCooldownChanged();
         }
     }
 
@@ -36,8 +36,8 @@ public class TimedEffectAbility : AbilityModule
         if (!IsActivatable) return;
         isActive = true;
         duration.ResetToMax();
-        ship.effectManager.SetEffects(this, EmitEffects(baseEffects, effectMultiplier));
-        InvokeUpdateActivatable();
+        ship.EffectManager.SetEffects(this, EmitEffects(baseEffects, effectMultiplier));
+        RaiseActivatableChanged();
     }
 
     public override void Deactivate()
@@ -45,8 +45,8 @@ public class TimedEffectAbility : AbilityModule
         if (!isActive) return;
         isActive = false;
         cooldown.ResetToMax();
-        InvokeUpdateActivatable();
-        ship.effectManager.ClearEffects(this);
+        RaiseActivatableChanged();
+        ship.EffectManager.ClearEffects(this);
     }
 
     protected override void CollectStats(List<IStat> stats)

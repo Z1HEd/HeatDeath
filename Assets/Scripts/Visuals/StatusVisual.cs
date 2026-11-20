@@ -8,18 +8,15 @@ using UnityEngine;
 // prefab (ThrusterCut) act while it's there.
 public class StatusVisual : MonoBehaviour
 {
-    public enum Placement { Hull, AroundShip, Weapons }
+    public enum Placement { Hull, Weapons }
 
     private static readonly int VelocityId = Shader.PropertyToID("_Velocity");
-    private static Sprite squareSprite;
 
     [Tooltip("Empty for a look drawn only by other components on the prefab (ShockSparks).")]
     [SerializeField] private Material material;
-    [Tooltip("Hull: a copy of the ship's sprite. AroundShip: a square around the ship. Weapons: a copy of each " +
-             "weapon's sprite, including weapons added later.")]
+    [Tooltip("Hull: a copy of the ship's sprite. Weapons: a copy of each weapon's sprite, including weapons added " +
+             "later.")]
     [SerializeField] private Placement placement = Placement.Hull;
-    [Tooltip("AroundShip: the square's side as a share of the hull's longest side.")]
-    [SerializeField] private float aroundSize = 1.6f;
     [Tooltip("Hull: the copy's size relative to the ship's sprite (the shield is drawn at 1.12).")]
     [SerializeField] private float hullScale = 1f;
     [SerializeField] private float fadeTime = 0.15f;
@@ -48,16 +45,11 @@ public class StatusVisual : MonoBehaviour
 
         body = ship.GetComponent<Rigidbody2D>();
         block = new MaterialPropertyBlock();
-        if (material == null)
-            return;
-        var hull = ship.GetComponent<SpriteRenderer>();
-        if (placement == Placement.Hull)
+        if (material != null && placement == Placement.Hull)
         {
-            Cover(hull, transform);
+            Cover(ship.GetComponent<SpriteRenderer>(), transform);
             transform.localScale = Vector3.one * hullScale;
         }
-        else if (placement == Placement.AroundShip)
-            Surround(hull);
     }
 
     private void Update()
@@ -85,8 +77,8 @@ public class StatusVisual : MonoBehaviour
 
     private void CoverNewWeapons()
     {
-        foreach (var weapon in ship.moduleManager.WeaponModules)
-            if (weapon != null && coveredWeapons.Add(weapon))
+        foreach (var module in ship.ModuleManager.Modules)
+            if (module is WeaponModule weapon && weapon != null && coveredWeapons.Add(weapon))
                 Cover(weapon.GetComponent<SpriteRenderer>(), weapon.transform);
     }
 
@@ -95,19 +87,6 @@ public class StatusVisual : MonoBehaviour
     {
         if (source != null)
             MakePart(source, parent).sprite = source.sprite;
-    }
-
-    private void Surround(SpriteRenderer hull)
-    {
-        if (hull == null)
-            return;
-        if (squareSprite == null)
-            squareSprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f), 4f);
-
-        var part = MakePart(hull, transform);
-        part.sprite = squareSprite;
-        part.transform.localScale = Vector3.one * Mathf.Max(hull.sprite.bounds.size.x, hull.sprite.bounds.size.y)
-                                    * aroundSize;
     }
 
     private SpriteRenderer MakePart(SpriteRenderer source, Transform parent)

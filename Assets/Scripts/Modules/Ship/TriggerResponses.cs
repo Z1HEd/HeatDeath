@@ -25,15 +25,15 @@ public class ApplyEffects : TriggerResponse
             if (effect != null && float.IsPositiveInfinity(effect.Duration))
                 Debug.LogWarning($"{module.ModuleDefinition.DisplayName}: a triggered effect has no duration, so it never ends", module);
 
-        module.Ship.effectManager.SetEffects(this, module.Emit(effects));
+        module.Ship.EffectManager.SetEffects(this, module.Emit(effects));
     }
 
     // Brings a running buff to the new strength, which also restarts it.
     public override void OnMultiplierChanged(ShipModule module)
     {
-        if (module.Ship.effectManager.HasEffects(this))
+        if (module.Ship.EffectManager.HasEffects(this))
             Run(module);
     }
 
-    public override void OnDestroy(ShipModule module) => module.Ship.effectManager.ClearEffects(this);
+    public override void OnDestroy(ShipModule module) => module.Ship.EffectManager.ClearEffects(this);
 }

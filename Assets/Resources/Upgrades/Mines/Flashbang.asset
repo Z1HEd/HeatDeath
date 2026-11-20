@@ -40,12 +40,12 @@ MonoBehaviour:
         - rid: 7560140318346840542
         - rid: 7560140318346840543
         - rid: 7560140318346840544
+        - rid: 7560140318346840545
         stacksRaiseStrength: 0
         stacksRaiseDuration: 1
     - rid: 7560140318346840542
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
-        visual: {fileID: 6110000000000000003, guid: bbd89c7433974020b59ec6a190c9b301, type: 3}
         duration:
           currentValue: 0.25
           baseValue: 0.25
@@ -62,6 +62,7 @@ MonoBehaviour:
     - rid: 7560140318346840543
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        visual: {fileID: 6110000000000000003, guid: bbd89c7433974020b59ec6a190c9b301, type: 3}
         duration:
           currentValue: 0.25
           baseValue: 0.25
@@ -82,12 +83,20 @@ MonoBehaviour:
           currentValue: 0.25
           baseValue: 0.25
           minValue: 0
-        stat: 5
+        stat: 52
         statModifier:
-          Flat: 0
-          Percent: -100
+          Flat: 1
+          Percent: 0
         perLevel:
           Flat: 0
           Percent: 0
         targetTags:
         - {fileID: 11400000, guid: df54a4c9aee35f5478056d725b32b0c6, type: 2}
+    - rid: 7560140318346840545
+      type: {class: MultiplyRigidbodyVelocityEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
+        multiplier: 0.1

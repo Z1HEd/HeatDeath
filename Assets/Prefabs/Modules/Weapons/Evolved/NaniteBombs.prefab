@@ -128,6 +128,7 @@ MonoBehaviour:
   - rid: 7560140318346840602
   - rid: 7560140318346840603
   - rid: 7560140318346840604
+  - rid: 7560140318346840605
   damage:
     currentValue: 0
     baseValue: 40
@@ -165,7 +166,7 @@ MonoBehaviour:
     currentValue: 0
     baseValue: 0
     minValue: 0
-  ExplosionRange:
+  blastDiameter:
     currentValue: 0
     baseValue: 4
     minValue: 0
@@ -175,7 +176,6 @@ MonoBehaviour:
     - rid: 7560140318346840601
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
-        visual: {fileID: 6110000000000000003, guid: bbd89c7433974020b59ec6a190c9b301, type: 3}
         duration:
           currentValue: 0.4
           baseValue: 0.4
@@ -192,6 +192,7 @@ MonoBehaviour:
     - rid: 7560140318346840602
       type: {class: StatModifierEffect, ns: , asm: Assembly-CSharp}
       data:
+        visual: {fileID: 6110000000000000003, guid: bbd89c7433974020b59ec6a190c9b301, type: 3}
         duration:
           currentValue: 0.4
           baseValue: 0.4
@@ -212,10 +213,10 @@ MonoBehaviour:
           currentValue: 0.4
           baseValue: 0.4
           minValue: 0
-        stat: 5
+        stat: 52
         statModifier:
-          Flat: 0
-          Percent: -100
+          Flat: 1
+          Percent: 0
         perLevel:
           Flat: 0
           Percent: 0
@@ -230,6 +231,14 @@ MonoBehaviour:
           baseValue: 4
           minValue: 0
         percentMaxHullPerSecond: 2
+    - rid: 7560140318346840605
+      type: {class: MultiplyRigidbodyVelocityEffect, ns: , asm: Assembly-CSharp}
+      data:
+        duration:
+          currentValue: 0
+          baseValue: Infinity
+          minValue: 0
+        multiplier: 0.1
 --- !u!1 &3014855846730604681
 GameObject:
   m_ObjectHideFlags: 0

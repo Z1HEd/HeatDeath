@@ -7,30 +7,38 @@ using UnityEngine;
 public class EffectManager : MonoBehaviour
 {
     [SerializeReference] [SubclassSelector] private List<Effect> activeEffects = new List<Effect>();
-    // The on-hit subset of activeEffects, which follows the one-per-slot rule.
+    // The on-hit subset of activeEffects, and those of them waiting behind a stronger one in their slot.
     private readonly List<Effect> hitEffects = new List<Effect>();
+    private readonly HashSet<Effect> waitingEffects = new HashSet<Effect>();
+    // What modules and the appearance get: the active effects that aren't waiting.
+    private readonly List<Effect> appliedEffects = new List<Effect>();
     // Effects set with SetEffects, by owner (an upgrade, a module, a buff), and the owner of each.
     private readonly Dictionary<object, List<Effect>> sourcedEffects = new Dictionary<object, List<Effect>>();
     private readonly Dictionary<Effect, object> effectSources = new Dictionary<Effect, object>();
     private Ship ship;
     private bool shouldRecalculate = false;
 
-    // Carries any on-hit effect (from an attacker): a slow, stun, jam, and so on.
+    // Carries any on-hit effect (from an attacker), waiting ones included: a slow, stun, jam, and so on.
     public bool HasHitEffects => hitEffects.Count > 0;
 
-    protected void Awake()
+    private void Awake()
     {
         ship = GetComponent<Ship>();
     }
 
-    public void Update()
+    private void Update()
     {
         for (int i = 0; i < activeEffects.Count;)
         {
-            if (!activeEffects[i].Update(Time.deltaTime))
-                RemoveEffect(activeEffects[i]);
-            else
+            // A waiting effect's time runs, but it doesn't act: a waiting DOT doesn't tick.
+            Effect effect = activeEffects[i];
+            bool running = waitingEffects.Contains(effect)
+                ? effect.Elapse(Time.deltaTime)
+                : effect.Update(Time.deltaTime);
+            if (running)
                 i++;
+            else
+                RemoveEffect(effect);
         }
 
         if (shouldRecalculate)
@@ -43,9 +51,14 @@ public class EffectManager : MonoBehaviour
 
     private void ReapplyEffects()
     {
-        foreach (var module in ship.moduleManager.GetModules<ModuleBase>())
-            module.UpdateEffects(activeEffects);
-        ship.Appearance.Rebuild(activeEffects);
+        appliedEffects.Clear();
+        foreach (var effect in activeEffects)
+            if (!waitingEffects.Contains(effect))
+                appliedEffects.Add(effect);
+
+        foreach (var module in ship.ModuleManager.GetModules<ModuleBase>())
+            module.UpdateEffects(appliedEffects);
+        ship.Appearance.Rebuild(appliedEffects);
     }
     public void MarkDirty()
     {
@@ -59,27 +72,43 @@ public class EffectManager : MonoBehaviour
         shouldRecalculate = true;
     }
 
-    // On-hit effects: one per slot. A stronger one replaces the old one; an equal one replaces it only if it lasts
-    // longer, so a short stun never cuts a longer one short; a weaker one is ignored. Effects that owners hold
-    // stack: see SetEffects.
+    // On-hit effects. A repeat of one the ship has (a copy of the same asset effect at the same strength) only extends
+    // it, so it keeps running: a DOT keeps its ticks. Effects in the same slot (SharesSlotWith) don't stack: the
+    // strongest applies, the first of equals, and the others wait with their time running and take over when it
+    // ends. Effects that owners hold stack: see SetEffects.
     public void AddHitEffect(Effect effect)
     {
         foreach (var current in hitEffects)
         {
-            if (!effect.SharesSlotWith(current))
-                continue;
-
-            if (!effect.IsAtLeastAsStrongAs(current))
+            if (current.Template == effect.Template && IsEquallyStrong(current, effect))
+            {
+                current.ExtendTo(effect.TimeLeft);
                 return;
-            if (current.IsAtLeastAsStrongAs(effect) && current.TimeLeft >= effect.TimeLeft)
-                return;
-
-            RemoveEffect(current);
-            break;
+            }
         }
 
         hitEffects.Add(effect);
         AddEffect(effect);
+        UpdateWaiting();
+    }
+
+    // An on-hit effect waits while another in its slot outranks it: a stronger one, or an equal one that came first.
+    private void UpdateWaiting()
+    {
+        waitingEffects.Clear();
+        for (int i = 0; i < hitEffects.Count; i++)
+        {
+            for (int j = 0; j < hitEffects.Count; j++)
+            {
+                Effect effect = hitEffects[i], rival = hitEffects[j];
+                if (i != j && effect.SharesSlotWith(rival) && rival.IsAtLeastAsStrongAs(effect)
+                    && (j < i || !effect.IsAtLeastAsStrongAs(rival)))
+                {
+                    waitingEffects.Add(effect);
+                    break;
+                }
+            }
+        }
     }
 
     // Makes the owner's effects exactly these copies, so calling it again replaces them instead of adding more.
@@ -128,12 +157,14 @@ public class EffectManager : MonoBehaviour
     // Whether any effect the owner set is still running.
     public bool HasEffects(object source) => sourcedEffects.ContainsKey(source);
 
-    private static bool IsSameCopy(Effect a, Effect b) =>
-        a.Duration == b.Duration && a.IsAtLeastAsStrongAs(b) && b.IsAtLeastAsStrongAs(a);
+    private static bool IsEquallyStrong(Effect a, Effect b) => a.IsAtLeastAsStrongAs(b) && b.IsAtLeastAsStrongAs(a);
+
+    private static bool IsSameCopy(Effect a, Effect b) => a.Duration == b.Duration && IsEquallyStrong(a, b);
 
     private void RemoveEffect(Effect effect)
     {
-        hitEffects.Remove(effect);
+        if (hitEffects.Remove(effect))
+            UpdateWaiting();
         if (effectSources.Remove(effect, out object source))
         {
             List<Effect> list = sourcedEffects[source];

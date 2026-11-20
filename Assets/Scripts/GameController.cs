@@ -127,7 +127,7 @@ public class GameController : MonoBehaviour
     {
         // Level-scaled effects (StatModifierEffect.perLevel) grow with each level.
         if (player != null)
-            player.effectManager.MarkDirty();
+            player.EffectManager.MarkDirty();
         OnLevelChanged?.Invoke(levelsGained);
     }
 

@@ -159,23 +159,23 @@ MonoBehaviour:
     currentValue: 5
     baseValue: 5
     minValue: 0
-  projectileDamage:
+  damage:
     currentValue: 25
     baseValue: 25
     minValue: 0
-  ShieldDamageMultiplier:
+  shieldDamageMultiplier:
     currentValue: 0.75
     baseValue: 0.75
     minValue: -1
-  HPDamageMultiplier:
+  hpDamageMultiplier:
     currentValue: 1.4
     baseValue: 1.4
     minValue: -1
-  BackstabMultiplier:
+  backstabMultiplier:
     currentValue: 1
     baseValue: 1
     minValue: 0
-  projectileKnockback:
+  knockback:
     currentValue: 4
     baseValue: 4
     minValue: 0
@@ -191,16 +191,16 @@ MonoBehaviour:
     currentValue: 0
     baseValue: 0
     minValue: 0
-  ExplosionRange:
+  blastDiameter:
     currentValue: 1
     baseValue: 1
     minValue: 0
-  SeekingRange:
+  seekingRange:
     currentValue: 5
     baseValue: 5
     minValue: 0
-  textureWithRocket: {fileID: 21300000, guid: 8efac6b2a71ff2049ad237d20bca2742, type: 3}
-  textureWithoutRocket: {fileID: 21300000, guid: 91c95e7eaecf92f409fea676d191e5e9, type: 3}
+  loadedSprite: {fileID: 21300000, guid: 8efac6b2a71ff2049ad237d20bca2742, type: 3}
+  emptySprite: {fileID: 21300000, guid: 91c95e7eaecf92f409fea676d191e5e9, type: 3}
 --- !u!1 &2305461417796508724
 GameObject:
   m_ObjectHideFlags: 0

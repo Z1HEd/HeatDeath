@@ -3,12 +3,19 @@ using UnityEngine;
 
 public class MineModule : ProjectileModule
 {
-    [SerializeField] public ScalarStat ExplosionRange = new ScalarStat(StatType.ExplosionRange,1f,0f);
-    [SerializeField]private readonly List<MineProjectile> activeMines = new List<MineProjectile>();
+    [Tooltip("The diameter of each mine's blast.")]
+    [SerializeField] private ScalarStat blastDiameter = new ScalarStat(StatType.BlastDiameter, 1f, 0f);
+    private readonly List<MineProjectile> activeMines = new List<MineProjectile>();
 
+    public float BlastDiameter => blastDiameter;
+
+    // One mine per throw: Projectile Count is the most mines on the field.
+    protected override void SpawnProjectiles(Vector3 position, Vector3 aimDirection) =>
+        SpawnProjectile(position, aimDirection, 0, 1);
+
+    // A mine past the most allowed sets off the oldest.
     protected override void OnProjectileSpawned(Projectile projectile, int direction, int directions)
     {
-        
         activeMines.RemoveAll(m => m == null);
         activeMines.Add(projectile as MineProjectile);
 
@@ -20,30 +27,10 @@ public class MineModule : ProjectileModule
                 oldest.ForceExplode();
         }
     }
-    // projectileCount is treated as max num of mines on map.
-    protected override void SpawnProjectiles(Vector3 spawnPosition, Vector3 aimDirection)
-    {
-        if (projectilePrefab == null)
-        {
-            Debug.LogWarning("Projectile prefab not assigned on " + gameObject.name);
-            return;
-        }
-
-        int count = Mathf.Max(1, Mathf.FloorToInt(projectileCount));
-        float spreadDegrees = Mathf.Max(0f, projectileSpread);
-        
-        float angleOffset = GetSpreadAngleOffset(spreadDegrees);
-        Vector3 shotDirection = Quaternion.AngleAxis(angleOffset, Vector3.forward) * aimDirection;
-
-        Projectile projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
-        projectile.gameObject.layer = DetectLayer;
-        projectile.Initialize(shotDirection, projectileSpeed, this);
-        OnProjectileSpawned(projectile, 0, 1);
-    }
     protected override void CollectStats(List<IStat> stats)
     {
         base.CollectStats(stats);
 
-        stats.Add(ExplosionRange);
+        stats.Add(blastDiameter);
     }
 }

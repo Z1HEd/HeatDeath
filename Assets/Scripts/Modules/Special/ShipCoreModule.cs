@@ -80,8 +80,7 @@ public class ShipCoreModule : ModuleBase
     protected SpriteRenderer shieldRenderer;
     private Color defaultRimColor, defaultFillColor;
     private readonly Vector4[] rippleOrigins = new Vector4[MaxRipples];
-    private readonly float[] rippleStartTimes = { float.NegativeInfinity, float.NegativeInfinity,
-                                                  float.NegativeInfinity, float.NegativeInfinity };
+    private readonly float[] rippleStartTimes = new float[MaxRipples];
     private int nextRipple;
     // Game time of the last hit that took shields or hull. Shields wait shieldRegenDelay after it.
     private float lastDamageTime = float.NegativeInfinity;
@@ -102,7 +101,7 @@ public class ShipCoreModule : ModuleBase
     public float HealthFraction => health.Fraction;
     public float MaxHealth => health.MaxValue;
     // Carries any on-hit debuff, for damage bonuses against debuffed targets.
-    public bool IsDebuffed => ship.effectManager.HasHitEffects;
+    public bool IsDebuffed => ship.EffectManager.HasHitEffects;
     public float ShieldFraction => shields.Fraction;
     public bool HasHardenedShields => hardenedShields;
     // Purple shields that are up: Ship ignores knockback and on-hit effects.
@@ -139,26 +138,29 @@ public class ShipCoreModule : ModuleBase
         // Own copy per ship: with one shared material, shields drew the newest ship's texture.
         shieldRenderer.sharedMaterial = Instantiate(Resources.Load<Material>("ShieldMaterial"));
         defaultRimColor = shieldRenderer.sharedMaterial.GetColor(RimColorId);
-        defaultFillColor = shieldRenderer.sharedMaterial.GetColor(FillColorId);        shieldRenderer.sortingLayerName = "Shields";
+        defaultFillColor = shieldRenderer.sharedMaterial.GetColor(FillColorId);
+        shieldRenderer.sortingLayerName = "Shields";
         shieldRenderer.sortingOrder = 0;
         transform.localScale = Vector3.one * shieldScale;
+        // No ripple has started yet: unused slots draw nothing.
+        Array.Fill(rippleStartTimes, float.NegativeInfinity);
 
         // Only drawn while flashing: the shader is too costly to run invisibly on every ship.
         shieldRenderer.enabled = false;
     }
 
+    // Regeneration. The bars hear about it only when something actually changed: not while a recharge waits out its
+    // delay, nor on ships without regen.
     private void Update()
     {
-        if (shields.CurrentValue < shields.MaxValue){
+        float shieldsBefore = shields.CurrentValue, healthBefore = health.CurrentValue;
+        if (shieldsBefore < shields.MaxValue)
             shields.AddCurrent(CurrentShieldRegen * Time.deltaTime);
-            OnHPShieldsChanged?.Invoke();
-        }
-
-        if (health.CurrentValue < health.MaxValue){
+        if (healthBefore < health.MaxValue)
             health.AddCurrent(CurrentHPRegen * Time.deltaTime);
+
+        if (shields.CurrentValue != shieldsBefore || health.CurrentValue != healthBefore)
             OnHPShieldsChanged?.Invoke();
-        }
-        
     }
 
     // Takes the hit's damage from shields, then hull. Returns what it took (nothing while invincible).
@@ -206,17 +208,17 @@ public class ShipCoreModule : ModuleBase
         shieldRenderer.enabled = false;
     }
 
-    protected IEnumerator FlashShield(Vector3 hitPoint)
+    private IEnumerator FlashShield(Vector3 hitPoint)
     {
-        const float SHIELD_FLASH_DURATION = 0.7f;
+        const float FlashDuration = 0.7f;
         // Each hit adds a ripple to the next slot. Rapid fire must not replace ripples that are still young, or
         // they'd never get to spread: at this interval, a slot is reused only after about one flash.
-        const float MIN_RIPPLE_INTERVAL = SHIELD_FLASH_DURATION / MaxRipples;
+        const float MinRippleInterval = FlashDuration / MaxRipples;
         Material shieldMaterial = shieldRenderer.sharedMaterial;
         shieldRenderer.enabled = true;
 
         float newestRippleStart = rippleStartTimes[(nextRipple + MaxRipples - 1) % MaxRipples];
-        if (Time.time - newestRippleStart >= MIN_RIPPLE_INTERVAL)
+        if (Time.time - newestRippleStart >= MinRippleInterval)
         {
             rippleStartTimes[nextRipple] = Time.time;
             rippleOrigins[nextRipple] = WorldToSpriteTexels(hitPoint);
@@ -225,10 +227,10 @@ public class ShipCoreModule : ModuleBase
         }
 
         float flashStartTime = Time.time;
-        for (float t = 0f; t < SHIELD_FLASH_DURATION; t = Time.time - flashStartTime)
+        for (float t = 0f; t < FlashDuration; t = Time.time - flashStartTime)
         {
             float opacity = hardenedShields ? HardenedFlashOpacity : DefaultFlashOpacity;
-            shieldRenderer.color = new Color(1,1,1,opacity * (1f - t / SHIELD_FLASH_DURATION));
+            shieldRenderer.color = new Color(1, 1, 1, opacity * (1f - t / FlashDuration));
             shieldMaterial.SetVector(RippleAgesId, RippleAges());
             yield return null;
         }

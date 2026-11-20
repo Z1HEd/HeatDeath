@@ -5,7 +5,6 @@ using UnityEngine;
 
 // Lightning that never misses: a bolt to the closest enemy that jumps on to the closest ship not yet hit. Evolutions
 // that strike differently (ShockFieldModule, ThunderSpearModule) override PickTarget and Strike.
-[ExecuteAlways]
 public class TeslaModule : WeaponModule
 {
     // Damage, the multipliers, and knockback (0: the bolt doesn't push) come from WeaponModule.
@@ -43,21 +42,11 @@ public class TeslaModule : WeaponModule
     {
         base.Update();
 
-        if (rangeDetector == null)
-            return;
         Ship target = PickTarget();
         if (target == null)
             return;
 
-        if (firePoint != null && !IsStunned)
-        {
-            Vector3 towardsTarget = target.transform.position - transform.position;
-            Vector3 currentAim = firePoint.position - transform.position;
-
-            float angle = Vector2.SignedAngle(currentAim, towardsTarget);
-            transform.Rotate(0f, 0f, angle);
-        }
-
+        AimAt(target);
         if (CanFire)
         {
             Fire();
@@ -71,7 +60,7 @@ public class TeslaModule : WeaponModule
     protected virtual void Strike(Ship target, in HitPayload payload)
     {
         List<Ship> chain = BuildChain(target);
-        ApplyChainDamage(chain, payload, 1f, true);
+        ApplyChainDamage(chain, payload, 1f);
         ShowLightning(chain);
     }
 
@@ -155,18 +144,19 @@ public class TeslaModule : WeaponModule
 
     // Each ship is hit from the previous link of the chain (the fire point for the first), which sets backstab and
     // the shield ripple. Each jump deals Chain Jump Damage of the hit before it.
-    protected void ApplyChainDamage(List<Ship> chain, in HitPayload payload, float damageScale, bool withEffects)
+    protected void ApplyChainDamage(List<Ship> chain, in HitPayload payload, float damageScale)
     {
         Vector2 firedFrom = firePoint.position;
         Vector2 from = firedFrom;
         int enemiesHit = 0;
+        HitEffects effects = GetHitEffects();
         foreach (Ship target in chain)
         {
             if (target == null || target.IsDead)
                 continue;
 
-            DamageTaken taken = target.TakeHit(new Hit(payload, firedFrom, from, Vector2.zero, enemiesHit,
-                withEffects ? GetHitEffects() : null, damageScale));
+            DamageTaken taken = target.TakeHit(new Hit(payload, firedFrom, from, Vector2.zero, enemiesHit, effects,
+                damageScale));
             OnHitLanded(target.CoreModule, taken);
             enemiesHit++;
             from = target.transform.position;
@@ -187,7 +177,7 @@ public class TeslaModule : WeaponModule
         int sortingLayerID = sprite != null ? sprite.sortingLayerID : 0;
         int sortingOrder = (sprite != null ? sprite.sortingOrder : 0) + 10;
 
-        Transform from = start != null ? start : firePoint != null ? firePoint : transform;
+        Transform from = start != null ? start : firePoint;
         foreach (Ship target in chain)
         {
             if (target == null)

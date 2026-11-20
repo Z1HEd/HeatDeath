@@ -16,9 +16,9 @@ public class BurstThrusterModule : MovementModule
 
     private float cooldownTimer = 0f;
 
-    public void Update()
+    private void Update()
     {
-        if (maxSpeed <= 0f) // Stunned: no burst, and the cooldown pauses
+        if (steeringThrust <= 0f) // Stunned (thrust cut): no burst, and the cooldown pauses
             return;
 
         cooldownTimer -= Time.deltaTime;
@@ -26,10 +26,11 @@ public class BurstThrusterModule : MovementModule
         if (cooldownTimer > 0f || Time.timeScale <= 0f)
             return;
 
-        if ((!UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame || GameUIController.Instance.IsCursorOverUI()) && ship is Player)
+        Vector2 target = targetPosition;
+        if (ship is Player && !TryGetPressedPoint(out target))
             return;
 
-        Vector2 toTarget = targetPosition - body.position;
+        Vector2 toTarget = target - body.position;
         if (toTarget.magnitude > StopDistance*maxSpeed)
         {
             body.linearVelocity = toTarget.normalized * maxSpeed;
@@ -37,12 +38,20 @@ public class BurstThrusterModule : MovementModule
         }
     }
 
-    public void SetTargetPosition(Vector2 newTarget)
+    // The player bursts toward where a click or touch lands this frame, outside the UI.
+    private static bool TryGetPressedPoint(out Vector2 point)
     {
-        targetPosition = newTarget;
+        point = default;
+        var pointer = UnityEngine.InputSystem.Pointer.current;
+        if (pointer == null || !pointer.press.wasPressedThisFrame || GameUIController.Instance.IsCursorOverUI())
+            return false;
+
+        point = Camera.main.ScreenToWorldPoint(pointer.position.ReadValue());
+        return true;
     }
 
-    public void FixedUpdate()
+
+    private void FixedUpdate()
     {
         if (ship != null && ship.IsKnockedBack)
             return;

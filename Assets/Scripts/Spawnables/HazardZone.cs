@@ -6,8 +6,6 @@ using UnityEngine;
 // The prefab's sprite is a circle 1 unit across; the zone scales it to its radius.
 public class HazardZone : MonoBehaviour
 {
-    private const float TickInterval = 0.5f;
-
     [SerializeField] private float duration = 4f;
     [Tooltip("Percent of each enemy's max hull per second.")]
     [SerializeField] private float percentMaxHullPerSecond = 2f;
@@ -21,14 +19,14 @@ public class HazardZone : MonoBehaviour
     private float radius;
     private int targetMask;
     private float age;
-    private float sinceTick;
+    private DamageTicks ticks;
     private SpriteRenderer spriteRenderer;
     private Color baseColor;
     private readonly HashSet<Ship> hitThisTick = new();
 
     public void Initialize(in HitPayload shot, float blastRadius, int detectLayer)
     {
-        payload = HitPayload.PercentOfMaxHull(percentMaxHullPerSecond * TickInterval, shot.Source, shot.Attacker);
+        payload = HitPayload.PercentOfMaxHull(percentMaxHullPerSecond * DamageTicks.Interval, shot.Source, shot.Attacker);
         radius = blastRadius * radiusOfBlast;
         // The shot's detect layer is two above the layer of the ships it hits, as for explosions.
         targetMask = 1 << (detectLayer - 2);
@@ -40,6 +38,9 @@ public class HazardZone : MonoBehaviour
 
     private void Update()
     {
+        for (int due = ticks.Advance(Time.deltaTime, duration - age); due > 0; due--)
+            Tick();
+
         age += Time.deltaTime;
         if (age >= duration)
         {
@@ -50,12 +51,6 @@ public class HazardZone : MonoBehaviour
         transform.localScale = Vector3.one * radius * 2f * Mathf.Lerp(0.5f, 1f, spread);
         spriteRenderer.color = new Color(baseColor.r, baseColor.g, baseColor.b,
             baseColor.a * spread * (1f - age / duration));
-
-        sinceTick += Time.deltaTime;
-        if (sinceTick < TickInterval)
-            return;
-        sinceTick -= TickInterval;
-        Tick();
     }
 
     // A ship can have several colliders on its layer: each is hit once per tick.

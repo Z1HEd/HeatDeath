@@ -129,10 +129,9 @@ public class GameUIController : MonoBehaviour
     }
     public void BindWeaponButton(GameObject weapon, int index){
         if (boundWeapons[index] != null)
-            boundWeapons[index].updateCooldownOverlay -= weaponButtonOverlays[index].SetCooldownFill;
+            boundWeapons[index].OnCooldownChanged -= weaponButtonOverlays[index].SetCooldownFill;
         boundWeapons[index] = weapon.GetComponent<WeaponModule>();
-        boundWeapons[index].updateCooldownOverlay+=
-                weaponButtonOverlays[index].SetCooldownFill;
+        boundWeapons[index].OnCooldownChanged += weaponButtonOverlays[index].SetCooldownFill;
         weaponButtonOverlays[index].button.style.backgroundImage =
                 new StyleBackground(weapon.GetComponent<SpriteRenderer>().sprite.texture);
     }
@@ -152,14 +151,14 @@ public class GameUIController : MonoBehaviour
     {
         player = playerObject.GetComponent<Player>();
         player.CoreModule.OnHPShieldsChanged += UpdateBars;
-        player.moduleManager.OnModuleReplaced += OnModuleReplaced;
+        player.ModuleManager.OnModuleReplaced += OnModuleReplaced;
         
-        abilityButtonOverlay.button.clicked += player.ability.Activate;
-        player.ability.updateCooldown += abilityButtonOverlay.SetCooldownFill;
-        player.ability.updateDuration += abilityButtonOverlay.SetDurationFill;
-        player.ability.updateIcon += abilityButtonOverlay.SetIcon;
-        player.ability.updateActivatable += abilityButtonOverlay.SetClickable;
-        abilityButtonOverlay.SetClickable(player.ability.IsActivatable);
+        abilityButtonOverlay.button.clicked += player.Ability.Activate;
+        player.Ability.OnCooldownChanged += abilityButtonOverlay.SetCooldownFill;
+        player.Ability.OnDurationChanged += abilityButtonOverlay.SetDurationFill;
+        player.Ability.OnIconChanged += abilityButtonOverlay.SetIcon;
+        player.Ability.OnActivatableChanged += abilityButtonOverlay.SetClickable;
+        abilityButtonOverlay.SetClickable(player.Ability.IsActivatable);
     }
     private void PauseUnpause()
     {
@@ -304,7 +303,7 @@ public class GameUIController : MonoBehaviour
     // Where the pick goes, counted after it: "Cannon · new slot 2/3", "Core · stack 3/4", "Minigun · infinite ×5".
     private string DescribeSlot(UpgradeDefinition upgrade)
     {
-        UpgradeManager upgrades = player.upgradeManager;
+        UpgradeManager upgrades = player.UpgradeManager;
         ModuleDefinition group = upgrades.GroupOf(upgrade);
         EvolutionPathDefinition path = upgrades.GetPath(group);
         string module = path != null ? path.DisplayName : group.DisplayName;
@@ -370,7 +369,7 @@ public class GameUIController : MonoBehaviour
             if (index < 0 || index >= currentWeaponOptions.Count)
                 return;
 
-            player.moduleManager.AddWeapon(currentWeaponOptions[index]);
+            player.ModuleManager.AddWeapon(currentWeaponOptions[index]);
             pendingWeaponDrafts--;
         }
         else if (pendingShipModuleDrafts > 0)
@@ -378,7 +377,7 @@ public class GameUIController : MonoBehaviour
             if (index < 0 || index >= currentShipModuleOptions.Count)
                 return;
 
-            player.moduleManager.AddShipModule(currentShipModuleOptions[index]);
+            player.ModuleManager.AddShipModule(currentShipModuleOptions[index]);
             pendingShipModuleDrafts--;
         }
         else
@@ -388,9 +387,9 @@ public class GameUIController : MonoBehaviour
 
             UpgradeDraftOption picked = currentOptions[index];
             if (picked.IsEvolution)
-                player.upgradeManager.Evolve(picked.Module, picked.Path);
+                player.UpgradeManager.Evolve(picked.Module, picked.Path);
             else
-                player.upgradeManager.AddUpgrade(picked.Upgrade);
+                player.UpgradeManager.AddUpgrade(picked.Upgrade);
             pendingUpgradeDrafts--;
         }
 
@@ -470,10 +469,15 @@ public class GameUIController : MonoBehaviour
     // Helpers
     // -------------------------------------------------------------------------
 
+    // The mouse or the touch: Pointer covers both.
     public bool IsCursorOverUI()
     {
+        var pointer = UnityEngine.InputSystem.Pointer.current;
+        if (pointer == null)
+            return false;
+
         var root = uiDocument.rootVisualElement;
-        var screenPos = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
+        var screenPos = pointer.position.ReadValue();
         screenPos.y = Screen.height - screenPos.y; // flip bottom-up -> top-down
         var panelPos = RuntimePanelUtils.ScreenToPanel(root.panel, screenPos);
         var picked = root.panel.Pick(panelPos);

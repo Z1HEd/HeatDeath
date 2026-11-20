@@ -64,7 +64,7 @@ public class UpgradeDraftService
         if (player == null || optionCount <= 0)
             return result;
 
-        UpgradeManager upgrades = player.upgradeManager;
+        UpgradeManager upgrades = player.UpgradeManager;
         List<UpgradeDefinition> candidates = definitions.FindAll(upgrades.CanTake);
         var evolutions = new List<UpgradeDraftOption>();
         foreach (var module in upgrades.GetGroupsReadyToEvolve())

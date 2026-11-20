@@ -1,12 +1,10 @@
 using UnityEngine;
-using System;
 using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "ModuleDefinition", menuName = "HeatDeath/Module Definition")]
 public class ModuleDefinition : ScriptableObject
 {
     [SerializeField] private string displayName;
-    [SerializeField] private string componentTypeName;
     [SerializeField] private List<TagDefinition> tags = new List<TagDefinition>();
     [Tooltip("The paths this module can evolve along. A ship's paths go on its own core.")]
     [SerializeField] private List<EvolutionPathDefinition> evolutionPaths = new List<EvolutionPathDefinition>();
@@ -15,15 +13,9 @@ public class ModuleDefinition : ScriptableObject
     [SerializeField] private ModuleDefinition baseDefinition;
 
     public string DisplayName => displayName;
-    public string ComponentTypeName => componentTypeName;
     public IReadOnlyList<TagDefinition> Tags => tags;
     public IReadOnlyList<EvolutionPathDefinition> EvolutionPaths => evolutionPaths;
     public ModuleDefinition BaseDefinition => baseDefinition;
-
-    public bool HasTag(TagDefinition tag)
-    {
-        return tag != null && tags.Contains(tag);
-    }
 
     public bool MatchesAnyTag(IReadOnlyList<TagDefinition> targetTags)
     {
@@ -38,14 +30,5 @@ public class ModuleDefinition : ScriptableObject
         }
 
         return false;
-    }
-
-    public Type ResolveComponentType()
-    {
-        Type direct = Type.GetType(componentTypeName);
-        if (direct != null)
-            return direct;
-
-        return Type.GetType(componentTypeName + ", Assembly-CSharp");
     }
 }

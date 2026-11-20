@@ -7,15 +7,13 @@ using UnityEngine;
 [Serializable]
 public class DamageOverTimeEffect : Effect
 {
-    private const float TickInterval = 0.5f;
-
     [Tooltip("Percent of the ship's max hull per second. Stacks multiply it.")]
     [SerializeField] private float percentMaxHullPerSecond = 1f;
 
     [NonSerialized] private ModuleDefinition source;
     [NonSerialized] private Ship attacker;
     [NonSerialized] private Ship target;
-    [NonSerialized] private float sinceTick;
+    [NonSerialized] private DamageTicks ticks;
 
     public override void OnEmittedBy(ModuleBase module)
     {
@@ -26,32 +24,27 @@ public class DamageOverTimeEffect : Effect
     public override void ApplyToShip(Ship ship)
     {
         target = ship;
-        sinceTick = 0f;
+        ticks = default;
     }
 
     public override void RemoveFromShip(Ship ship) => target = null;
 
     public override bool Update(float delta)
     {
-        bool running = base.Update(delta);
-        sinceTick += delta;
-        while (running && sinceTick >= TickInterval && target != null && !target.IsDead)
-        {
-            sinceTick -= TickInterval;
+        for (int due = ticks.Advance(delta, TimeLeft); due > 0 && target != null && !target.IsDead; due--)
             Tick();
-        }
-        return running;
+        return base.Update(delta);
     }
 
     // A hit from the ship's own position: no backstab, no knockback, no distance bonus.
     private void Tick()
     {
-        var payload = HitPayload.PercentOfMaxHull(percentMaxHullPerSecond * TickInterval, source, attacker);
+        var payload = HitPayload.PercentOfMaxHull(percentMaxHullPerSecond * DamageTicks.Interval, source, attacker);
         Vector2 at = target.transform.position;
         target.TakeHit(new Hit(payload, at, at, Vector2.zero, 0, null));
     }
 
-    // One per ship (the default slot): a stronger one replaces a weaker one.
+    // One slot per ship (the default): the strongest ticks, the others wait.
     public override bool IsAtLeastAsStrongAs(Effect other) =>
         other is not DamageOverTimeEffect o || percentMaxHullPerSecond >= o.percentMaxHullPerSecond;
 

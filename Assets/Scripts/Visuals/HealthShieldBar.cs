@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class HealthShieldbar : MonoBehaviour
+public class HealthShieldBar : MonoBehaviour
 {
     private ShipCoreModule shipCore;
     [SerializeField]

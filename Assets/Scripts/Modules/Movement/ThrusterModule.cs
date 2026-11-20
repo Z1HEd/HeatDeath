@@ -5,11 +5,11 @@ public class ThrusterModule : MovementModule
     [Header("Thruster Settings")]
     [SerializeField] private ScalarStat thrust = new ScalarStat(StatType.Thrust, 0.5f, 0f);
 
-    private float thrustScale = 100.0f;
-    private float stopDistance = 0.1f;
-    private float brakingSafety = 0.9f;
+    private const float ThrustScale = 100.0f;
+    private const float StopDistance = 0.1f;
+    private const float BrakingSafety = 0.9f;
 
-    public void FixedUpdate()
+    private void FixedUpdate()
     {
         if (ship != null && ship.IsKnockedBack)
             return;
@@ -17,12 +17,12 @@ public class ThrusterModule : MovementModule
         Vector2 toTarget = targetPosition - body.position;
         float dist = toTarget.magnitude;
 
-        float maxAccel = (thrust * thrustScale) / Mathf.Max(body.mass, 0.0001f);
+        float maxAccel = (thrust * ThrustScale) / Mathf.Max(body.mass, 0.0001f);
         Vector2 desiredVelocity = Vector2.zero;
         Vector2 requiredAccel;
 
         // If basically already there, do a soft stop.
-        if (dist <= stopDistance)
+        if (dist <= StopDistance)
         {
             requiredAccel = (desiredVelocity - body.linearVelocity) / Mathf.Max(Time.fixedDeltaTime, 0.0001f);
 
@@ -36,7 +36,7 @@ public class ThrusterModule : MovementModule
         float allowedSpeed = 0.0f;
         if (dist > 0.0f)
         {
-            allowedSpeed = Mathf.Sqrt(2.0f * maxAccel * dist) * brakingSafety;
+            allowedSpeed = Mathf.Sqrt(2.0f * maxAccel * dist) * BrakingSafety;
         }
 
         float desiredSpeed = Mathf.Min(maxSpeed, allowedSpeed);
@@ -52,11 +52,6 @@ public class ThrusterModule : MovementModule
 
         if (body.linearVelocity.magnitude > maxSpeed)
             body.linearVelocity = body.linearVelocity.normalized * maxSpeed;
-    }
-
-    public void SetTargetPosition(Vector2 newTarget)
-    {
-        targetPosition = newTarget;
     }
 
     protected override void CollectStats(List<IStat> stats)

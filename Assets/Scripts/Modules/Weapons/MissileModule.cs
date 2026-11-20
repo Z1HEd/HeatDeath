@@ -1,34 +1,38 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 using System.Collections.Generic;
 
 public class MissileModule : ProjectileModule
 {
-    [SerializeField] public ScalarStat ExplosionRange = new ScalarStat(StatType.ExplosionRange,1f,0f);
-    [SerializeField] public ScalarStat SeekingRange = new ScalarStat(StatType.ProjectileRange,1f,0f);
-    public Sprite textureWithRocket;
-    public Sprite textureWithoutRocket;
-    protected SpriteRenderer spriteRenderer;
+    [Tooltip("The diameter of each missile's blast.")]
+    [SerializeField] private ScalarStat blastDiameter = new ScalarStat(StatType.BlastDiameter, 1f, 0f);
+    [Tooltip("How far a missile looks for a target to steer toward. 0: it flies straight.")]
+    [SerializeField] private ScalarStat seekingRange = new ScalarStat(StatType.SeekingRange, 1f, 0f);
+    [Tooltip("The launcher with a rocket ready and without one. Leave both empty to keep its sprite.")]
+    [SerializeField] private Sprite loadedSprite;
+    [SerializeField] private Sprite emptySprite;
+    private SpriteRenderer spriteRenderer;
+
+    public float BlastDiameter => blastDiameter;
+    public float SeekingRange => seekingRange;
     protected override void Awake()
     {
         base.Awake();
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
+    // The rocket shows once the launcher is half reloaded. Without the sprites (Vacuum Cannon), its sprite stays.
     protected override void Update()
     {
         base.Update();
-        if (fireCooldown < fireCooldown.MaxValue/2)
-            spriteRenderer.sprite = textureWithRocket;
-        else
-            spriteRenderer.sprite = textureWithoutRocket;
+        if (loadedSprite != null)
+            spriteRenderer.sprite = fireCooldown < fireCooldown.MaxValue / 2 ? loadedSprite : emptySprite;
     }
 
     protected override void CollectStats(List<IStat> stats)
     {
         base.CollectStats(stats);
 
-        stats.Add(ExplosionRange);
-        stats.Add(SeekingRange);
+        stats.Add(blastDiameter);
+        stats.Add(seekingRange);
     }
 }

@@ -11,7 +11,8 @@ public class ShipLightningOverlay : MonoBehaviour
     private static readonly int SeedId = Shader.PropertyToID("_Seed");
 
     private SpriteRenderer overlayRenderer;
-    private Material material;
+    // This overlay's values for the shared material, so no material is copied per overlay.
+    private MaterialPropertyBlock block;
     private float duration;
     private float jitterInterval;
     private float elapsed;
@@ -20,7 +21,8 @@ public class ShipLightningOverlay : MonoBehaviour
     private float flickerLength; // 0 = steady, fading out
     private int lastFlicker = -1;
 
-    private const float FLICKER_ON_SHARE = 0.55f;
+    // Each flicker is on for this share of its length.
+    private const float FlickerOnShare = 0.55f;
 
     // Lightning across the whole hull.
     public static ShipLightningOverlay Spawn(Ship target, float duration, float jitterInterval,
@@ -80,16 +82,14 @@ public class ShipLightningOverlay : MonoBehaviour
         this.jitterInterval = jitterInterval;
         transform.SetParent(target.transform, false);
 
-        // Own copy: sprites with different textures must not share a material.
-        material = Instantiate(sourceMaterial);
-
         overlayRenderer = GetComponent<SpriteRenderer>();
         overlayRenderer.sprite = target.GetComponent<SpriteRenderer>().sprite;
-        overlayRenderer.sharedMaterial = material;
+        overlayRenderer.sharedMaterial = sourceMaterial;
         overlayRenderer.sortingLayerID = sortingLayerID;
         overlayRenderer.sortingOrder = sortingOrder;
 
-        material.SetFloat(RadiusId, regionRadius > 0f ? regionRadius : overlayRenderer.bounds.extents.magnitude);
+        block = new MaterialPropertyBlock();
+        block.SetFloat(RadiusId, regionRadius > 0f ? regionRadius : overlayRenderer.bounds.extents.magnitude);
 
         Tick(0f);
     }
@@ -107,12 +107,14 @@ public class ShipLightningOverlay : MonoBehaviour
 
     private void Tick(float deltaTime)
     {
-        material.SetVector(CenterId, transform.TransformPoint(localCenter));
+        block.SetVector(CenterId, transform.TransformPoint(localCenter));
 
         if (flickerLength > 0f)
             TickFlicker();
         else
             TickSteady(deltaTime);
+
+        overlayRenderer.SetPropertyBlock(block);
     }
 
     // The shape keeps changing while it fades: bright early, faster near the end, like LightningBolt.
@@ -121,7 +123,7 @@ public class ShipLightningOverlay : MonoBehaviour
         jitterTimer -= deltaTime;
         if (jitterTimer <= 0f)
         {
-            material.SetFloat(SeedId, Random.Range(0f, 100f));
+            block.SetFloat(SeedId, Random.Range(0f, 100f));
             jitterTimer = jitterInterval;
         }
 
@@ -137,15 +139,10 @@ public class ShipLightningOverlay : MonoBehaviour
         if (current != lastFlicker)
         {
             lastFlicker = current;
-            material.SetFloat(SeedId, Random.Range(0f, 100f));
+            block.SetFloat(SeedId, Random.Range(0f, 100f));
         }
 
-        bool isOn = flickers - current < FLICKER_ON_SHARE;
+        bool isOn = flickers - current < FlickerOnShare;
         overlayRenderer.color = new Color(1f, 1f, 1f, isOn ? 1f : 0f);
-    }
-
-    private void OnDestroy()
-    {
-        Destroy(material);
     }
 }

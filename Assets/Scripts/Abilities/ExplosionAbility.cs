@@ -12,6 +12,7 @@ public class ExplosionAbility : AbilityModule
     protected ResourceStat cooldown = new ResourceStat(StatType.Cooldown,1f,0f);
     [SerializeField]
     protected ScalarStat effectMultiplier = new ScalarStat(StatType.EffectMultiplier,1f,0.01f);
+    [Tooltip("The blast's diameter.")]
     [SerializeField]
     protected ScalarStat range = new ScalarStat(StatType.Range,1f,0.01f);
     [SerializeField]
@@ -22,32 +23,28 @@ public class ExplosionAbility : AbilityModule
     [SerializeField]
     private int explosionLayer;
     public override bool IsActivatable => cooldown.CurrentValue == 0f;
-    public override bool IsActive => false;
-    public override float CooldownFraction => cooldown.Fraction;
-    public override float DurationFraction => 0f;
+    public override float CooldownLeft => cooldown.Fraction;
 
-    private List<Effect> GetEffects() => EmitHitEffects(baseEffects, effectMultiplier);
+    private HitEffects GetEffects() => EmitHitEffects(baseEffects, effectMultiplier);
 
     // The blast's damage and types. Abilities have no damage bonuses and no weapon.
     private HitPayload CreatePayload() => new HitPayload(damage, shieldDamageMultiplier, hpDamageMultiplier,
         backstabMultiplier, knockback, default, ModuleDefinition, ship, null);
-    public void Update()
+    private void Update()
     {
-        if (cooldown.Tick(Time.deltaTime)) InvokeUpdateActivatable();
-        InvokeUpdateCooldown();
+        if (cooldown.Tick(Time.deltaTime)) RaiseActivatableChanged();
+        RaiseCooldownChanged();
     }
 
     public override void Activate()
     {
         if (!IsActivatable) return;
         cooldown.ResetToMax();
-        InvokeUpdateActivatable();
+        RaiseActivatableChanged();
 
-        var instance = Instantiate(explosionPrefab,transform.position,transform.rotation) as Explosion;
-        instance.Initialize(CreatePayload(), transform.position, GetEffects(), range, explosionLayer);
+        Explosion blast = Instantiate(explosionPrefab, transform.position, transform.rotation);
+        blast.Initialize(CreatePayload(), transform.position, GetEffects(), range, explosionLayer);
     }
-
-    public override void Deactivate(){}
 
     protected override void CollectStats(List<IStat> stats)
     {

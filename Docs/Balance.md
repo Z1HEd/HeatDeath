@@ -2,6 +2,8 @@
 
 Source of truth for run pacing, enemy scaling, and power budgets. Values marked *tunable* are inspector fields; change them in playtesting and update this file. Current enemy stats and core upgrades in the assets are placeholders and are **not** a reference. Weapon values and upgrades are a first pass sized on paper, until block F's playtests measure them.
 
+The rules here are general guidelines. A module's specific design decisions take precedence over them (user).
+
 ## Difficulty goals
 
 - All 5 sectors have the same base difficulty and the same base scrap. They come in random order, so a sector must never doom a run by being first.
@@ -147,7 +149,7 @@ Shields are a barrier that recharges between fights. Hull is the budget for the 
 - Enemy weapons should follow the same table.
 - Sectors can lean one way: Outer Belt mostly unshielded, Storm Verge and other high-tech sectors shield-heavy, so builds that invest only in hull damage struggle there. Kinetic stays neutral, so a bad sector order never ruins a run.
 
-**Debuffs**, applied on hit. Upgrades grant them to weapons through `HitEffectsEffect`, with a chance per shot that stacks raise. The same kind from different weapons doesn't stack: the strongest one applies. Purple shields block all of them.
+**Debuffs**, applied on hit. Upgrades grant them to weapons through `HitEffectsEffect`, with a chance per hit that stacks raise: every ship a shot pierces or a blast catches, and every blast of a Multicharge mine, rolls on its own (user). The same kind from different weapons doesn't stack: the strongest one applies, and weaker ones wait and take over when it ends (user). A 2 s slow that lands with a 0.5 s stun slows for the 1.5 s after it, so a debuff upgrade stays useful on a weapon that stuns on its own (Short Circuit on Shock Field). Hitting again with the same debuff extends it. Purple shields block all of them.
 
 | Debuff | Effects (tags) |
 |---|---|
@@ -155,7 +157,9 @@ Shields are a barrier that recharges between fights. Hull is the budget for the 
 | Disruptor | `ShieldsOffline` (ShipCore): the shields that are left absorb nothing, so all damage hits the hull, and they don't recharge. Strong against shield-heavy enemies, so it's rare and short: the Laser's Disruptor is an Epic, 20% per stack (2 stacks), 2.5 s. It costs an energy build its own damage (1.5× vs shields, 0.75× vs hull) and pays off kinetic and explosive weapons |
 | Jammed | weapon `TimeScale` −X% (Weapon) |
 | Slow | `Thrust` and `MaxSpeed` −X% (Movement) |
-| Stun | `TimeScale` −100% (Weapon), `Thrust` and `MaxSpeed` −100% (Movement), 0.3-0.5 s, like Thunder's EMP |
+| Stun | `TimeScale` −100% (Weapon), `Thrust` −100% and `Drag` +1 (Movement), and the ship's velocity ×0.1 once; 0.3-0.5 s, Thunder's EMP 4 s |
+
+A stun doesn't stop the ship dead (user): it keeps drifting with its inertia at a tenth of its speed, and the drag (linear damping) slows it to a stop. Weapon stuns and Thunder's EMP work the same way. *Tunable.*
 
 Size a debuff upgrade by the value it gives the whole build, not by its own damage. Support works best as control (Vacuum Cannon, debuffs), not only as stat buffs.
 

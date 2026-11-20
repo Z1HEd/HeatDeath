@@ -1,13 +1,13 @@
 using UnityEngine;
-[ExecuteAlways]
+
 public class MissileProjectile : Projectile
 {
     [SerializeField] private float lockDelay = 0.5f;
     [SerializeField] private float turnSpeedDegrees = 540f;
-    [SerializeField] protected ScalarStat targetLockRange = new ScalarStat(StatType.Range, 5f, 0f);
-    [SerializeField] protected float explosionRange = 1f;
     [SerializeField] protected Explosion explosionPrefab;
 
+    // From the launcher, as fired.
+    private float blastDiameter;
     private RangeDetector rangeDetector;
     private Ship target;
     private float lockTime;
@@ -16,10 +16,6 @@ public class MissileProjectile : Projectile
     public override void Initialize(Vector2 direction, float speed, ProjectileModule sourceModule)
     {
         base.Initialize(direction, speed, sourceModule);
-        EnsureRangeDetector();
-        rangeDetector.gameObject.layer = gameObject.layer;
-
-
         lockTime = Time.time + Mathf.Max(0f, lockDelay);
         this.speed = Mathf.Max(0.01f, speed);
         target = null;
@@ -27,25 +23,28 @@ public class MissileProjectile : Projectile
         if (direction.sqrMagnitude > 0f)
             transform.up = direction;
 
-        if (sourceModule is MissileModule){
-            explosionRange = (sourceModule as MissileModule).ExplosionRange;
-            targetLockRange = (sourceModule as MissileModule).SeekingRange;
+        var launcher = sourceModule as MissileModule;
+        if (launcher == null)
+        {
+            Debug.LogError("Missile expects MissileModule, got: " + sourceModule);
+            return;
         }
-        else
-            Debug.LogError("Missile expects MissileModule, got: "+ sourceModule);
-        
-        rangeDetector.Initialize(targetLockRange);
+
+        blastDiameter = launcher.BlastDiameter;
+        rangeDetector = RangeDetector.FindOrCreate(transform);
+        rangeDetector.gameObject.layer = gameObject.layer;
+        rangeDetector.Initialize(launcher.SeekingRange);
     }
 
     private void FixedUpdate()
     {
-        if (isDead)
+        if (IsDead)
             return;
 
         if (Time.time < lockTime)
             return;
 
-        target = rangeDetector != null ? rangeDetector.GetClosestTarget(transform) : null;
+        target = rangeDetector.GetClosestTarget();
 
         if (target == null || rb == null)
             return;
@@ -66,44 +65,11 @@ public class MissileProjectile : Projectile
         transform.up = steeredDirection;
     }
 
-    protected override bool TryApplyHit(Collider2D collision)
+    // Explodes where it hits: the blast deals the damage.
+    protected override void Strike(IHittable hittable, Collider2D collision)
     {
-        if (isDead)
-            return false;
-
-        if (collision.gameObject == null)
-            return false;
-
-        var hittable = collision.GetComponent<IHittable>();
-        if (hittable == null || hittable.IsDead)
-            return false;
-
-        Explosion explosion = Instantiate(explosionPrefab,transform.position,transform.rotation);
-        explosion.Initialize(Payload, FiredFrom, GetEffects(), explosionRange, gameObject.layer);
+        Explosion explosion = Instantiate(explosionPrefab, transform.position, transform.rotation);
+        explosion.Initialize(Payload, FiredFrom, HitEffects, blastDiameter, gameObject.layer);
         LeaveHazard(explosion);
-            
-        TryConsumeCharge();
-        return true;
-    }
-
-    protected void OnValidate()
-    {
-        UpdateRange(targetLockRange);
-    }
-    private void UpdateRange(float range)
-    {   
-        if (rangeDetector)
-            rangeDetector.SetRadius(range);
-    }
-    private void EnsureRangeDetector()
-    {
-        if (rangeDetector == null)
-            rangeDetector = GetComponentInChildren<RangeDetector>(true);
-        if (rangeDetector == null)
-        {
-            GameObject detectorObject = new GameObject("RangeDetector");
-            detectorObject.transform.SetParent(transform, false);
-            rangeDetector = detectorObject.AddComponent<RangeDetector>();
-        }
     }
 }

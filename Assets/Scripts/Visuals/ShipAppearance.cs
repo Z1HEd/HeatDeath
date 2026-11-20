@@ -25,12 +25,30 @@ public class ShipAppearance
     private ParticleSystem.MinMaxGradient thrusterColor;
     private List<ParticleSystem> thrusterOriginals;
     private readonly List<ParticleSystem> thrusterClones = new List<ParticleSystem>();
+    // The originals and the clones emitting now, and the original each clone was made from.
+    private readonly List<ParticleSystem> thrusters = new List<ParticleSystem>();
+    private readonly Dictionary<ParticleSystem, ParticleSystem> cloneOriginals = new Dictionary<ParticleSystem, ParticleSystem>();
 
     public ShipAppearance(Ship ship)
     {
         this.ship = ship;
         baseLayer = ship.gameObject.layer;
     }
+
+    // The thruster particles that can emit: the originals, and the copies showing a colour while one is set. Looks
+    // that change the engine fire (ThrusterCut, ThrusterSmoke) work on these.
+    public IReadOnlyList<ParticleSystem> Thrusters
+    {
+        get
+        {
+            CollectThrusterOriginals();
+            return thrusters;
+        }
+    }
+
+    // The thruster a colour copy was made from, or the thruster itself.
+    public ParticleSystem OriginalOf(ParticleSystem thruster) =>
+        cloneOriginals.TryGetValue(thruster, out ParticleSystem original) ? original : thruster;
 
     public void MultiplyTint(Color color) => tint *= color;
     public void MakeGhost() => isGhost = true;
@@ -57,7 +75,7 @@ public class ShipAppearance
 
         ship.gameObject.layer = isGhost ? ghostLayer : baseLayer;
         Tint(ship.GetComponent<SpriteRenderer>());
-        foreach (var weapon in ship.moduleManager.WeaponModules)
+        foreach (var weapon in ship.ModuleManager.WeaponModules)
             Tint(weapon.GetComponent<SpriteRenderer>());
 
         if (thrusterSource != shownThrusterSource)
@@ -78,14 +96,8 @@ public class ShipAppearance
             Object.Destroy(clone.gameObject, clone.main.startLifetime.constantMax + clone.main.duration + 0.5f);
         }
         thrusterClones.Clear();
-
-        // Collected before the first clone exists, so clones are never cloned.
-        if (thrusterOriginals == null)
-        {
-            thrusterOriginals = new List<ParticleSystem>();
-            foreach (var movementModule in ship.moduleManager.MovementModules)
-                thrusterOriginals.AddRange(movementModule.GetComponentsInChildren<ParticleSystem>());
-        }
+        cloneOriginals.Clear();
+        CollectThrusterOriginals();
 
         foreach (var original in thrusterOriginals)
         {
@@ -105,7 +117,24 @@ public class ShipAppearance
             clone.Clear();
             clone.Play();
             thrusterClones.Add(clone);
+            cloneOriginals[clone] = original;
         }
+
+        thrusters.Clear();
+        thrusters.AddRange(thrusterOriginals);
+        thrusters.AddRange(thrusterClones);
+    }
+
+    // Collected before the first clone exists, so clones are never cloned.
+    private void CollectThrusterOriginals()
+    {
+        if (thrusterOriginals != null)
+            return;
+
+        thrusterOriginals = new List<ParticleSystem>();
+        foreach (var movementModule in ship.ModuleManager.MovementModules)
+            thrusterOriginals.AddRange(movementModule.GetComponentsInChildren<ParticleSystem>());
+        thrusters.AddRange(thrusterOriginals);
     }
 
     // A visual no effect references any more fades out and removes itself; a new one is added and fades in.
